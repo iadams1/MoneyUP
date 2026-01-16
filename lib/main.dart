@@ -10,6 +10,17 @@ void main() {
   runApp(const MyApp());
 }
 
+enum BudgetType {
+  food("Food & Dining"),
+  entertainment("Entertainment & Leisure"),
+  transportation("Transportation"),
+  shopping("Shopping & Personal"),
+  housing("Housing & Utilities");
+
+  final String label;
+  const BudgetType(this.label);
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
