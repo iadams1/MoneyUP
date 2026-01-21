@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'budgetTracker/budget_home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Supabase.initialize(
-    url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
+    url: 'https://ajkkfqhavhgxdydzcxpu.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqa2tmcWhhdmhneGR5ZHpjeHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NDE4OTEsImV4cCI6MjA3ODIxNzg5MX0.ebh_8MxBh1Y4xHJh0uBH_k5E4qGN3hN5TNr3lhX1ras',
   );
   runApp(const MyApp());
 }
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'MoneyUP'),
+      home: const BudgetGoalPage(),
     );
   }
 }

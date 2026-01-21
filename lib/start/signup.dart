@@ -24,14 +24,14 @@ class _SignUpState extends State<SignUpScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(// BACKGROUND
-            'images/mu_bg.png',
+            'assets/images/mu_bg.png',
             fit: BoxFit.fill
           ),
           Container( // IMAGE CONTAINER
             alignment: Alignment.topCenter,
             padding: EdgeInsets.only(top: 50.0),
             child: Image.asset(
-              'images/mu_signup.png',
+              'assets/images/mu_signup.png',
               width: 350,
               height: 350,
               fit: BoxFit.contain,
