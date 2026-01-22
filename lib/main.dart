@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hexcolor/hexcolor.dart';
 
-void main() {
+import 'package:moneyup/transactions/transactions_home.dart';
+import 'package:moneyup/education/education.dart';
+import 'package:moneyup/profile.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Supabase.initialize(
     url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
   );
-  runApp(const MyApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? true;
+
+  runApp(MyApp(showHome: hasSeenOnboarding));
 }
 
 enum BudgetType {
@@ -22,47 +32,26 @@ enum BudgetType {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showHome;
+  const MyApp({super.key, required this.showHome});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'MoneyUP',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'MoneyUP'),
+      debugShowCheckedModeBanner: false,
+      home: EducationScreen(),
+      // home: showHome ? const MyHomePage(title: 'MoneyUP') : const WelcomeScreen(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -71,69 +60,183 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // Future<void> _resetOnboarding(BuildContext context) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setBool('hasSeenOnboarding', false);
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  //   if (context.mounted) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Onboarding reset. Restarting...'),
+  //         duration: Duration(seconds: 2),
+  //       ),
+  //     );
+
+  //     // Wait a bit for the SnackBar, then go to onboarding
+  //     await Future.delayed(const Duration(seconds: 2));
+  //     Navigator.pushReplacement(
+  //       // ignore: use_build_context_synchronously
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+  //     );
+  //   }
+  // }
+
+  int get _selectedIndex => 0;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        title: Padding(
+          padding: EdgeInsets.only(top: 10, left: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.all(0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: const Color.fromARGB(0, 255, 255, 255),
+                  border: Border.all(
+                    width: 3,
+                    color: const Color.fromARGB(255, 121, 121, 121),
+                  ),
+                ),
+                child: Image.asset('assets/icons/profileIcon.png'),
+              ),
+              Container( // NOTIFICATION ICON
+                alignment: Alignment.topRight,
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    // print('Notification icon pressed');
+                  }, 
+                  icon: Icon(
+                    Icons.notifications_outlined, 
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
+        toolbarHeight: 120,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset( // BACKGROUND
+              'assets/images/mu_bg.png',
+              fit: BoxFit.fill
+            ),
+          ),
+          SafeArea( // WHITE BOX CONTAINER
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(50.0),
+                ),
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
+        height: 80,
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage(title: ''))
+              );
+            break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => TransactionsHome())
+              );
+            break;
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EducationScreen())
+              );
+            break;
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen())
+              );
+            break;
+          }
+        }, 
+        indicatorColor: Colors.transparent,
+        destinations: [
+          NavigationDestination(
+            icon: Icon(
+              Icons.home_outlined,
+              color: Colors.grey[400],
+              size: 35
+            ),
+            selectedIcon: Icon(
+              Icons.home_outlined,
+              color: HexColor('#0F52BA'),
+              size: 35
+            ), 
+            label: '',
+          ),
+          NavigationDestination(
+            icon: Icon(
+              Icons.credit_card_outlined,
+              color: Colors.grey[400],
+              size: 35
+            ), 
+            selectedIcon: Icon(
+              Icons.credit_card_outlined,
+              color: HexColor('#0F52BA'),
+              size: 35
+            ), 
+            label: '',
+          ),
+          NavigationDestination(
+            icon: Icon(
+              Icons.menu_book_outlined,
+              color: Colors.grey[400],
+              size: 35
+            ), 
+            selectedIcon: Icon(
+              Icons.menu_book_outlined,
+              color: HexColor('#0F52BA'),
+              size: 35
+            ), 
+            label: '',
+          ),
+          NavigationDestination(
+            icon: Icon(
+              Icons.person_outline,
+              color: Colors.grey[400],
+              size: 35
+            ),
+            selectedIcon: Icon(
+              Icons.person_outline,
+              color: HexColor('#0F52BA'),
+              size: 35
+            ), 
+            label: '',
+          ),
+        ],
+      ),
     );
   }
 }
