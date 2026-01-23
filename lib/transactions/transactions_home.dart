@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/profile.dart';

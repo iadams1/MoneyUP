@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:hexcolor/hexcolor.dart';
 
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/profile.dart';
-import 'budgetTracker/budget_home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

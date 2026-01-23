@@ -25,12 +25,12 @@ class _EducationScreenState extends State<EducationScreen> {
   ];
 
   final List<List<Color>> colorGradient = [
-    [HexColor('#28A948'), HexColor('#56D776'), HexColor('#A0E9B2')], //green
-    [HexColor('#28A9A1'), HexColor('#56D7CF'), HexColor('#A0E9E4')], //light blue
-    [HexColor('#2860A9'), HexColor('#568ED7'), HexColor('#A0C0E9')], //dark blue
-    [HexColor('#5928A9'), HexColor('#8756D7'), HexColor('#BCA0E9')], //purple
-    [HexColor('#A9289C'), HexColor('#D756CA'), HexColor('#E9A0E1')], //pink
-    [HexColor('#D60617'), HexColor('#FA3344'), HexColor('#FC8D96')], //yellow
+    [HexColor('#0D1250'), HexColor('#A6F1A4')], // light green
+    [HexColor('#0D1250'), HexColor('#79E1DE')], // light blue
+    [HexColor('#0D1250'), HexColor('#E1A579')], // light orange
+    [HexColor('#0D1250'), HexColor('#FC97F7')], // light pink
+    [HexColor('#0D1250'), HexColor('#D756CA'), HexColor('#E9A0E1')], //pink
+    [HexColor('#0D1250'), HexColor('#FA3344'), HexColor('#FC8D96')], //yellow
   ];
 
   @override
@@ -97,9 +97,9 @@ class _EducationScreenState extends State<EducationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: 30),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -117,8 +117,9 @@ class _EducationScreenState extends State<EducationScreen> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
+                                color: const Color.fromARGB(16, 0, 0, 0),
+                                offset: Offset(0, 8),
+                                blurRadius: 12,
                               ),
                             ],
                           ),
@@ -126,14 +127,70 @@ class _EducationScreenState extends State<EducationScreen> {
                           width: 380,
                           alignment: Alignment.topCenter,
                         ),
-                        Text(
-                          "Articles",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontFamily: 'SF Pro',
-                            fontWeight: FontWeight.w600,
-                          ),
+                        SizedBox(height: 5),
+                        Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              spacing: 190,
+                              children: [
+                                Text(
+                                  "Articles",
+                                  style: TextStyle(
+                                    fontSize: 34,
+                                    fontFamily: 'SF Pro',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  "See All",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'SF Pro',
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(156, 156, 156, 1)
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(16, 0, 0, 0),
+                                    offset: Offset(0, 8),
+                                    blurRadius: 12,
+                                  ),
+                                ],
+                              ),
+                              height: 80,
+                              width: 380,
+                              alignment: Alignment.topCenter,
+                            ),
+                            SizedBox(height: 15),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(16, 0, 0, 0),
+                                    offset: Offset(0, 8),
+                                    blurRadius: 12,
+                                  ),
+                                ],
+                              ),
+                              height: 80,
+                              width: 380,
+                              alignment: Alignment.topCenter,
+                            )
+                          ],
                         ),
+                        SizedBox(height: 10),
                         Text(
                           "Categories",
                           style: TextStyle(
@@ -142,6 +199,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        SizedBox(height: 5),
                         CarouselSlider.builder(
                           itemCount: categories.length,
                           itemBuilder: (context, index, realIdx){
@@ -170,7 +228,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             );
                           },
                           options: CarouselOptions(
-                            height: 150.0,
+                            height: 130.0,
                             autoPlay: false,
                             enlargeCenterPage: false,
                             aspectRatio: 16/9,
