@@ -32,8 +32,6 @@ class _EducationScreenState extends State<EducationScreen> {
     [HexColor('#A9289C'), HexColor('#D756CA'), HexColor('#E9A0E1')], //pink
     [HexColor('#D60617'), HexColor('#FA3344'), HexColor('#FC8D96')], //yellow
   ];
-  
-  int get _selectedIndex => 2;
 
   @override
   Widget build(BuildContext context) {

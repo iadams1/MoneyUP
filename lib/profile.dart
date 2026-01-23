@@ -8,8 +8,6 @@ import 'package:moneyup/transactions/transactions_home.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
   
-  int get _selectedIndex => 3;
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

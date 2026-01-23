@@ -81,8 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //   }
   // }
 
-  int get _selectedIndex => 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
