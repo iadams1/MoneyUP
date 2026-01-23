@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/education/education.dart';
+import 'package:moneyup/main.dart';
+import 'package:moneyup/profile.dart';
+import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'budget_home.dart';
@@ -461,26 +465,54 @@ class _BudgetPageState extends State<BudgetPage> {
       ),
 
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: const Color.fromARGB(0, 255, 253, 249),
         height: 80,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
               icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/transactionsIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => TransactionsHome(),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/educationIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => EducationScreen(),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/settingsIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+              onPressed: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
         ),

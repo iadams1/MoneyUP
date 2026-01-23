@@ -74,93 +74,58 @@ class TransactionsHome extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.white,
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromARGB(0, 255, 253, 249),
         height: 80,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage(title: ''))
-              );
-            break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => TransactionsHome())
-              );
-            break;
-            case 2:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => EducationScreen())
-              );
-            break;
-            case 3:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen())
-              );
-            break;
-          }
-        }, 
-        indicatorColor: Colors.transparent,
-        destinations: [
-          NavigationDestination(
-            icon: Icon(
-              Icons.home_outlined,
-              color: Colors.grey[400],
-              size: 35
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                  ),
+                );
+              },
             ),
-            selectedIcon: Icon(
-              Icons.home_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.credit_card_outlined,
-              color: Colors.grey[400],
-              size: 35
-            ), 
-            selectedIcon: Icon(
-              Icons.credit_card_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.menu_book_outlined,
-              color: Colors.grey[400],
-              size: 35
-            ), 
-            selectedIcon: Icon(
-              Icons.menu_book_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.person_outline,
-              color: Colors.grey[400],
-              size: 35
+            IconButton(
+              icon: Image.asset('assets/icons/transactionsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => TransactionsHome(),
+                  ),
+                );
+              },
             ),
-            selectedIcon: Icon(
-              Icons.person_outline,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-        ],
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => EducationScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+              onPressed: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
