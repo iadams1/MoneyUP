@@ -29,8 +29,8 @@ class _EducationScreenState extends State<EducationScreen> {
     [HexColor('#0D1250'), HexColor('#79E1DE')], // light blue
     [HexColor('#0D1250'), HexColor('#E1A579')], // light orange
     [HexColor('#0D1250'), HexColor('#FC97F7')], // light pink
-    [HexColor('#0D1250'), HexColor('#D756CA'), HexColor('#E9A0E1')], //pink
-    [HexColor('#0D1250'), HexColor('#FA3344'), HexColor('#FC8D96')], //yellow
+    [HexColor('#0D1250'), HexColor('#CD97FC')], // light purple
+    [HexColor('#0D1250'), HexColor('#F5FC97')], // light yellow
   ];
 
   @override
@@ -97,7 +97,7 @@ class _EducationScreenState extends State<EducationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 30),
+                  SizedBox(height: 25),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
@@ -123,11 +123,11 @@ class _EducationScreenState extends State<EducationScreen> {
                               ),
                             ],
                           ),
-                          height: 150,
+                          height: 140,
                           width: 380,
                           alignment: Alignment.topCenter,
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 10),
                         Column(
                           children: [
                             Row(
@@ -155,6 +155,8 @@ class _EducationScreenState extends State<EducationScreen> {
                               ],
                             ),
                             SizedBox(height: 10),
+
+                            // Add Cards later for database. Containers are placeholders
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -167,11 +169,62 @@ class _EducationScreenState extends State<EducationScreen> {
                                   ),
                                 ],
                               ),
-                              height: 80,
+                              height: 85,
                               width: 380,
                               alignment: Alignment.topCenter,
+                              child: Padding(
+                                padding: EdgeInsetsGeometry.all(10),
+                                child: Row(
+                                  children: [
+                                    // Category Icon
+                                    Container(
+                                      height: 80,
+                                      width: 66,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        color: const Color.fromARGB(255, 57, 57, 57),
+                                      ),
+                                    ),
+                                    SizedBox(width: 15),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Article title
+                                          Text(
+                                            "Budgeting 101: How to Create a Budget",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 17,
+                                              height: 1.1,
+                                              color: Colors.black
+                                            ),
+                                          ),
+                                          // Artile author
+                                          Text(
+                                            "Rebecca Lake",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 17,
+                                              color: Colors.black
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    
+                                    IconButton(
+                                          icon: Image.asset(
+                                            'assets/icons/chevronRightArrow.png',
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                  ],
+                                ),
+                              )
                             ),
-                            SizedBox(height: 15),
+                            SizedBox(height: 10),
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -184,10 +237,61 @@ class _EducationScreenState extends State<EducationScreen> {
                                   ),
                                 ],
                               ),
-                              height: 80,
+                              height: 85,
                               width: 380,
                               alignment: Alignment.topCenter,
-                            )
+                              child: Padding(
+                                padding: EdgeInsetsGeometry.all(10),
+                                child: Row(
+                                  children: [
+                                    // Category Icon
+                                    Container(
+                                      height: 80,
+                                      width: 66,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        color: const Color.fromARGB(255, 57, 57, 57),
+                                      ),
+                                    ),
+                                    SizedBox(width: 15),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Article title
+                                          Text(
+                                            "Credit Scorces and Why They Matter",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 17,
+                                              height: 1.1,
+                                              color: Colors.black
+                                            ),
+                                          ),
+                                          // Artile author
+                                          Text(
+                                            "CFPB",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 17,
+                                              color: Colors.black
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    
+                                    IconButton(
+                                      icon: Image.asset(
+                                        'assets/icons/chevronRightArrow.png',
+                                      ),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ),
                           ],
                         ),
                         SizedBox(height: 10),
@@ -220,7 +324,7 @@ class _EducationScreenState extends State<EducationScreen> {
                                     color: Colors.white, 
                                     fontSize: 30.0,
                                     fontFamily: 'SF Pro',
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600,
                                     fontStyle: FontStyle.italic
                                   ),
                                 ),
@@ -228,7 +332,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             );
                           },
                           options: CarouselOptions(
-                            height: 130.0,
+                            height: 125.0,
                             autoPlay: false,
                             enlargeCenterPage: false,
                             aspectRatio: 16/9,
