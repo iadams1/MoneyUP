@@ -110,13 +110,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                             'assets/icons/chevronLeftArrow.png',
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (context) =>
-                                    const EducationScreen(),
-                              ),
-                            );
+                            Navigator.pop(context);
                           },
                         ),
 

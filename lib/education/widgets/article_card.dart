@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/education/articledetails.dart';
 import 'category_helper.dart';
 
 class ArticleCard extends StatelessWidget {
@@ -82,7 +83,14 @@ class ArticleCard extends StatelessWidget {
 
                 IconButton(
                   icon: Image.asset('assets/icons/chevronRightArrow.png'),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ArticleDetailsScreen(articleId: article['id']),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
