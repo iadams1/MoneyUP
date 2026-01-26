@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/budgetTracker/budget_home.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -9,8 +11,8 @@ import 'package:moneyup/profile.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Supabase.initialize(
-    url: 'https://ajkkfqhavhgxdydzcxpu.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqa2tmcWhhdmhneGR5ZHpjeHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NDE4OTEsImV4cCI6MjA3ODIxNzg5MX0.ebh_8MxBh1Y4xHJh0uBH_k5E4qGN3hN5TNr3lhX1ras',
+    url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
   );
 
   final prefs = await SharedPreferences.getInstance();
@@ -57,27 +59,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Future<void> _resetOnboarding(BuildContext context) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('hasSeenOnboarding', false);
+  late Future<Map<String, dynamic>?> _randomBudget;
 
-  //   if (context.mounted) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Onboarding reset. Restarting...'),
-  //         duration: Duration(seconds: 2),
-  //       ),
-  //     );
+  @override
+  void initState() {
+    super.initState();
+    _randomBudget = getRandomBudget();
+  }
 
-  //     // Wait a bit for the SnackBar, then go to onboarding
-  //     await Future.delayed(const Duration(seconds: 2));
-  //     Navigator.pushReplacement(
-  //       // ignore: use_build_context_synchronously
-  //       context,
-  //       MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-  //     );
-  //   }
-  // }
+  Future<Map<String, dynamic>?> getRandomBudget() async {
+  try {
+    final response = await Supabase.instance.client
+        .rpc('get_random_budget', params: {'p_user_id': 1001});
+
+    debugPrint("RPC response: $response");
+
+    if (response == null) return null;
+    if (response is List && response.isEmpty) return null;
+
+    return (response as List).first as Map<String, dynamic>;
+  } catch (e) {
+    debugPrint("RPC ERROR: $e");
+    rethrow;
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +145,142 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 color: Colors.white,
               ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                  ),
+                  // Budget Tracker Section
+                  FutureBuilder<Map<String, dynamic>?>(
+                    future: _randomBudget, 
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.data == null) {
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text("No budgets available."),
+                        );
+                      }
+
+                      final budget = snapshot.data!;
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(16, 0, 0, 0),
+                                offset: Offset(0, 8),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                        height: 160,
+                        width: 380,
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 140,
+                                    height: 140,
+                                    child: CircularPercentIndicator(
+                                      radius: 60,
+                                      lineWidth: 18,
+                                      percent:
+                                          (budget["AmountSaved"] / budget["Goal"]).clamp(0.0, 1.0),
+                                      center: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "${((budget["AmountSaved"] / budget["Goal"]) * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 25,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      backgroundColor: const Color.fromARGB(6, 0, 0, 0,),
+                                      progressColor: Color.fromRGBO(47, 52, 126, 100),
+                                      circularStrokeCap: CircularStrokeCap.round,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 30),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 0),
+                                    Text(
+                                      budget["Title"],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w600
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                                        padding: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(200),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute<void>(
+                                            builder: (_) => BudgetGoalPage(),
+                                          ),
+                                        );
+                                      },
+                                      child: Ink(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [Color.fromRGBO(25, 50, 100, 100), Color.fromRGBO(47, 52, 126, 100)],
+                                          ),
+                                          borderRadius: BorderRadius.circular(200),
+                                        ),
+                                        child: Container(
+                                          width: 220,
+                                          height: 40,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            'See All',
+                                            style: TextStyle(
+                                              color: Colors.white, 
+                                              fontSize: 18
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    )                  
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              )
             ),
           ),
         ],
