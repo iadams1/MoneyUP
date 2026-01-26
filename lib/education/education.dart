@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../education/widgets/article_card.dart';
+
 import 'package:moneyup/main.dart';
 import 'package:moneyup/profile.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/education/viewallarticles.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
 
   @override
   State<EducationScreen> createState() => _EducationScreenState();
-}
-
-class CategoryStyle {
-  final Color color;
-  final String imageAsset;
-
-  const CategoryStyle({required this.color, required this.imageAsset});
 }
 
 class _EducationScreenState extends State<EducationScreen> {
@@ -48,44 +44,6 @@ class _EducationScreenState extends State<EducationScreen> {
     [HexColor('#0D1250'), HexColor('#F5FC97')], // light yellow
   ];
 
-  final Map<String, CategoryStyle> _categoryStyles = {
-    'Budgeting': const CategoryStyle(
-      color: Color.fromRGBO(206, 235, 181, 100),
-      imageAsset: 'assets/icons/articleBudgeting.png',
-    ),
-    'Credit': const CategoryStyle(
-      color: Color.fromRGBO(191, 240, 241, 100),
-      imageAsset: 'assets/icons/articleCredit.png',
-    ),
-    'Debt': const CategoryStyle(
-      color: Color.fromRGBO(255, 222, 175, 100),
-      imageAsset: 'assets/icons/articleDebt.png',
-    ),
-    'Savings': const CategoryStyle(
-      color: Color.fromRGBO(241, 191, 228, 100),
-      imageAsset: 'assets/icons/articleSavings.png',
-    ),
-    'Banking': const CategoryStyle(
-      color: Color.fromRGBO(223, 191, 236, 100),
-      imageAsset: 'assets/icons/articleBanking.png',
-    ),
-    'Investing': const CategoryStyle(
-      color: Color.fromRGBO(247, 249, 179, 100),
-      imageAsset: 'assets/icons/articleInvesting.png',
-    ),
-  };
-
-  CategoryStyle getCategoryStyle(String category) {
-    final key = category;
-    if (categories.contains(key) && _categoryStyles.containsKey(key)) {
-      return _categoryStyles[key]!;
-    }
-    return const CategoryStyle(
-      color: Colors.grey,
-      imageAsset: 'assets/icons/default.png',
-    );
-  }
-
   Future<List<Map<String, dynamic>>> fetchRandomArticles() async {
     final response = await Supabase.instance.client.rpc(
       'get_random_articles',
@@ -93,88 +51,6 @@ class _EducationScreenState extends State<EducationScreen> {
     );
 
     return List<Map<String, dynamic>>.from(response);
-  }
-
-  Widget articleCard(Map<String, dynamic> article) {
-    final style = getCategoryStyle(article['category'] ?? '');
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(200),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromARGB(16, 0, 0, 0),
-                offset: Offset(0, 8),
-                blurRadius: 12,
-              ),
-            ],
-          ),
-          height: 85,
-          width: 380,
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: EdgeInsetsGeometry.all(10),
-            child: Row(
-              children: [
-                // Category Icon
-                Container(
-                  height: 80,
-                  width: 66,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: style.color,
-                  ),
-                  child: Image.asset(style.imageAsset),
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Article title
-                      Text(
-                        article['title'],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
-                          height: 1.1,
-                          color: Colors.black,
-                        ),
-                      ),
-                      // Artile author
-                      Text(
-                        article['arcl_author'] ?? article['src_author'],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                IconButton(
-                  icon: Image.asset('assets/icons/chevronRightArrow.png'),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -278,7 +154,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.baseline,
                               textBaseline: TextBaseline.alphabetic,
-                              spacing: 190,
+                              spacing: 170,
                               children: [
                                 Text(
                                   "Articles",
@@ -288,7 +164,14 @@ class _EducationScreenState extends State<EducationScreen> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                Text(
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(builder: (_) => ViewAllArticlesScreen()),
+                                    );
+                                  },
+                                  child: Text(
                                   "See All",
                                   style: TextStyle(
                                     fontSize: 20,
@@ -296,7 +179,7 @@ class _EducationScreenState extends State<EducationScreen> {
                                     fontWeight: FontWeight.w600,
                                     color: Color.fromRGBO(156, 156, 156, 1),
                                   ),
-                                ),
+                                ),)
                               ],
                             ),
                             SizedBox(height: 10),
@@ -318,9 +201,7 @@ class _EducationScreenState extends State<EducationScreen> {
 
                                 return Column(
                                   spacing: 15,
-                                  children: articles
-                                      .map(articleCard)
-                                      .toList(),
+                                  children: articles.map((a) => ArticleCard(article: a,)).toList(),
                                 );
                               },
                             ),
