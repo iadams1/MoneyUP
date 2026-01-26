@@ -5,15 +5,30 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/profile.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class EducationScreen extends StatefulWidget{
+class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
 
   @override
   State<EducationScreen> createState() => _EducationScreenState();
 }
 
+class CategoryStyle {
+  final Color color;
+  final String imageAsset;
+
+  const CategoryStyle({required this.color, required this.imageAsset});
+}
+
 class _EducationScreenState extends State<EducationScreen> {
+  late Future<List<Map<String, dynamic>>> _randomArticles;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomArticles = fetchRandomArticles();
+  }
 
   final List<String> categories = const [
     'Budgeting',
@@ -32,6 +47,135 @@ class _EducationScreenState extends State<EducationScreen> {
     [HexColor('#0D1250'), HexColor('#CD97FC')], // light purple
     [HexColor('#0D1250'), HexColor('#F5FC97')], // light yellow
   ];
+
+  final Map<String, CategoryStyle> _categoryStyles = {
+    'Budgeting': const CategoryStyle(
+      color: Color.fromRGBO(206, 235, 181, 100),
+      imageAsset: 'assets/icons/articleBudgeting.png',
+    ),
+    'Credit': const CategoryStyle(
+      color: Color.fromRGBO(191, 240, 241, 100),
+      imageAsset: 'assets/icons/articleCredit.png',
+    ),
+    'Debt': const CategoryStyle(
+      color: Color.fromRGBO(255, 222, 175, 100),
+      imageAsset: 'assets/icons/articleDebt.png',
+    ),
+    'Savings': const CategoryStyle(
+      color: Color.fromRGBO(241, 191, 228, 100),
+      imageAsset: 'assets/icons/articleSavings.png',
+    ),
+    'Banking': const CategoryStyle(
+      color: Color.fromRGBO(223, 191, 236, 100),
+      imageAsset: 'assets/icons/articleBanking.png',
+    ),
+    'Investing': const CategoryStyle(
+      color: Color.fromRGBO(247, 249, 179, 100),
+      imageAsset: 'assets/icons/articleInvesting.png',
+    ),
+  };
+
+  CategoryStyle getCategoryStyle(String category) {
+    final key = category;
+    if (categories.contains(key) && _categoryStyles.containsKey(key)) {
+      return _categoryStyles[key]!;
+    }
+    return const CategoryStyle(
+      color: Colors.grey,
+      imageAsset: 'assets/icons/default.png',
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRandomArticles() async {
+    final response = await Supabase.instance.client.rpc(
+      'get_random_articles',
+      params: {'p_limit': 2},
+    );
+
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  Widget articleCard(Map<String, dynamic> article) {
+    final style = getCategoryStyle(article['category'] ?? '');
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(200),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color.fromARGB(16, 0, 0, 0),
+                offset: Offset(0, 8),
+                blurRadius: 12,
+              ),
+            ],
+          ),
+          height: 85,
+          width: 380,
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: EdgeInsetsGeometry.all(10),
+            child: Row(
+              children: [
+                // Category Icon
+                Container(
+                  height: 80,
+                  width: 66,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    color: style.color,
+                  ),
+                  child: Image.asset(style.imageAsset),
+                ),
+                SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Article title
+                      Text(
+                        article['title'],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                          height: 1.1,
+                          color: Colors.black,
+                        ),
+                      ),
+                      // Artile author
+                      Text(
+                        article['arcl_author'] ?? article['src_author'],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                IconButton(
+                  icon: Image.asset('assets/icons/chevronRightArrow.png'),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,15 +202,16 @@ class _EducationScreenState extends State<EducationScreen> {
                 ),
                 child: Image.asset('assets/icons/profileIcon.png'),
               ),
-              Container( // NOTIFICATION ICON
+              Container(
+                // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
                     // print('Notification icon pressed');
-                  }, 
+                  },
                   icon: Icon(
-                    Icons.notifications_outlined, 
+                    Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
                   ),
@@ -80,18 +225,18 @@ class _EducationScreenState extends State<EducationScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
+              // BACKGROUND
               'assets/images/mu_bg.png',
-              fit: BoxFit.fill
+              fit: BoxFit.fill,
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
+            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
               child: Column(
@@ -149,148 +294,35 @@ class _EducationScreenState extends State<EducationScreen> {
                                     fontSize: 20,
                                     fontFamily: 'SF Pro',
                                     fontWeight: FontWeight.w600,
-                                    color: Color.fromRGBO(156, 156, 156, 1)
+                                    color: Color.fromRGBO(156, 156, 156, 1),
                                   ),
                                 ),
                               ],
                             ),
                             SizedBox(height: 10),
 
-                            // Add Cards later for database. Containers are placeholders
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color.fromARGB(16, 0, 0, 0),
-                                    offset: Offset(0, 8),
-                                    blurRadius: 12,
-                                  ),
-                                ],
-                              ),
-                              height: 85,
-                              width: 380,
-                              alignment: Alignment.topCenter,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.all(10),
-                                child: Row(
-                                  children: [
-                                    // Category Icon
-                                    Container(
-                                      height: 80,
-                                      width: 66,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(6),
-                                        color: const Color.fromARGB(255, 57, 57, 57),
-                                      ),
-                                    ),
-                                    SizedBox(width: 15),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Article title
-                                          Text(
-                                            "Budgeting 101: How to Create a Budget",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 17,
-                                              height: 1.1,
-                                              color: Colors.black
-                                            ),
-                                          ),
-                                          // Artile author
-                                          Text(
-                                            "Rebecca Lake",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 17,
-                                              color: Colors.black
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    
-                                    IconButton(
-                                          icon: Image.asset(
-                                            'assets/icons/chevronRightArrow.png',
-                                          ),
-                                          onPressed: () {},
-                                        ),
-                                  ],
-                                ),
-                              )
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color.fromARGB(16, 0, 0, 0),
-                                    offset: Offset(0, 8),
-                                    blurRadius: 12,
-                                  ),
-                                ],
-                              ),
-                              height: 85,
-                              width: 380,
-                              alignment: Alignment.topCenter,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.all(10),
-                                child: Row(
-                                  children: [
-                                    // Category Icon
-                                    Container(
-                                      height: 80,
-                                      width: 66,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(6),
-                                        color: const Color.fromARGB(255, 57, 57, 57),
-                                      ),
-                                    ),
-                                    SizedBox(width: 15),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Article title
-                                          Text(
-                                            "Credit Scorces and Why They Matter",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 17,
-                                              height: 1.1,
-                                              color: Colors.black
-                                            ),
-                                          ),
-                                          // Artile author
-                                          Text(
-                                            "CFPB",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 17,
-                                              color: Colors.black
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    
-                                    IconButton(
-                                      icon: Image.asset(
-                                        'assets/icons/chevronRightArrow.png',
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ],
-                                ),
-                              )
+                            // 2 Articles and See All Button
+                            FutureBuilder<List<Map<String, dynamic>>>(
+                              future: _randomArticles,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const CircularProgressIndicator();
+                                }
+
+                                final articles = snapshot.data!;
+                                if (articles.isEmpty) {
+                                  return const Text(
+                                    'No articles available.',
+                                  );
+                                }
+
+                                return Column(
+                                  spacing: 15,
+                                  children: articles
+                                      .map(articleCard)
+                                      .toList(),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -306,26 +338,28 @@ class _EducationScreenState extends State<EducationScreen> {
                         SizedBox(height: 5),
                         CarouselSlider.builder(
                           itemCount: categories.length,
-                          itemBuilder: (context, index, realIdx){
+                          itemBuilder: (context, index, realIdx) {
                             return Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 5.0,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: colorGradient[index],
                                 ),
-                                borderRadius: BorderRadius.circular(12.0)
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                               child: Center(
                                 child: Text(
                                   categories[index],
                                   style: TextStyle(
-                                    color: Colors.white, 
+                                    color: Colors.white,
                                     fontSize: 30.0,
                                     fontFamily: 'SF Pro',
                                     fontWeight: FontWeight.w600,
-                                    fontStyle: FontStyle.italic
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
                               ),
@@ -335,9 +369,9 @@ class _EducationScreenState extends State<EducationScreen> {
                             height: 125.0,
                             autoPlay: false,
                             enlargeCenterPage: false,
-                            aspectRatio: 16/9,
+                            aspectRatio: 16 / 9,
                             viewportFraction: 0.7,
-                            enableInfiniteScroll: true
+                            enableInfiniteScroll: true,
                           ),
                         ),
                       ],
@@ -361,7 +395,7 @@ class _EducationScreenState extends State<EducationScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -371,9 +405,7 @@ class _EducationScreenState extends State<EducationScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -382,20 +414,16 @@ class _EducationScreenState extends State<EducationScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),
