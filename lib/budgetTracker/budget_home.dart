@@ -63,23 +63,20 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
   }
 
   Future<void> deleteBudget(String budgetId) async {
-    final response = await Supabase.instance.client
+  try {
+    await Supabase.instance.client
         .from('budgets')
         .delete()
         .eq('budget_ID', budgetId)
         .eq('user_ID', 1001);
 
-    if (response.error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting budget: ${response.error!.message}')),
-      );
-      throw response.error!;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Budget deleted successfully!')),
-      );
-    }
+    debugPrint('Deletion was successful!');
+
+  } catch (error) {
+    debugPrint('Error Deleting rows: $error');
+    rethrow;
   }
+}
 
   Future<void> confirmDelete(BuildContext context, String budgetID) async {
     final bool? shouldDelete = await showDialog<bool>(

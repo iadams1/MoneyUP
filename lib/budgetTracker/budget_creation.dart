@@ -341,7 +341,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
       ),
 
       bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
+        color: const Color.fromARGB(255, 255, 255, 255),
         height: 80,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
