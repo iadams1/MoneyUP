@@ -25,14 +25,14 @@ class _LoginState extends State<LoginScreen> {
         fit: StackFit.expand,
         children: <Widget>[
           Image.asset( // BACKGROUND
-            'images/mu_bg.png',
+            'assets/images/mu_bg.png',
             fit: BoxFit.fill
           ),
           Container( // LOGIN IMAGE
             alignment: Alignment.topCenter,
             padding: EdgeInsets.only(top: 120),
             child: Image.asset(
-              'images/mu_login.png',
+              'assets/images/mu_login.png',
               width: 350,
               height: 350,
               fit: BoxFit.cover,

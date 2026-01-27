@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../education/widgets/article_card.dart';
+
 import 'package:moneyup/main.dart';
 import 'package:moneyup/profile.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/education/viewallarticles.dart';
 
-class EducationScreen extends StatefulWidget{
+class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
 
   @override
@@ -14,6 +18,13 @@ class EducationScreen extends StatefulWidget{
 }
 
 class _EducationScreenState extends State<EducationScreen> {
+  late Future<List<Map<String, dynamic>>> _randomArticles;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomArticles = fetchRandomArticles();
+  }
 
   final List<String> categories = const [
     'Budgeting',
@@ -25,15 +36,22 @@ class _EducationScreenState extends State<EducationScreen> {
   ];
 
   final List<List<Color>> colorGradient = [
-    [HexColor('#28A948'), HexColor('#56D776'), HexColor('#A0E9B2')], //green
-    [HexColor('#28A9A1'), HexColor('#56D7CF'), HexColor('#A0E9E4')], //light blue
-    [HexColor('#2860A9'), HexColor('#568ED7'), HexColor('#A0C0E9')], //dark blue
-    [HexColor('#5928A9'), HexColor('#8756D7'), HexColor('#BCA0E9')], //purple
-    [HexColor('#A9289C'), HexColor('#D756CA'), HexColor('#E9A0E1')], //pink
-    [HexColor('#D60617'), HexColor('#FA3344'), HexColor('#FC8D96')], //yellow
+    [HexColor('#0D1250'), HexColor('#A6F1A4')], // light green
+    [HexColor('#0D1250'), HexColor('#79E1DE')], // light blue
+    [HexColor('#0D1250'), HexColor('#E1A579')], // light orange
+    [HexColor('#0D1250'), HexColor('#FC97F7')], // light pink
+    [HexColor('#0D1250'), HexColor('#CD97FC')], // light purple
+    [HexColor('#0D1250'), HexColor('#F5FC97')], // light yellow
   ];
-  
-  int get _selectedIndex => 2;
+
+  Future<List<Map<String, dynamic>>> fetchRandomArticles() async {
+    final response = await Supabase.instance.client.rpc(
+      'get_random_articles',
+      params: {'p_limit': 2},
+    );
+
+    return List<Map<String, dynamic>>.from(response);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +78,16 @@ class _EducationScreenState extends State<EducationScreen> {
                 ),
                 child: Image.asset('assets/icons/profileIcon.png'),
               ),
-              Container( // NOTIFICATION ICON
+              Container(
+                // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
                     // print('Notification icon pressed');
-                  }, 
+                  },
                   icon: Icon(
-                    Icons.notifications_outlined, 
+                    Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
                   ),
@@ -82,26 +101,26 @@ class _EducationScreenState extends State<EducationScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
+              // BACKGROUND
               'assets/images/mu_bg.png',
-              fit: BoxFit.fill
+              fit: BoxFit.fill,
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
+            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: 25),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -119,23 +138,76 @@ class _EducationScreenState extends State<EducationScreen> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
+                                color: const Color.fromARGB(16, 0, 0, 0),
+                                offset: Offset(0, 8),
+                                blurRadius: 12,
                               ),
                             ],
                           ),
-                          height: 150,
+                          height: 140,
                           width: 380,
                           alignment: Alignment.topCenter,
                         ),
-                        Text(
-                          "Articles",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontFamily: 'SF Pro',
-                            fontWeight: FontWeight.w600,
-                          ),
+                        SizedBox(height: 10),
+                        Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              spacing: 170,
+                              children: [
+                                Text(
+                                  "Articles",
+                                  style: TextStyle(
+                                    fontSize: 34,
+                                    fontFamily: 'SF Pro',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(builder: (_) => ViewAllArticlesScreen()),
+                                    );
+                                  },
+                                  child: Text(
+                                  "See All",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'SF Pro',
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(156, 156, 156, 1),
+                                  ),
+                                ),)
+                              ],
+                            ),
+                            SizedBox(height: 10),
+
+                            // 2 Articles and See All Button
+                            FutureBuilder<List<Map<String, dynamic>>>(
+                              future: _randomArticles,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const CircularProgressIndicator();
+                                }
+
+                                final articles = snapshot.data!;
+                                if (articles.isEmpty) {
+                                  return const Text(
+                                    'No articles available.',
+                                  );
+                                }
+
+                                return Column(
+                                  spacing: 15,
+                                  children: articles.map((a) => ArticleCard(article: a,)).toList(),
+                                );
+                              },
+                            ),
+                          ],
                         ),
+                        SizedBox(height: 10),
                         Text(
                           "Categories",
                           style: TextStyle(
@@ -144,40 +216,43 @@ class _EducationScreenState extends State<EducationScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        SizedBox(height: 5),
                         CarouselSlider.builder(
                           itemCount: categories.length,
-                          itemBuilder: (context, index, realIdx){
+                          itemBuilder: (context, index, realIdx) {
                             return Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 5.0,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: colorGradient[index],
                                 ),
-                                borderRadius: BorderRadius.circular(12.0)
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                               child: Center(
                                 child: Text(
                                   categories[index],
                                   style: TextStyle(
-                                    color: Colors.white, 
+                                    color: Colors.white,
                                     fontSize: 30.0,
                                     fontFamily: 'SF Pro',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.italic
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
                               ),
                             );
                           },
                           options: CarouselOptions(
-                            height: 150.0,
+                            height: 125.0,
                             autoPlay: false,
                             enlargeCenterPage: false,
-                            aspectRatio: 16/9,
+                            aspectRatio: 16 / 9,
                             viewportFraction: 0.7,
-                            enableInfiniteScroll: true
+                            enableInfiniteScroll: true,
                           ),
                         ),
                       ],
@@ -189,93 +264,52 @@ class _EducationScreenState extends State<EducationScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.white,
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromARGB(0, 255, 253, 249),
         height: 80,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage(title: ''))
-              );
-            break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => TransactionsHome())
-              );
-            break;
-            case 2:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => EducationScreen())
-              );
-            break;
-            case 3:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen())
-              );
-            break;
-          }
-        }, 
-        indicatorColor: Colors.transparent,
-        destinations: [
-          NavigationDestination(
-            icon: Icon(
-              Icons.home_outlined,
-              color: Colors.grey[400],
-              size: 35
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
+                  ),
+                );
+              },
             ),
-            selectedIcon: Icon(
-              Icons.home_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.credit_card_outlined,
-              color: Colors.grey[400],
-              size: 35
-            ), 
-            selectedIcon: Icon(
-              Icons.credit_card_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.menu_book_outlined,
-              color: Colors.grey[400],
-              size: 35
-            ), 
-            selectedIcon: Icon(
-              Icons.menu_book_outlined,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.person_outline,
-              color: Colors.grey[400],
-              size: 35
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
+                );
+              },
             ),
-            selectedIcon: Icon(
-              Icons.person_outline,
-              color: HexColor('#0F52BA'),
-              size: 35
-            ), 
-            label: '',
-          ),
-        ],
+            IconButton(
+              icon: Image.asset('assets/icons/educationIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

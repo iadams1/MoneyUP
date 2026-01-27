@@ -11,7 +11,7 @@ class ConfirmationScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(// BACKGROUND
-            'images/mu_bg.png',
+            'assets/images/mu_bg.png',
             fit: BoxFit.fill
           ),
           Center(
@@ -20,7 +20,7 @@ class ConfirmationScreen extends StatelessWidget {
               child: Column(
                 children: <Widget> [
                   Image.asset(
-                    'images/mu_check.png',
+                    'assets/images/mu_check.png',
                     width: 240,
                     height: 240,
                     fit: BoxFit.cover

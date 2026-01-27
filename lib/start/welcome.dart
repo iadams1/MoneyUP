@@ -23,12 +23,12 @@ class WelcomeScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: <Widget>[
           Image.asset(
-            'images/mu_bg.png',
+            'assets/images/mu_bg.png',
             fit: BoxFit.fill
           ),
           SizedBox(height: 40.0),
           Image.asset(
-            'images/mu_start.png', 
+            'assets/images/mu_start.png', 
             height: 400,
             width: 400,
             fit: BoxFit.none,
