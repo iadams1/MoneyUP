@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-// import 'package:url_launcher/url_launcher.dart';
+import 'package:moneyup/education/widgets/category_info.dart';
+import 'dart:math';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../education/widgets/article_card.dart';
-import '../loading.dart';
+// import '../education/widgets/category_info.dart';
 import '../education/education.dart';
 import '../main.dart';
 import '../profile.dart';
@@ -35,8 +36,14 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
     return List<Map<String, dynamic>>.from(response);
   }
 
+  List<Map<String,dynamic>> getRandomArticles(List<Map<String,dynamic>> articles) {
+    final shuffled = List<Map<String,dynamic>>.from(articles)..shuffle(Random());
+    return shuffled.take(2).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final categoryInfo = categoryInfoMap[widget.category]!;
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
@@ -89,80 +96,113 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
               fit: BoxFit.fill,
             ),
           ),
-          SafeArea(
-            // WHITE BOX CONTAINER
+          SafeArea(// WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _categoryArticles,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return LoadingScreen();
-                    }
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: Image.asset('assets/icons/chevronLeftArrow.png'),
-                          onPressed: () {
-                          Navigator.pop(context);
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          widget.category,
-                          style: TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Why it Matters',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 20,
-                            fontStyle: FontStyle.italic
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Best Practices',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro',
-                            fontSize: 20,
-                          ),
-                        ),
-                        FutureBuilder<List<Map<String, dynamic>>>(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: IconButton(
+                      icon: Image.asset('assets/icons/chevronLeftArrow.png'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: FutureBuilder<List<Map<String, dynamic>>>(
                           future: _categoryArticles,
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
-                              return const LoadingScreen();
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             }
                             final articles = snapshot.data!;
                             if (articles.isEmpty) {
-                              return const Text(
-                                'No articles available.',
+                              return const Center(
+                                child: Text('No articles available'),
                               );
                             }
+                            final randomArticles = getRandomArticles(articles);
                             return Column(
-                              spacing: 15,
-                              children: articles.map((a) => ArticleCard(article: a,)).toList(),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.category,
+                                  style: TextStyle(
+                                    fontFamily: 'SF Pro',
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w700
+                                  ),
+                                ),
+                                const SizedBox(height:6),
+                                Text(
+                                  categoryInfo.text,
+                                  style: TextStyle(
+                                    fontFamily: 'SF Pro',
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 30),
+                                  child: Text(
+                                    'Why it Matters',
+                                    style: TextStyle(
+                                      fontFamily: 'SF Pro',
+                                      fontSize: 26,
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w600
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 30),
+                                  child: Text(
+                                    categoryInfo.whyItMatters,
+                                    style: TextStyle(
+                                      fontFamily: 'SF Pro',
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Best Practices',
+                                  style: TextStyle(
+                                    fontFamily: 'SF Pro',
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w600
+                                  ),
+                                ),
+                                Column(
+                                  children: categoryInfo.bestPractices.map((text)=>bulletItem(text)).toList(),
+                                ),
+                                const SizedBox(height: 15),
+                                Column(
+                                  spacing: 15,
+                                  children: randomArticles.map((article)=>ArticleCard(article: article)).toList()
+                                ),
+                              ],
                             );
                           },
                         ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
