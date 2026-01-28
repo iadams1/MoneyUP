@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/main.dart';
@@ -68,6 +69,81 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 color: Colors.white,
               ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20,),
+                    ProfileMenu(
+                      text: 'Edit Account',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Reset Password',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Change Theme',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Language',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Currency',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Help & Support',
+                      press: () => {},
+                    ),
+                    ProfileMenu(
+                      text: 'Terms and Conditions',
+                      press: () => {},
+                    ),
+                    Padding( // LOGIN BUTTON
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: AlignmentGeometry.centerRight,
+                            colors: <HexColor>[
+                              HexColor('#124074'), 
+                              HexColor('#332677'),
+                              HexColor('#124074'), 
+                              HexColor('#0D1250'),
+                            ],
+                            tileMode: TileMode.mirror,
+                          ),
+                        ),
+                        child:ElevatedButton(
+                          onPressed: () {
+                            // if (_formkey.currentState!.validate()) {
+                            //   Navigator.pushReplacement(
+                            //   context,
+                            //   MaterialPageRoute(builder: (context) => const MyHomePage(title: '',)),
+                            //   );
+                            // }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: const Color.fromARGB(255, 144, 68, 232),
+                          ),
+                          child: Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -127,4 +203,45 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class ProfileMenu extends StatelessWidget {
+  final String text;
+  final VoidCallback? press;
+
+  const ProfileMenu({
+    super.key,
+    required this.text,
+    this.press,
+  });
+
+ @override
+ Widget build(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 10),
+    child: ElevatedButton(
+      onPressed: press,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Color.fromARGB(16, 0, 0, 0),
+        padding: const EdgeInsets.all(15),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 20
+              )
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black)
+        ],
+      )
+    ),
+  );
+ }
 }
