@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/profile.dart';
