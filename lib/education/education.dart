@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -19,12 +21,11 @@ class EducationScreen extends StatefulWidget {
 
 class _EducationScreenState extends State<EducationScreen> {
   late Future<List<Map<String, dynamic>>> _randomArticles;
+  late Future<List<Map<String, dynamic>>> _dailyTipsFuture;
 
-  @override
-  void initState() {
-    super.initState();
-    _randomArticles = fetchRandomArticles();
-  }
+  int _currentTipIndex = 0;
+  Timer? _rotationTimer;
+  List<Map<String, dynamic>> _tips = [];
 
   final List<String> categories = const [
     'Budgeting',
@@ -51,6 +52,39 @@ class _EducationScreenState extends State<EducationScreen> {
     );
 
     return List<Map<String, dynamic>>.from(response);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchDailyTips() async {
+    debugPrint('fetchDailyTips CALLED');
+
+    final response = await Supabase.instance.client.rpc('get_today_tips');
+
+    debugPrint('fetchDailyTips RESPONSE: $response');
+
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  void _startRotation() {
+    _rotationTimer = Timer.periodic(const Duration(seconds: 6), (_) {
+      if (!mounted || _tips.isEmpty) return;
+
+      setState(() {
+        _currentTipIndex = (_currentTipIndex + 1) % _tips.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _rotationTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _randomArticles = fetchRandomArticles();
+    _dailyTipsFuture = fetchDailyTips();
   }
 
   @override
@@ -118,7 +152,7 @@ class _EducationScreenState extends State<EducationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 25),
+                  SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
@@ -132,21 +166,120 @@ class _EducationScreenState extends State<EducationScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color.fromARGB(16, 0, 0, 0),
-                                offset: Offset(0, 8),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          height: 140,
-                          width: 380,
-                          alignment: Alignment.topCenter,
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _dailyTipsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            }
+
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Text('No tips available');
+                            }
+
+                            // Load tips once
+                            if (_tips.isEmpty) {
+                              _tips = snapshot.data!;
+                              _startRotation();
+                            }
+
+                            _tips = snapshot.data!;
+                            if (_rotationTimer == null) _startRotation();
+
+                            final tip = _tips[_currentTipIndex];
+
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Container with tip content
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color.fromARGB(
+                                          16,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
+                                        offset: Offset(0, 8),
+                                        blurRadius: 12,
+                                      ),
+                                    ],
+                                  ),
+                                  height: 130,
+                                  width: 380,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.fromLTRB(
+                                    25,
+                                    25,
+                                    25,
+                                    0,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        tip['tip_summary'],
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        tip['display_title'],
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                // Dot indicators below the container
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(_tips.length, (
+                                    index,
+                                  ) {
+                                    return AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      width: _currentTipIndex == index ? 10 : 8,
+                                      height: _currentTipIndex == index
+                                          ? 10
+                                          : 8,
+                                      decoration: BoxDecoration(
+                                        color: _currentTipIndex == index
+                                            ? Colors.black
+                                            : Colors.grey[300],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         SizedBox(height: 10),
                         Column(
@@ -168,21 +301,24 @@ class _EducationScreenState extends State<EducationScreen> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute<void>(builder: (_) => ViewAllArticlesScreen()),
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => ViewAllArticlesScreen(),
+                                      ),
                                     );
                                   },
                                   child: Text(
-                                  "See All",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontFamily: 'SF Pro',
-                                    fontWeight: FontWeight.w600,
-                                    color: Color.fromRGBO(156, 156, 156, 1),
+                                    "See All",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'SF Pro',
+                                      fontWeight: FontWeight.w600,
+                                      color: Color.fromRGBO(156, 156, 156, 1),
+                                    ),
                                   ),
-                                ),)
+                                ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
 
                             // 2 Articles and See All Button
                             FutureBuilder<List<Map<String, dynamic>>>(
@@ -194,20 +330,20 @@ class _EducationScreenState extends State<EducationScreen> {
 
                                 final articles = snapshot.data!;
                                 if (articles.isEmpty) {
-                                  return const Text(
-                                    'No articles available.',
-                                  );
+                                  return const Text('No articles available.');
                                 }
 
                                 return Column(
                                   spacing: 15,
-                                  children: articles.map((a) => ArticleCard(article: a,)).toList(),
+                                  children: articles
+                                      .map((a) => ArticleCard(article: a))
+                                      .toList(),
                                 );
                               },
                             ),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 15),
                         Text(
                           "Categories",
                           style: TextStyle(
@@ -247,7 +383,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             );
                           },
                           options: CarouselOptions(
-                            height: 125.0,
+                            height: 120.0,
                             autoPlay: false,
                             enlargeCenterPage: false,
                             aspectRatio: 16 / 9,
