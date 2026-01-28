@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/education/categorydetails.dart';
 
 import '../education/widgets/article_card.dart';
 
@@ -26,7 +27,7 @@ class _EducationScreenState extends State<EducationScreen> {
     _randomArticles = fetchRandomArticles();
   }
 
-  final List<String> categories = const [
+  late final List<String> categories = const [
     'Budgeting',
     'Credit',
     'Debt',
@@ -115,6 +116,7 @@ class _EducationScreenState extends State<EducationScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
+              child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -220,31 +222,68 @@ class _EducationScreenState extends State<EducationScreen> {
                         CarouselSlider.builder(
                           itemCount: categories.length,
                           itemBuilder: (context, index, realIdx) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 5.0,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: colorGradient[index],
+                            final category = categories[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CategoryDetailsScreen(category: category)
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 5.0,
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  categories[index],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 30.0,
-                                    fontFamily: 'SF Pro',
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FontStyle.italic,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: colorGradient[index],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    categories[index],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30.0,
+                                      fontFamily: 'SF Pro',
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ),
-                              ),
+                              )
                             );
+                            
+                            // return Container(
+                            //   margin: const EdgeInsets.symmetric(
+                            //     horizontal: 5.0,
+                            //   ),
+                            //   decoration: BoxDecoration(
+                            //     gradient: LinearGradient(
+                            //       begin: Alignment.topCenter,
+                            //       end: Alignment.bottomCenter,
+                            //       colors: colorGradient[index],
+                            //     ),
+                            //     borderRadius: BorderRadius.circular(12.0),
+                            //   ),
+                            //    child: Center(
+                            //     child: Text(
+                            //       categories[index],
+                            //       style: TextStyle(
+                            //         color: Colors.white,
+                            //         fontSize: 30.0,
+                            //         fontFamily: 'SF Pro',
+                            //         fontWeight: FontWeight.w600,
+                            //         fontStyle: FontStyle.italic,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // );
                           },
                           options: CarouselOptions(
                             height: 125.0,
@@ -261,6 +300,7 @@ class _EducationScreenState extends State<EducationScreen> {
                 ],
               ),
             ),
+          ),
           ),
         ],
       ),
