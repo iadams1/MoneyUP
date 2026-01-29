@@ -144,7 +144,7 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
                                   style: TextStyle(
                                     fontFamily: 'SF Pro',
                                     fontSize: 36,
-                                    fontWeight: FontWeight.w700
+                                    fontWeight: FontWeight.w600
                                   ),
                                 ),
                                 const SizedBox(height:6),
