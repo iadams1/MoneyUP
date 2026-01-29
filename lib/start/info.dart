@@ -18,18 +18,18 @@ class _InfoScreenState extends State<InfoScreen> {
 
   final List<_InfoScreenData> introData = const [
     _InfoScreenData(
-      logo: 'images/mu_logo.png',
-      image: 'images/mu_info1.png',
+      logo: 'assets/images/mu_logo.png',
+      image: 'assets/images/mu_info1.png',
       description: "MoneyUp is built to help you take control of your finances--without the stress. Whether you're just starting out or leveling up, we're here to make money feel manageable."
     ),
     _InfoScreenData(
-      logo: 'images/mu_logo.png',
-      image: 'images/mu_info2.png',
+      logo: 'assets/images/mu_logo.png',
+      image: 'assets/images/mu_info2.png',
       description: "Track your spending, set goals, and build habits that stick. MoneyUp turns your financial data into clear insights and actionable steps."
     ),
     _InfoScreenData(
-      logo: 'images/mu_logo.png',
-      image: 'images/mu_info3.png',
+      logo: 'assets/images/mu_logo.png',
+      image: 'assets/images/mu_info3.png',
       description: "Money isn't just numbers—it's freedom, choices, and peace of mind. Start building the habits that lead to long-term confidence."
     ),
   ];
@@ -59,7 +59,7 @@ class _InfoScreenState extends State<InfoScreen> {
         fit:StackFit.expand,
         children: <Widget> [
           Image.asset(
-            'images/mu_info_bg.png',
+            'assets/images/mu_info_bg.png',
             fit: BoxFit.fill
           ),
           Column(

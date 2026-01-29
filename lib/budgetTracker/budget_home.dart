@@ -6,6 +6,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'budget_creation.dart';
 import 'budget_goaltracker.dart';
 
+import 'package:moneyup/main.dart';
+import 'package:moneyup/transactions/transactions_home.dart';
+import 'package:moneyup/education/education.dart';
+import 'package:moneyup/profile.dart';
+
 // ---------------- Budget Goal Page Widget ---------------- //
 enum TimeFilter { thisWeek, lastWeek, thisMonth, lastMonth, thisYear }
 
@@ -58,23 +63,20 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
   }
 
   Future<void> deleteBudget(String budgetId) async {
-    final response = await Supabase.instance.client
+  try {
+    await Supabase.instance.client
         .from('budgets')
         .delete()
         .eq('budget_ID', budgetId)
         .eq('user_ID', 1001);
 
-    if (response.error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting budget: ${response.error!.message}')),
-      );
-      throw response.error!;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Budget deleted successfully!')),
-      );
-    }
+    debugPrint('Deletion was successful!');
+
+  } catch (error) {
+    debugPrint('Error Deleting rows: $error');
+    rethrow;
   }
+}
 
   Future<void> confirmDelete(BuildContext context, String budgetID) async {
     final bool? shouldDelete = await showDialog<bool>(
@@ -296,7 +298,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  "assets/images/background.png",
+                  'assets/images/background.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -698,19 +700,47 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
           children: [
             IconButton(
               icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/transactionsIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => TransactionsHome(),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/educationIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => EducationScreen(),
+                  ),
+                );
+              },
             ),
             IconButton(
-              icon: Image.asset('assets/icons/settingsIcon.png'),
-              onPressed: () {},
+              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+              onPressed: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
         ),

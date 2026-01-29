@@ -49,7 +49,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-              'images/mu_bg.png',
+              'assets/images/mu_bg.png',
               fit: BoxFit.fill
           ),
           Center(
