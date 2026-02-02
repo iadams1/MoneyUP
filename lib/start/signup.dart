@@ -5,6 +5,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:moneyup/start/verification.dart';
 
 import 'package:moneyup/start/login.dart';
+import 'package:moneyup/services/auth_service.dart'; 
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -16,6 +17,21 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpState extends State<SignUpScreen> {
   Map userData = {};
   final _formkey = GlobalKey<FormState>();
+
+  // ADDED THESE CONTROLLERS
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _authService = AuthService();
+
+  @override
+  void dispose() {
+    // ADDED DISPOSE TO CLEAN UP MEMORY
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context){
@@ -65,6 +81,7 @@ class _SignUpState extends State<SignUpScreen> {
                               Padding( // NAME ENTRY
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
+                                  controller: _nameController, // LINKED CONTROLLER
                                   validator: MultiValidator([
                                     RequiredValidator(errorText: 'Enter your name'),
                                     MinLengthValidator(3, errorText: 'Minimum 3 characters'),
@@ -92,6 +109,7 @@ class _SignUpState extends State<SignUpScreen> {
                               Padding( // USERNAME ENTRY
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
+                                  // Note: You can use Name controller or add a Username controller if needed
                                   validator: MultiValidator([
                                     RequiredValidator(errorText: 'Enter your username'),
                                     MinLengthValidator(3, errorText: 'Minimum 3 characters'),
@@ -119,6 +137,7 @@ class _SignUpState extends State<SignUpScreen> {
                               Padding( // EMAIL ADDRESS ENTRY
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
+                                  controller: _emailController, // LINKED CONTROLLER
                                   validator: MultiValidator([
                                     RequiredValidator(
                                       errorText: 'Enter email address'),
@@ -147,6 +166,7 @@ class _SignUpState extends State<SignUpScreen> {
                               Padding( // PASSWORD ENTRY
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
+                                  controller: _passwordController, // LINKED CONTROLLER
                                   validator: MultiValidator([
                                     RequiredValidator(errorText: 'Enter password'),
                                     MinLengthValidator(8, errorText: 'Password must be at least 8 characters'),
@@ -220,17 +240,35 @@ class _SignUpState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      // if (_formkey.currentState!.validate()) {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => const VerificationScreen(email: '',))
+                                    onPressed: () async {
+                                      // UNCOMMENTED AND UPDATED LOGIC
+                                      if (_formkey.currentState!.validate()) {
+                                        final result = await _authService.signUp(
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text.trim(),
+                                          fullName: _nameController.text.trim(),
                                         );
-                                      // }
+
+                                        if (result == null) {
+                                          if (mounted) {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => VerificationScreen(email: _emailController.text))
+                                            );
+                                          }
+                                        } else {
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text(result), backgroundColor: Colors.red),
+                                            );
+                                          }
+                                        }
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       foregroundColor: const Color.fromARGB(255, 144, 68, 232),
+                                      shadowColor: Colors.transparent, // Added to prevent weird button shadows
                                     ),
                                     child: Text(
                                       'Sign Up',
