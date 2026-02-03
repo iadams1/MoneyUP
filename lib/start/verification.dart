@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/start/confirmation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // ADDED NECESSARY IMPORT
+import 'package:supabase_flutter/supabase_flutter.dart';
+//import 'package:plaid_flutter/plaid_flutter.dart'; 
 
 class VerificationScreen extends StatefulWidget{
   final String email;
 
-  const VerificationScreen({super.key, required this.email});
+  const VerificationScreen({
+    super.key, 
+    required this.email
+  });
 
   @override
   _VerificationScreenState createState() => _VerificationScreenState();
@@ -18,7 +22,22 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   // final _formKey = GlobalKey<FormState>();
   final TextEditingController _codeController  = TextEditingController();
-  final int _codeLength = 6; // UPDATED: Supabase default is 6 digits
+  final int _codeLength = 6;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  // This listens for when the user finishes the Plaid flow
+  // PlaidLink.onSuccess.listen((Success success) {
+  //   if (mounted) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const ConfirmationScreen()),
+  //     );
+  //   }
+
+  // });
 
   @override
   void dispose() {
@@ -26,50 +45,57 @@ class _VerificationScreenState extends State<VerificationScreen> {
     super.dispose();
   }
 
-  Future<void> _onContinuePressed() async { // ADDED async
-    // if (_formKey.currentState!.validate()) {
-      // IMPLEMENT VERIFICATION LOGIC
-      try {
-        // This confirms the code with Supabase
-        final response = await Supabase.instance.client.auth.verifyOTP(
-          email: widget.email,
-          token: _codeController.text.trim(),
-          type: OtpType.signup,
-        );
+  Future<void> _onContinuePressed() async {
+    try {
+      final response = await Supabase.instance.client.auth.verifyOTP(
+        email: widget.email,
+        token: _codeController.text.trim(),
+        type: OtpType.signup,
+      );
 
-        if (response.session != null) {
-          if (mounted) {
-            // print('Verification code: ${_codeController.text}');
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ConfirmationScreen())
-            );
-          }
-        }
-      } on AuthException catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid code"), backgroundColor: Colors.red),
-          );
-        }
+      if (response.session != null) {
+        // 1. Trigger Plaid  (Josh)
+        //_openPlaidLink();
+
+      if (mounted) {
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+      );
+    }
       }
-    // }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid verification code"), backgroundColor: Colors.red),
+      );
+    }
   }
 
-  void _onResendCodePressed() {
+
+  Future<void> _onResendCodePressed() async {
     // IMPLEMENT RESEND CODE LOGIC
-    print('Resending code to ${widget.email}');
-    Supabase.instance.client.auth.resend(
-      type: OtpType.signup,
-      email: widget.email,
-    );
+    try {
+      await Supabase.instance.client.auth.resend(
+        type: OtpType.signup,
+        email: widget.email,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Code resent successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error resending code"), backgroundColor: Colors.red),
+      );
+    }
   }
+
+  // void _openPlaidLink() {
+  //   // Note: You will eventually need to fetch a real 'link_token' from your server here
+  //   LinkTokenConfiguration config = LinkTokenConfiguration(
+  //     token: "GENERATED_LINK_TOKEN", 
+  //   );
+  //   PlaidLink.open(configuration: config);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +146,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.only(top: 20.0, bottom: 40.0),
                     child: Text(
-                      'Please enter the code we sent to\n${widget.email}', // ADDED EMAIL TO UI
+                      'Please enter the code we sent to the email address',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: Colors.white,
@@ -154,7 +180,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             counterText: "",
                             filled: true,
                             fillColor: Colors.grey[200],
-                            contentPadding: EdgeInsets.symmetric(vertical: 20), // ADJUSTED: 100 was too large for some screens
+                            contentPadding: EdgeInsets.symmetric(vertical: 100),
                           ),
                           onChanged: (value) {
                             if (value.length == _codeLength) {
@@ -173,7 +199,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 borderRadius: BorderRadius.all(Radius.circular(50.0)),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                                  end: AlignmentGeometry.centerRight,
                                   colors: <HexColor>[
                                     HexColor('#124074'), 
                                     HexColor('#332677'),
@@ -184,14 +210,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 ),
                               ),
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                ),
                                 onPressed: _onContinuePressed, 
                                 child: const Text(
                                   'Continue',
-                                  style: TextStyle(fontSize: 18.0, color: Colors.white)
+                                  style: TextStyle(fontSize: 18.0,)
                                 ),
                               ),
                             ),

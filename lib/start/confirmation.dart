@@ -56,10 +56,15 @@ class ConfirmationScreen extends StatelessWidget {
                       ),
                       child:ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => InfoScreen()),
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const InfoScreen()),
+                            (route) => false,
                           );
+                          // Navigator.push(
+                          // context,
+                          // MaterialPageRoute(builder: (context) => InfoScreen()),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,

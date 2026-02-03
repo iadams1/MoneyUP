@@ -4,14 +4,14 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:moneyup/start/signup.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/profile.dart';
-import 'package:moneyup/start/signup.dart'; // ADDED: Necessary to show signup
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize( // ADDED: 'await' ensures this finishes before app starts
+  await Supabase.initialize(
     url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
   );
@@ -42,33 +42,14 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'MoneyUP',
-      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // UPDATED: This checks if the user is logged in
-      home: StreamBuilder<AuthState>(
-        stream: Supabase.instance.client.auth.onAuthStateChange,
-        builder: (context, snapshot) {
-          // While checking the session, show a loader
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          }
-
-          final session = snapshot.hasData ? snapshot.data!.session : null;
-
-          if (session != null) {
-            return const MyHomePage(title: 'MoneyUP');
-          } else {
-            return const SignupScreen(); 
-          }
-        },
-      ),
+      //home: const MyHomePage(title: 'MoneyUP'),
+      home: const SignUpScreen(),
     );
   }
 }
-
-// ... EVERYTHING BELOW THIS LINE REMAINS EXACTLY AS YOU HAD IT ...
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
