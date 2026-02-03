@@ -220,13 +220,37 @@ class _SignUpState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      // if (_formkey.currentState!.validate()) {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => const VerificationScreen(email: '',))
-                                        );
-                                      // }
+                                    onPressed: () async {
+                                      if (_formkey.currentState!.validate()) {
+                                        try {
+                                          final response = await Supabase.instance.client.auth.signUp(
+                                            email: _emailController.text.trim(),
+                                            password: _passwordController.text.trim(),
+                                            data: {
+                                              'full_name': _nameController.text.trim(),
+                                              'username': _usernameController.text.trim()
+                                            },
+                                          );
+
+                                          final user = response.user;
+                                          if (user != null) 
+                                          {
+                                          }
+
+                                          if (mounted) {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
+                                              ),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Signup Failed: ${e.toString()}')),
+                                          );
+                                        }
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,

@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  plaid_flutter: ^5.0.5
+  http: ^1.2.2
   
   supabase_flutter: ^2.10.1
   percent_indicator: ^4.2.5
