@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/budgetTracker/budget_home.dart';
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:moneyup/transactions/transactions_home.dart';
-import 'package:moneyup/education/education.dart';
-import 'package:moneyup/profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
