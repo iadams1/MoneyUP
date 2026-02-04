@@ -5,6 +5,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:moneyup/start/verification.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/start/login.dart';
+import 'package:moneyup/start/confirmation.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -214,7 +215,7 @@ class _SignUpState extends State<SignUpScreen> {
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
+                                                builder: (context) => ConfirmationScreen(),//VerificationScreen(email: _emailController.text.trim()),
                                               ),
                                             );
                                           }
