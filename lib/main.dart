@@ -4,7 +4,9 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:moneyup/services/plaid_connect.dart';
 import 'package:moneyup/start/signup.dart';
+import 'package:moneyup/start/login.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/profile.dart';
@@ -39,14 +41,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'MoneyUP',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      //home: const MyHomePage(title: 'MoneyUP'),
-      home: const SignUpScreen(),
+      routes: {
+        '/': (context) => const SignUpScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const MyHomePage(title: 'MoneyUP'),
+        '/plaid-connect': (context) => PlaidConnectScreen(),
+      },
+      initialRoute: '/',
     );
   }
 }
@@ -70,21 +76,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<Map<String, dynamic>?> getRandomBudget() async {
-  try {
-    final response = await Supabase.instance.client
-        .rpc('get_random_budget', params: {'p_user_id': 1001});
+    try {
+      final response = await Supabase.instance.client
+          .rpc('get_random_budget', params: {'p_user_id': 1001});
 
-    debugPrint("RPC response: $response");
+      debugPrint("RPC response: $response");
 
-    if (response == null) return null;
-    if (response is List && response.isEmpty) return null;
+      if (response == null) return null;
+      if (response is List && response.isEmpty) return null;
 
-    return (response as List).first as Map<String, dynamic>;
-  } catch (e) {
-    debugPrint("RPC ERROR: $e");
-    rethrow;
+      return (response as List).first as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint("RPC ERROR: $e");
+      rethrow;
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -111,15 +117,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: Image.asset('assets/icons/profileIcon.png'),
               ),
-              Container( // NOTIFICATION ICON
+              Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
                     // print('Notification icon pressed');
-                  }, 
+                  },
                   icon: Icon(
-                    Icons.notifications_outlined, 
+                    Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
                   ),
@@ -133,12 +139,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
               'assets/images/mu_bg.png',
               fit: BoxFit.fill
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -152,9 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     height: 50,
                   ),
-                  // Budget Tracker Section
                   FutureBuilder<Map<String, dynamic>?>(
-                    future: _randomBudget, 
+                    future: _randomBudget,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Padding(
@@ -265,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           child: Text(
                                             'See All',
                                             style: TextStyle(
-                                              color: Colors.white, 
+                                              color: Colors.white,
                                               fontSize: 18
                                             ),
                                           ),

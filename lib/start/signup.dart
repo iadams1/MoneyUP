@@ -206,14 +206,8 @@ class _SignUpState extends State<SignUpScreen> {
                                           );
 
                                           final user = response.user;
-                                          if (user != null) {
-                                            await Supabase.instance.client.from('profiles').insert({
-                                              'id': user.id,
-                                              'email': _emailController.text.trim(),
-                                              'full_name': _nameController.text.trim(),
-                                              'username': _usernameController.text.trim(),
-                                              'created_at': DateTime.now().toIso8601String(),
-                                            });
+                                          if (user != null) 
+                                          {
                                           }
 
                                           if (mounted) {

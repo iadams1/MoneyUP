@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/start/confirmation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/services/plaid_connect.dart'; 
 //import 'package:plaid_flutter/plaid_flutter.dart'; 
 
 class VerificationScreen extends StatefulWidget{
@@ -54,15 +55,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
       );
 
       if (response.session != null) {
-        // 1. Trigger Plaid  (Josh)
-        //_openPlaidLink();
-
-      if (mounted) {
-        Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ConfirmationScreen())
-      );
-    }
+        if (mounted) {
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

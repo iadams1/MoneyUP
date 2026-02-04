@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:form_field_validator/form_field_validator.dart';
-
-import 'package:moneyup/main.dart';
+import 'package:moneyup/services/auth_service.dart';
 import 'package:moneyup/start/signup.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,189 +12,118 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginScreen> {
-
-  Map userData = {};
   final _formkey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    if (!_formkey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _authService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (response.user != null && mounted) {
+        // Login successful - navigate to home screen
+        Navigator.pushReplacementNamed(context, '/home'); // Navigator push '/home' isnt recognized
+      }
+    } catch (e) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Image.asset( // BACKGROUND
-            'assets/images/mu_bg.png',
-            fit: BoxFit.fill
-          ),
-          Container( // LOGIN IMAGE
-            alignment: Alignment.topCenter,
-            padding: EdgeInsets.only(top: 120),
-            child: Image.asset(
-              'assets/images/mu_login.png',
-              width: 350,
-              height: 350,
-              fit: BoxFit.cover,
+      body: Form(
+        key: _formkey,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
+            Container(
+              alignment: Alignment.topCenter,
+              padding: const EdgeInsets.only(top: 120),
+              child: Image.asset('assets/images/mu_login.png', width: 350, height: 350, fit: BoxFit.cover),
             ),
-          ),
-          Align( // LOGIN SCREEN BOX
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50.0),
-                  topRight: Radius.circular(50.0),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(50.0), topRight: Radius.circular(50.0)),
+                  color: Colors.white,
                 ),
-                color: Colors.white,
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding( // EMAIL ADDRESS
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: TextFormField(
-                            validator: MultiValidator([
-                              RequiredValidator(
-                                errorText: 'Enter email address'),
-                                EmailValidator(errorText: 'Invalid email address. Please try again.'),
-                            ]).call,
-                            decoration: InputDecoration(
-                              hintText: 'Email Address',
-                              labelText: 'Email Address',
-                              labelStyle: TextStyle(
-                                color: Color(0x4F000000),
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SF Pro'
-                              ),
-                              prefixIcon: Icon(Icons.email_outlined, color: Colors.black,),
-                              errorStyle: TextStyle(fontSize: 16.0),
-                              filled: true,
-                              fillColor: HexColor('#E7E7E7'),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.all(Radius.circular(9.0))
-                              ),
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: _emailController,
+                        enabled: !_isLoading,
+                        validator: (value) => (value == null || value.isEmpty) ? 'Required' : null,
+                        decoration: InputDecoration(labelText: 'Email', filled: true, fillColor: HexColor('#E7E7E7')),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _passwordController,
+                        enabled: !_isLoading,
+                        obscureText: true,
+                        validator: (value) => (value == null || value.isEmpty) ? 'Required' : null,
+                        decoration: InputDecoration(labelText: 'Password', filled: true, fillColor: HexColor('#E7E7E7')),
+                      ),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _handleLogin,
+                        child: _isLoading 
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          )
-                        ),
-                        Padding( // PASSWORD ENTRY
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: TextFormField(
-                            validator: MultiValidator([
-                              RequiredValidator(errorText: 'Enter password'),
-                              MinLengthValidator(8, errorText: 'Password must be at least 8 characters'),
-                              PatternValidator(r'(?=.*?[#!@$%^&*-])', errorText: 'Invalid password')
-                            ]).call,
-                            decoration: InputDecoration(
-                              hintText: 'Password',
-                              labelText: 'Password',
-                              labelStyle: TextStyle(
-                                color: Color(0x4F000000),
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SF Pro'
-                              ),
-                              prefixIcon: Icon(Icons.lock_outline, color: Colors.black),
-                              errorStyle: TextStyle(fontSize: 16.0),
-                              filled: true,
-                              fillColor: HexColor('#E7E7E7'),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.all(Radius.circular(9.0))
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Container(
-                        //   padding: EdgeInsets.only(left: 20),
-                        //   child: Text('Forgot Password?'),
-                        // ),
-                        Padding( // LOGIN BUTTON
-                          padding: const EdgeInsets.only(top: 30.0),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: AlignmentGeometry.centerRight,
-                                colors: <HexColor>[
-                                  HexColor('#124074'), 
-                                  HexColor('#332677'),
-                                  HexColor('#124074'), 
-                                  HexColor('#0D1250'),
-                                ],
-                                tileMode: TileMode.mirror,
-                              ),
-                            ),
-                            child:ElevatedButton(
-                              onPressed: () {
-                                if (_formkey.currentState!.validate()) {
-                                  Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const MyHomePage(title: '',)),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: const Color.fromARGB(255, 144, 68, 232),
-                              ),
-                              child: Text(
-                              'Login',
-                              style: TextStyle(color: Colors.white, fontSize: 16),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Center( // PUSH TO SIGNUP SCREEN
-                          child: Container(
-                            alignment: FractionalOffset.bottomCenter,
-                            padding: EdgeInsets.only(top: 40),
-                            child: RichText(
-                              text: TextSpan(
-                                text: "Don't have an account? ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                  fontFamily: 'SF Pro'
-                                ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: 'Sign up',
-                                    style: TextStyle(
-                                      color: HexColor('#7247B8'),
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'SF Pro'
-                                    ),
-                                    recognizer: TapGestureRecognizer()..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
+                          : const Text('Login'),
+                      ),
+                      const SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: _isLoading ? null : () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
+                        },
+                        child: const Text("Don't have an account? Sign Up", style: TextStyle(color: Colors.blue)),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
