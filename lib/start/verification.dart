@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/start/confirmation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/services/plaid_connect.dart'; 
+//import 'package:plaid_flutter/plaid_flutter.dart'; 
 
 class VerificationScreen extends StatefulWidget{
   final String email;
 
-  const VerificationScreen({super.key, required this.email});
+  const VerificationScreen({
+    super.key, 
+    required this.email
+  });
 
   @override
   _VerificationScreenState createState() => _VerificationScreenState();
@@ -17,7 +23,22 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   // final _formKey = GlobalKey<FormState>();
   final TextEditingController _codeController  = TextEditingController();
-  final int _codeLength = 5;
+  final int _codeLength = 6;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  // This listens for when the user finishes the Plaid flow
+  // PlaidLink.onSuccess.listen((Success success) {
+  //   if (mounted) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const ConfirmationScreen()),
+  //     );
+  //   }
+
+  // });
 
   @override
   void dispose() {
@@ -25,22 +46,54 @@ class _VerificationScreenState extends State<VerificationScreen> {
     super.dispose();
   }
 
-  void _onContinuePressed() {
-    // if (_formKey.currentState!.validate()) {
-      // IMPLEMENT VERIFICATION LOGIC
-
-      // print('Verification code: ${_codeController.text}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+  Future<void> _onContinuePressed() async {
+    try {
+      final response = await Supabase.instance.client.auth.verifyOTP(
+        email: widget.email,
+        token: _codeController.text.trim(),
+        type: OtpType.signup,
       );
-    // }
+
+      if (response.session != null) {
+        if (mounted) {
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid verification code"), backgroundColor: Colors.red),
+      );
+    }
   }
 
-  void _onResendCodePressed() {
+
+  Future<void> _onResendCodePressed() async {
     // IMPLEMENT RESEND CODE LOGIC
-    print('Resending code to ${widget.email}');
+    try {
+      await Supabase.instance.client.auth.resend(
+        type: OtpType.signup,
+        email: widget.email,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Code resent successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error resending code"), backgroundColor: Colors.red),
+      );
+    }
   }
+
+  // void _openPlaidLink() {
+  //   // Note: You will eventually need to fetch a real 'link_token' from your server here
+  //   LinkTokenConfiguration config = LinkTokenConfiguration(
+  //     token: "GENERATED_LINK_TOKEN", 
+  //   );
+  //   PlaidLink.open(configuration: config);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +173,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             letterSpacing: 10,
                           ),
                           decoration: InputDecoration(
-                            hintText: '_ _ _ _ _',
+                            hintText: '_ _ _ _ _ _',
                             border: InputBorder.none,
                             counterText: "",
                             filled: true,
