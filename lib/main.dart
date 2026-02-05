@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/budgetTracker/budget_home.dart';
+import 'package:moneyup/start/verification.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +45,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'MoneyUP'),
+      home: VerificationScreen(email: '')
+      // home: const MyHomePage(title: 'MoneyUP'),
     );
   }
 }
