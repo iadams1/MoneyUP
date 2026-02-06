@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/budgetTracker/budget_home.dart';
+import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
