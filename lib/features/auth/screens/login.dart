@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:form_field_validator/form_field_validator.dart';
-
-import 'package:moneyup/main.dart';
+import 'package:moneyup/services/auth_service.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,9 +11,9 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginState();
 }
 
-class _LoginState extends State<LoginScreen> {
 
-  Map userData = {};
+
+class _LoginState extends State<LoginScreen> {
   final _formkey = GlobalKey<FormState>();
 
   @override
@@ -198,5 +196,12 @@ class _LoginState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

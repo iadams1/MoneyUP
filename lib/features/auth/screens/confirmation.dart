@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/auth/screens/info.dart';
+import 'package:moneyup/services/plaid_connect.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
@@ -25,7 +26,7 @@ class ConfirmationScreen extends StatelessWidget {
                     height: 240,
                     fit: BoxFit.cover
                   ),
-                  const SizedBox(height: 40.0),
+                  SizedBox(height: 40.0),
                   Text(
                     'VERIFIED!',
                     textAlign: TextAlign.center,
@@ -35,7 +36,7 @@ class ConfirmationScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold
                     ),
                   ),
-                  const SizedBox(height: 12.0),
+                  SizedBox(height: 12.0),
                   Text(
                     'Cha Ching! You have successfully verified your account.',
                     textAlign: TextAlign.center,
@@ -45,9 +46,9 @@ class ConfirmationScreen extends StatelessWidget {
                       fontWeight: FontWeight.w500
                     ),
                   ),
-                  const SizedBox(height: 90.0),
+                  SizedBox(height: 90.0),
                   Padding( // GET STARTED BUTTON
-                    padding: const EdgeInsets.only(top:20.0),
+                    padding: EdgeInsets.only(top:20.0),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 45,
@@ -56,10 +57,15 @@ class ConfirmationScreen extends StatelessWidget {
                       ),
                       child:ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => InfoScreen()),
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => PlaidConnectScreen()),
+                            (route) => false,
                           );
+                          // Navigator.push(
+                          // context,
+                          // MaterialPageRoute(builder: (context) => InfoScreen()),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
