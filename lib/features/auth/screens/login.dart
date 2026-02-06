@@ -3,6 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/services/auth_service.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moneyup/main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,8 +12,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginState();
 }
-
-
 
 class _LoginState extends State<LoginScreen> {
   final _formkey = GlobalKey<FormState>();
@@ -200,7 +200,9 @@ class _LoginState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    var _emailController;
     _emailController.dispose();
+    var _passwordController;
     _passwordController.dispose();
     super.dispose();
   }
