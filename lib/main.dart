@@ -10,12 +10,23 @@ import 'package:moneyup/start/login.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/profile.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    
+  await dotenv.load();
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw Exception('Missing Supabase environment variables');
+  }
+
   await Supabase.initialize(
-    url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   final prefs = await SharedPreferences.getInstance();
