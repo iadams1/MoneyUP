@@ -4,6 +4,8 @@ import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/models/budget.dart';
+import 'package:moneyup/services/service_locator.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -13,8 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  
-  Supabase.initialize(
+
+  await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
@@ -23,17 +25,6 @@ void main() async {
   final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? true;
 
   runApp(MyApp(showHome: hasSeenOnboarding));
-}
-
-enum BudgetType {
-  food("Food & Dining"),
-  entertainment("Entertainment & Leisure"),
-  transportation("Transportation"),
-  shopping("Shopping & Personal"),
-  housing("Housing & Utilities");
-
-  final String label;
-  const BudgetType(this.label);
 }
 
 class MyApp extends StatelessWidget {
@@ -63,30 +54,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<Map<String, dynamic>?> _randomBudget;
+  late Future<Budget?> _budgetFuture;
 
   @override
   void initState() {
     super.initState();
-    _randomBudget = getRandomBudget();
+    _budgetFuture = budgetService.getRandomBudget();
   }
-
-  Future<Map<String, dynamic>?> getRandomBudget() async {
-  try {
-    final response = await Supabase.instance.client
-        .rpc('get_random_budget', params: {'p_user_id': 1001});
-
-    debugPrint("RPC response: $response");
-
-    if (response == null) return null;
-    if (response is List && response.isEmpty) return null;
-
-    return (response as List).first as Map<String, dynamic>;
-  } catch (e) {
-    debugPrint("RPC ERROR: $e");
-    rethrow;
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -155,23 +129,23 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 50,
                   ),
                   // Budget Tracker Section
-                  FutureBuilder<Map<String, dynamic>?>(
-                    future: _randomBudget, 
+                  FutureBuilder<Budget?>(
+                    future: _budgetFuture, 
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        );
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                      if (snapshot.data == null) {
-                        return const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text("No budgets available."),
-                        );
+
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+
+                      if (!snapshot.hasData || snapshot.data == null) {
+                        return const Text("No budgets available.");
                       }
 
                       final budget = snapshot.data!;
+
                       return Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -201,13 +175,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       radius: 60,
                                       lineWidth: 18,
                                       percent:
-                                          (budget["AmountSaved"] / budget["Goal"]).clamp(0.0, 1.0),
+                                          (budget.amountNeeded / budget.goal).clamp(0.0, 1.0),
                                       center: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "${((budget["AmountSaved"] / budget["Goal"]) * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%",
+                                            "${((budget.amountSaved / budget.goal) * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%",
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 25,
@@ -229,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   children: [
                                     SizedBox(height: 0),
                                     Text(
-                                      budget["Title"],
+                                      budget.title,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 22,

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/models/budget_type.dart';
 import 'package:moneyup/main.dart';
+import 'package:moneyup/services/service_locator.dart';
 
 // -------------- Budget Creation Page Widget -------------- //
 class BudgetCreationPage extends StatefulWidget {
@@ -22,28 +23,6 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> insertBudget(
-    String title,
-    double goal,
-    double saved,
-    BudgetType type,
-  ) async {
-    final supabase = Supabase.instance.client;
-
-    try {
-      await supabase.from('budgets').insert({
-        'user_ID': 1001,
-        'Title': title,
-        'Goal': goal,
-        'AmountSaved': saved,
-        'AmountNeeded': (goal - saved),
-        'Category': type.label,
-      });
-    } catch (e) {
-      debugPrint('Error inserting budget: $e');
-    }
   }
 
   @override
@@ -299,7 +278,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                                             ) ??
                                             0.0;
 
-                                        await insertBudget(
+                                        await budgetService.insertBudget(
                                           title,
                                           goal,
                                           saved,
