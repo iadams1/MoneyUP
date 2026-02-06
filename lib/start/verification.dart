@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/start/confirmation.dart';
 
+import '../otp_input.dart';
+
 class VerificationScreen extends StatefulWidget{
   final String email;
 
@@ -15,9 +17,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
   // String _otpCode = "";
   // bool _isResendEnabled = true;
 
-  // final _formKey = GlobalKey<FormState>();
   final TextEditingController _codeController  = TextEditingController();
-  final int _codeLength = 5;
+  // final int _codeLength = 5;
 
   @override
   void dispose() {
@@ -26,15 +27,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _onContinuePressed() {
-    // if (_formKey.currentState!.validate()) {
-      // IMPLEMENT VERIFICATION LOGIC
-
-      // print('Verification code: ${_codeController.text}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ConfirmationScreen())
-      );
-    // }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+    );
   }
 
   void _onResendCodePressed() {
@@ -110,41 +106,22 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: _codeController,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          maxLength: _codeLength,
-                          style: TextStyle(
-                            fontSize: 24,
-                            letterSpacing: 10,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 60),
+                          child: OtpInput(
+                            length: 5,
                           ),
-                          decoration: InputDecoration(
-                            hintText: '_ _ _ _ _',
-                            border: InputBorder.none,
-                            counterText: "",
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            contentPadding: EdgeInsets.symmetric(vertical: 100),
-                          ),
-                          onChanged: (value) {
-                            if (value.length == _codeLength) {
-                              //
-                            }
-                          },
                         ),
                         Padding( // CONTINUE BUTTON
                           padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                          child: Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 40,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: DecoratedBox(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                borderRadius: BorderRadius.circular(50.0),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
-                                  end: AlignmentGeometry.centerRight,
+                                  end: Alignment.centerRight,
                                   colors: <HexColor>[
                                     HexColor('#124074'), 
                                     HexColor('#332677'),
@@ -156,9 +133,13 @@ class _VerificationScreenState extends State<VerificationScreen> {
                               ),
                               child: ElevatedButton(
                                 onPressed: _onContinuePressed, 
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent
+                                ),
                                 child: const Text(
                                   'Continue',
-                                  style: TextStyle(fontSize: 18.0,)
+                                  style: TextStyle(fontSize: 18.0, color: Colors.white)
                                 ),
                               ),
                             ),
