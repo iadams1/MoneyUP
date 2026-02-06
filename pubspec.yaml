@@ -44,6 +44,7 @@ dependencies:
   carousel_slider: ^5.1.1
   shared_preferences: ^2.5.4
   plaid_flutter: ^5.0.5
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
