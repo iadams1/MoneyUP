@@ -15,6 +15,7 @@ import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/services/plaid_service.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
