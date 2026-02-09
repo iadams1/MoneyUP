@@ -4,8 +4,10 @@ import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
 import 'package:moneyup/main.dart';
-import 'package:moneyup/shared/widgets/article_card.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/widgets/article_card.dart';
 
 class ViewAllArticlesScreen extends StatefulWidget {
   const ViewAllArticlesScreen({super.key});
@@ -15,26 +17,50 @@ class ViewAllArticlesScreen extends StatefulWidget {
 }
 
 class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
-  late Future<List<Map<String, dynamic>>> _future;
+  bool _isLoading = true;
+  List<Article> _articles = [];
 
   @override
   void initState() {
     super.initState();
-    _future = getAllArticles();
+    _loadAllArticles();
   }
 
-  Future<List<Map<String, dynamic>>> getAllArticles() async {
-    final response = await Supabase.instance.client
-        .from('Educational')
-        .select('*')        
-        .order('created_at', ascending: false); 
+  Future<void> _loadAllArticles() async {
+    try {
+      final articles = await articleService.getAllArticles();
 
-    return List<Map<String, dynamic>>.from(response);
+      if (!mounted) return;
+
+      setState(() {
+        _articles = articles;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading article: $e');
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+  
+  Widget _buildContent(BuildContext context, {required Key key}) {
+    final articles = _articles;
+
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -128,25 +154,11 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                   Expanded(
                     child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: FutureBuilder<List<Map<String, dynamic>>>(
-                        future: _future,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-
-                          final articles = snapshot.data!;
-                          if (articles.isEmpty) {
-                            return const Center(child: Text('No articles available.'));
-                          }
-
-                          return ListView.separated(
-                            itemCount: articles.length,
-                            itemBuilder: (context, index) => ArticleCard(article: articles[index]),
-                            separatorBuilder: (context, index) => const SizedBox(height: 10),
-                          );
-                        },
-                      )
+                      child: ListView.separated(
+                        itemCount: articles.length,
+                        itemBuilder: (context, index) => ArticleCard(article: articles[index]),
+                        separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      ),
                     )
                   )
                 ],

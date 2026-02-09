@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/services/auth_service.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:moneyup/main.dart';
+import 'package:moneyup/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,10 +15,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginState extends State<LoginScreen> {
   final _formkey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Form(
+      key: _formkey,
+      child: Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -58,6 +62,7 @@ class _LoginState extends State<LoginScreen> {
                         Padding( // EMAIL ADDRESS
                           padding: const EdgeInsets.only(top: 20.0),
                           child: TextFormField(
+                            controller: _emailController,
                             validator: MultiValidator([
                               RequiredValidator(
                                 errorText: 'Enter email address'),
@@ -86,10 +91,11 @@ class _LoginState extends State<LoginScreen> {
                         Padding( // PASSWORD ENTRY
                           padding: const EdgeInsets.only(top: 20.0),
                           child: TextFormField(
+                            controller: _passwordController,
                             validator: MultiValidator([
                               RequiredValidator(errorText: 'Enter password'),
                               MinLengthValidator(8, errorText: 'Password must be at least 8 characters'),
-                              PatternValidator(r'(?=.*?[#!@$%^&*-])', errorText: 'Invalid password')
+                              //PatternValidator(r'(?=.*?[#!@$%^&*-])', errorText: 'Invalid password')
                             ]).call,
                             decoration: InputDecoration(
                               hintText: 'Password',
@@ -135,11 +141,30 @@ class _LoginState extends State<LoginScreen> {
                               ),
                             ),
                             child:ElevatedButton(
-                              onPressed: () {
-                                if (_formkey.currentState!.validate()) {
+                              onPressed: () async {
+                                if (!(_formkey.currentState?.validate() ?? false)) return;
+
+                                try {
+                                  final response = await AuthService().login(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text,
+                                  );
+
+                                  final user = response.user;
+
+                                  if (!mounted) return;
+
                                   Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const MyHomePage(title: '',)),
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const MyHomePage(title: ''),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  debugPrint('LOGIN ERROR: $e');
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Invalid email or password')),
                                   );
                                 }
                               },
@@ -195,14 +220,12 @@ class _LoginState extends State<LoginScreen> {
           ),
         ],
       ),
+    ),
     );
   }
-
   @override
   void dispose() {
-    var _emailController;
     _emailController.dispose();
-    var _passwordController;
     _passwordController.dispose();
     super.dispose();
   }

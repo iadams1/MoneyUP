@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/auth/screens/info.dart';
-import 'package:moneyup/services/plaid_connect.dart';
+import 'package:moneyup/services/plaid_service.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
@@ -62,10 +62,10 @@ class ConfirmationScreen extends StatelessWidget {
                             MaterialPageRoute(builder: (context) => PlaidConnectScreen()),
                             (route) => false,
                           );
-                          // Navigator.push(
-                          // context,
-                          // MaterialPageRoute(builder: (context) => InfoScreen()),
-                          // );
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => InfoScreen()),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,

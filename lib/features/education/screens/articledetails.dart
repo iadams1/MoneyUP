@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:moneyup/main.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;
@@ -17,30 +18,40 @@ class ArticleDetailsScreen extends StatefulWidget {
 }
 
 class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
-  late Future<Map<String, dynamic>> _detailedArticle;
   late final ScrollController _summaryScrollController;
+  bool _isLoading = true;
+  Article? _article;
 
   @override
   void initState() {
     super.initState();
-    _detailedArticle = getArticleById(widget.articleId);
+    _loadArticle();
     _summaryScrollController = ScrollController();
+  }
+
+  Future<void> _loadArticle() async {
+    try {
+      final article = await articleService.getArticleById(widget.articleId);
+      if (!mounted) return;
+
+      setState(() {
+        _article = article;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading article: $e');
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     _summaryScrollController.dispose();
     super.dispose();
-  }
-
-  Future<Map<String, dynamic>> getArticleById(int id) async {
-    final response = await Supabase.instance.client
-        .from('Educational')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    return Map<String, dynamic>.from(response);
   }
 
   Future<void> openArticleUrl(String url) async {
@@ -61,7 +72,19 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {required Key key}) {
+    final article = _article!;
+
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -138,23 +161,12 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
-                      child: FutureBuilder<Map<String, dynamic>>(
-                        future: _detailedArticle,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          final article = snapshot.data!;
-
-                          return Column(
+                      child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Title
                               Text(
-                                article['display_title'],
+                                article.displayTitle,
                                 style: const TextStyle(
                                   fontSize: 30,
                                   height: 1.1,
@@ -166,8 +178,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
 
                               // Author
                               Text(
-                                article['source_author'] ??
-                                    article['source_name'],
+                                article.displaySource,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
@@ -187,7 +198,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    openArticleUrl(article['source_url']);
+                                    openArticleUrl(article.sourceURL);
                                   },
                                   child: Ink(
                                     decoration: BoxDecoration(
@@ -244,7 +255,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                       bottom: 8,
                                     ),
                                     child: Text(
-                                      article['summary'] ?? '',
+                                      article.summary,
                                       style: const TextStyle(
                                         fontSize: 19
                                       ),
@@ -253,8 +264,6 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                 ),
                               ),
                             ],
-                          );
-                        },
                       ),
                     ),
                   ),

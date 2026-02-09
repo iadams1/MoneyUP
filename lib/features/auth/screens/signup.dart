@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 

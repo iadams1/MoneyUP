@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
+import 'package:moneyup/features/budgettracker/utils/time_range.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/main.dart';
+import 'package:moneyup/models/budget.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/services/service_locator.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'budget_creation.dart';
 import 'budget_goaltracker.dart';
-import 'package:moneyup/main.dart';
 
 // ---------------- Budget Goal Page Widget ---------------- //
-enum TimeFilter { thisWeek, lastWeek, thisMonth, lastMonth, thisYear }
 
 class BudgetGoalPage extends StatefulWidget {
   const BudgetGoalPage({super.key});
@@ -20,64 +23,16 @@ class BudgetGoalPage extends StatefulWidget {
 }
 
 class _BudgetGoalPageState extends State<BudgetGoalPage> {
-  late Future<List<dynamic>> _future;
+  late Future<List<Budget>> _future;
   late Map<int, double> spendingData = {};
   late Map<int, String> categoryTitles = {};
-
   TimeFilter selectedFilter = TimeFilter.thisWeek;
 
-  static const Map<TimeFilter, String> filterLabels = {
-    TimeFilter.thisWeek: "This Week",
-    TimeFilter.lastWeek: "Last Week",
-    TimeFilter.thisMonth: "This Month",
-    TimeFilter.lastMonth: "Last Month",
-    TimeFilter.thisYear: "This Year",
-  };
-
-  Future<List<dynamic>> getUserBudgets() async {
-    final budgetsResponse = await Supabase.instance.client
-        .from('budgets')
-        .select('*')
-        .eq('user_ID', 1001);
-
-    final categoriesResponse = await Supabase.instance.client
-        .from('category_table')
-        .select('category_ID, Title');
-
-    final budgets = budgetsResponse as List<dynamic>;
-    final categories = categoriesResponse as List<dynamic>;
-
-    final budgetsWithId = budgets.map((budget) {
-      final matchingCategory = categories.firstWhere(
-        (c) => c['Title'] == budget['Category'],
-        orElse: () => {'category_ID': 0},
-      );
-
-      final categoryID = (matchingCategory['category_ID'] ?? 0) as int;
-
-      return {...budget, 'category_ID': categoryID};
-    }).toList();
-    
-    return budgetsWithId;
+  Future<List<Budget>> getUserBudgets() async {
+    return await budgetService.getUserBudgets();
   }
 
-  Future<void> deleteBudget(String budgetId) async {
-  try {
-    await Supabase.instance.client
-        .from('budgets')
-        .delete()
-        .eq('budget_ID', budgetId)
-        .eq('user_ID', 1001);
-
-    debugPrint('Deletion was successful!');
-
-  } catch (error) {
-    debugPrint('Error Deleting rows: $error');
-    rethrow;
-  }
-}
-
-  Future<void> confirmDelete(BuildContext context, String budgetID) async {
+  Future<void> confirmDelete(BuildContext context, dynamic budgetID) async {
     final bool? shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -145,7 +100,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
     );
 
     if (shouldDelete == true) {
-      deleteBudget(budgetID);
+      await budgetService.deleteBudget(budgetID);
       setState(() {
       _future = getUserBudgets();
     });
@@ -153,53 +108,9 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
   }
 
   Future<void> loadSpendingData() async {
-    final supabase = Supabase.instance.client;
+    final range = getTimeRange(selectedFilter, DateTime.now());
 
-    // Determine timeframe
-    DateTime now = DateTime.now();
-    late DateTime start;
-    late DateTime end;
-
-    switch (selectedFilter) {
-      case TimeFilter.thisWeek:
-        start = now.subtract(Duration(days: now.weekday - 1));
-        end = DateTime(now.year, now.month, now.day + 1);
-        break;
-
-      case TimeFilter.lastWeek:
-        final lastWeekEnd = now.subtract(Duration(days: now.weekday));
-        start = lastWeekEnd.subtract(Duration(days: 6));
-        end = DateTime(
-          lastWeekEnd.year,
-          lastWeekEnd.month,
-          lastWeekEnd.day + 1,
-        );
-        break;
-
-      case TimeFilter.thisMonth:
-        start = DateTime(now.year, now.month, 1);
-        end = now.add(Duration(days: 1));
-        break;
-
-      case TimeFilter.lastMonth:
-        start = DateTime(now.year, now.month - 1, 1);
-        end = DateTime(now.year, now.month, 1);
-        break;
-
-      case TimeFilter.thisYear:
-        start = DateTime(now.year, 1, 1);
-        end = now.add(Duration(days: 1));
-        break;
-    }
-
-    final response = await supabase
-        .from('budget_transactions')
-        .select(
-          'category_table!inner(category_ID, Title), spendingAmount, transactionDate',
-        )
-        .eq('user_ID', 1001)
-        .gte('transactionDate', start.toIso8601String().split("T")[0])
-        .lt('transactionDate', end.toIso8601String().split("T")[0]);
+    final response = await budgetService.getSpendingRows(start: range.start, end: range.end);
 
     final Map<int, double> tempData = {};
     final Map<int, String> titlesById = {};
@@ -207,7 +118,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
     for (final row in response) {
       final categoryId = row['category_table']['category_ID'] as int;
       final categoryTitle = row['category_table']['Title'] as String;
-      final amount = (row['spendingAmount'].toDouble() ?? 0.0);
+      final amount = ((row['spendingAmount'] as num?) ?? 0).toDouble();
 
       tempData.update(
         categoryId,
@@ -217,6 +128,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
       titlesById[categoryId] = categoryTitle;
     }
 
+    if (!mounted) return;
     setState(() {
       spendingData = tempData;
       categoryTitles = titlesById;
@@ -226,8 +138,8 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
   @override
   void initState() {
     super.initState();
-    loadSpendingData();
     _future = getUserBudgets();
+    loadSpendingData();
   }
 
   @override
@@ -280,17 +192,26 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
         toolbarHeight: 120,
       ),
 
-      body: FutureBuilder(
+      body: FutureBuilder<List<Budget>>(
         future: _future,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final budgets = snapshot.data!;
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error loading budgets",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            );
+          }
+
+          final budgets = snapshot.data ?? <Budget>[];
+
           if (budgets.isEmpty) {
-            debugPrint('Budget data: $budgets');
-            return const Center(child: Text('No budgets found.'));
+            return const Center(child: Text("No budgets found."));
           }
 
           return Stack(
@@ -548,14 +469,11 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                           itemBuilder: ((context, index) {
                             final budget = budgets[index];
 
-                            final String title = budget['Title'];
-                            final double saved = (budget['AmountSaved'] ?? 0)
-                                .toDouble();
-                            final double needed = (budget['AmountNeeded'] ?? 0)
-                                .toDouble();
-                            final double percent =
-                                (saved / (budget['Goal'] ?? 0).toDouble())
-                                    .clamp(0, 1);
+                            final String title = budget.title;
+                            final double saved = budget.amountSaved;
+                            final double needed = budget.amountNeeded;
+                            final percent = budget.percentComplete;
+
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
@@ -573,7 +491,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                     SlidableAction(
                                       flex: 1,
                                       onPressed: (_) {
-                                        confirmDelete(context, budget["budget_ID"] as String);
+                                        confirmDelete(context, budget.budgetId);
                                       },
                                       icon: Icons.delete,
                                       backgroundColor: Colors.red,
@@ -608,7 +526,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                                   50,
                                                 ),
                                             progressColor: getCategoryColor(
-                                              budget['category_ID'],
+                                              budget.categoryId,
                                             ),
                                             circularStrokeCap:
                                                 CircularStrokeCap.round,
@@ -664,9 +582,9 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                               context,
                                               MaterialPageRoute<void>(
                                                 builder: (_) => BudgetPage(
-                                                  budgetId: budget['budget_ID'],
+                                                  budgetId: budget.budgetId,
                                                   categoryId:
-                                                      budget['category_ID'],
+                                                      budget.categoryId,
                                                 ),
                                               ),
                                             );

@@ -9,8 +9,11 @@ import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
 import 'package:moneyup/main.dart';
-import 'package:moneyup/shared/widgets/article_card.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/models/daily_tip.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/widgets/article_card.dart';
+import 'package:moneyup/services/service_locator.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -20,14 +23,14 @@ class EducationScreen extends StatefulWidget {
 }
 
 class _EducationScreenState extends State<EducationScreen> {
-  late Future<List<Map<String, dynamic>>> _randomArticles;
-  late Future<List<Map<String, dynamic>>> _dailyTipsFuture;
+  bool _isLoading = true;
+  List<Article> _articles = [];
+  List<DailyTip> _tips = [];
 
   int _currentTipIndex = 0;
   Timer? _rotationTimer;
-  List<Map<String, dynamic>> _tips = [];
 
-  late final List<String> categories = const [
+  static const categories = [
     'Budgeting',
     'Credit',
     'Debt',
@@ -45,26 +48,8 @@ class _EducationScreenState extends State<EducationScreen> {
     [HexColor('#0D1250'), HexColor('#F5FC97')], // light yellow
   ];
 
-  Future<List<Map<String, dynamic>>> fetchRandomArticles() async {
-    final response = await Supabase.instance.client.rpc(
-      'get_random_articles',
-      params: {'p_limit': 2},
-    );
-
-    return List<Map<String, dynamic>>.from(response);
-  }
-
-  Future<List<Map<String, dynamic>>> fetchDailyTips() async {
-    debugPrint('fetchDailyTips CALLED');
-
-    final response = await Supabase.instance.client.rpc('get_today_tips');
-
-    debugPrint('fetchDailyTips RESPONSE: $response');
-
-    return List<Map<String, dynamic>>.from(response);
-  }
-
   void _startRotation() {
+    _rotationTimer?.cancel();
     _rotationTimer = Timer.periodic(const Duration(seconds: 6), (_) {
       if (!mounted || _tips.isEmpty) return;
 
@@ -83,13 +68,50 @@ class _EducationScreenState extends State<EducationScreen> {
   @override
   void initState() {
     super.initState();
-    _randomArticles = fetchRandomArticles();
-    _dailyTipsFuture = fetchDailyTips();
+    _loadEducation();
+  }
+
+  Future<void> _loadEducation() async {
+    try {
+      final articles = await articleService.fetchRandomArticles();
+      final tips = await articleService.fetchDailyTips();
+
+      if (!mounted) return;
+
+      setState(() {
+        _articles = articles;
+        _tips = tips;
+        _currentTipIndex = 0;
+        _isLoading = false;
+      });
+
+      if (tips.isNotEmpty) _startRotation();
+    } catch (e) {
+      debugPrint('Error loading article: $e');
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {required Key key}) {
+    final tip = _tips[_currentTipIndex];
+    final articles = _articles;
+
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -167,88 +189,60 @@ class _EducationScreenState extends State<EducationScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        FutureBuilder<List<Map<String, dynamic>>>(
-                          future: _dailyTipsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-
-                            if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            }
-
-                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Text('No tips available');
-                            }
-
-                            // Load tips once
-                            if (_tips.isEmpty) {
-                              _tips = snapshot.data!;
-                              _startRotation();
-                            }
-
-                            _tips = snapshot.data!;
-                            if (_rotationTimer == null) _startRotation();
-
-                            final tip = _tips[_currentTipIndex];
-
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Container with tip content
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color.fromARGB(
-                                          16,
-                                          0,
-                                          0,
-                                          0,
-                                        ),
-                                        offset: Offset(0, 8),
-                                        blurRadius: 12,
-                                      ),
-                                    ],
+                        
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Container with tip content
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color.fromARGB(
+                                      16,
+                                      0,
+                                      0,
+                                      0,
+                                    ),
+                                    offset: Offset(0, 8),
+                                    blurRadius: 12,
                                   ),
-                                  height: 130,
-                                  width: 380,
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.fromLTRB(
-                                    25,
-                                    25,
-                                    25,
-                                    0,
+                                ],
+                              ),
+                              height: 130,
+                              width: 380,
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.fromLTRB(
+                                25,
+                                25,
+                                25,
+                                0,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    tip.tipSummary,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        tip['tip_summary'],
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        tip['display_title'],
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    tip.displayTitle,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
-                                ),
+                                ],
+                              ),
+                            ),
 
                                 const SizedBox(height: 20),
 
@@ -279,10 +273,10 @@ class _EducationScreenState extends State<EducationScreen> {
                                   }),
                                 ),
                               ],
-                            );
-                          },
-                        ),
+                            ),
+
                         SizedBox(height: 10),
+
                         Column(
                           children: [
                             Row(
@@ -322,25 +316,10 @@ class _EducationScreenState extends State<EducationScreen> {
                             SizedBox(height: 5),
 
                             // 2 Articles and See All Button
-                            FutureBuilder<List<Map<String, dynamic>>>(
-                              future: _randomArticles,
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return const CircularProgressIndicator();
-                                }
-
-                                final articles = snapshot.data!;
-                                if (articles.isEmpty) {
-                                  return const Text('No articles available.');
-                                }
-
-                                return Column(
-                                  spacing: 15,
-                                  children: articles
-                                      .map((a) => ArticleCard(article: a))
-                                      .toList(),
-                                );
-                              },
+                            Column(
+                              spacing: 15,
+                              children: articles
+                                  .map((a) => ArticleCard(article: a)).toList(),
                             ),
                           ],
                         ),

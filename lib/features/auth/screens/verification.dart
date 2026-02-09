@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/services/plaid_connect.dart'; 
-//import 'package:plaid_flutter/plaid_flutter.dart'; 
 
 class VerificationScreen extends StatefulWidget{
   final String email;

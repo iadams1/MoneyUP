@@ -1,12 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/main.dart';
-import 'package:moneyup/shared/widgets/article_card.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/widgets/article_card.dart';
 import 'package:moneyup/shared/widgets/category_info.dart';
-import 'dart:math';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 // import '../education/widgets/category_info.dart';
 
@@ -19,32 +22,63 @@ class CategoryDetailsScreen extends StatefulWidget {
 }
 
 class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
-  late Future<List<Map<String, dynamic>>> _categoryArticles;
+  bool _isLoading = true;
+  List<Article> _articles = [];
 
   @override
   void initState() {
     super.initState();
-    _categoryArticles = getArticleByCategory(widget.category);
+    _loadArticles();
   }
 
-  Future<List<Map<String, dynamic>>> getArticleByCategory(String category) async {
-    final response = await Supabase.instance.client
-        .from('Educational')
-        .select('*')
-        .eq('category', category);
-
-    return List<Map<String, dynamic>>.from(response);
-  }
-
-  List<Map<String,dynamic>> getRandomArticles(List<Map<String,dynamic>> articles) {
-    final shuffled = List<Map<String,dynamic>>.from(articles)..shuffle(Random());
+  List<Article> getTwoDifferentArticles(List<Article> articles) {
+    if (articles.length <= 2) return articles;
+    final shuffled = List<Article>.from(articles)..shuffle(Random());
     return shuffled.take(2).toList();
+  }
+
+  Future<void> _loadArticles() async {
+    try {
+      final article = await articleService.getArticleByCategory(widget.category);
+      if (!mounted) return;
+
+      setState(() {
+        _articles = article;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading article: $e');
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  
+  Widget _buildContent(BuildContext context, {required Key key}) {
     final categoryInfo = categoryInfoMap[widget.category]!;
+    final randomArticles = getTwoDifferentArticles(_articles);
+
+    if (_articles.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text("No articles available.")),
+      );
+    }
+
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -121,22 +155,7 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
-                        child: FutureBuilder<List<Map<String, dynamic>>>(
-                          future: _categoryArticles,
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                            final articles = snapshot.data!;
-                            if (articles.isEmpty) {
-                              return const Center(
-                                child: Text('No articles available'),
-                              );
-                            }
-                            final randomArticles = getRandomArticles(articles);
-                            return Column(
+                        child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -196,9 +215,7 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
                                   children: randomArticles.map((article)=>ArticleCard(article: article)).toList()
                                 ),
                               ],
-                            );
-                          },
-                        ),
+                            ),
                       ),
                     ),
                   ),

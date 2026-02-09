@@ -3,13 +3,13 @@ import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/main.dart';
+import 'package:moneyup/models/budget.dart';
+import 'package:moneyup/services/service_locator.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'budget_home.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class BudgetPage extends StatefulWidget {
-  final String budgetId;
+  final dynamic budgetId;
   final int categoryId;
 
   const BudgetPage({
@@ -23,16 +23,12 @@ class BudgetPage extends StatefulWidget {
 }
 
 class _BudgetPageState extends State<BudgetPage> {
-  late Future<List<dynamic>> _future;
+  late Future<Budget?> _future;
   bool _initializedArrow = false;
   double previousSaved = 0;
 
-  ValueNotifier<double> overallGoalAmount = ValueNotifier<double>(
-    0,
-  ); // Overall budget goal
-  ValueNotifier<double> goalSaved = ValueNotifier<double>(
-    0,
-  ); // Amount saved towards the goal
+  ValueNotifier<double> overallGoalAmount = ValueNotifier<double>(0,); // Overall budget goal
+  ValueNotifier<double> goalSaved = ValueNotifier<double>(0,); // Amount saved towards the goal
   ValueNotifier<double> goalNeeded = ValueNotifier<double>(0);
 
   initBudget(double saved, double goal, double needed) {
@@ -63,14 +59,8 @@ class _BudgetPageState extends State<BudgetPage> {
     }
   }
 
-  Future<List<dynamic>> getBudget(String budgetId) async {
-    final response = await Supabase.instance.client
-        .from('budgets')
-        .select('*')
-        .eq('budget_ID', budgetId)
-        .eq('user_ID', 1001);
-
-    return response;
+  Future<Budget?> getBudget(dynamic budgetId) async {
+    return await budgetService.getSpecificBudget(budgetId);
   }
 
   @override
@@ -80,21 +70,17 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   Future<void> updateBudget() async {
-    final supabase = Supabase.instance.client;
-
-    try {
-      await supabase
-          .from('budgets')
-          .update({
-            'AmountSaved': goalSaved.value,
-            'AmountNeeded': goalNeeded.value,
-          })
-          .eq('budget_ID', widget.budgetId)
-          .select();
-    } catch (e) {
-      debugPrint('Error updating budget: $e');
-    }
+  try {
+    await budgetService.updateBudget(
+      budgetId: widget.budgetId,
+      amountSaved: goalSaved.value,
+      amountNeeded: goalNeeded.value,
+    );
+  } catch (e) {
+    debugPrint('Error updating budget: $e');
   }
+}
+
 
   Future<void> _showAmountDialog({required bool isAddition}) async {
     final TextEditingController amountController = TextEditingController();
@@ -227,237 +213,231 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
           ),
 
-          FutureBuilder(
+          FutureBuilder<Budget?>(
             future: _future,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-
-              final budgets = snapshot.data!;
-              if (budgets.isEmpty) {
-                return const Center(child: Text('No budgets found.'));
+              if (snapshot.hasError) {
+                return const Center(child: Text("Error loading budget."));
               }
 
-              return ListView.builder(
-                itemCount: budgets.length,
-                itemBuilder: ((context, index) {
-                  final budget = budgets[index];
+              final budget = snapshot.data;
+              if (budget == null) {
+                return const Center(child: Text("No budget found."));
+              }
 
-                  final savedAmount = (budget['AmountSaved'] ?? 0).toDouble();
-                  final goalAmount = (budget['Goal'] ?? 0).toDouble();
-                  final neededAmount = (budget['AmountNeeded'] ?? 0).toDouble();
+              final savedAmount = budget.amountSaved;
+              final goalAmount = budget.goal;
+              final neededAmount = budget.amountNeeded;
 
-                  // initialize the calculator with database values
-                  if (!_initializedArrow) {
-                    initBudget(savedAmount, goalAmount, neededAmount);
-                    _initializedArrow = true;
-                  }
+              // initialize the calculator with database values
+              if (!_initializedArrow) {
+                initBudget(savedAmount, goalAmount, neededAmount);
+                _initializedArrow = true;
+              }
 
-                  return SafeArea(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(50),
-                        ),
-                      ),
-                      height: 680,
-                      child: Column(
-                        children: [
-                          // Space to seperate AppBar and top edge
-                          SizedBox(height: 20),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(right: 25),
-                                  child: IconButton(
-                                    icon: Image.asset(
-                                      'assets/icons/chevronLeftArrow.png',
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute<void>(
-                                          builder: (context) =>
-                                              const BudgetGoalPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
+              return SafeArea(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(50),
+                    ),
+                  ),
+                  height: 680,
+                  child: Column(
+                    children: [
+                      // Space to seperate AppBar and top edge
+                      SizedBox(height: 20),
+
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(right: 25),
+                              child: IconButton(
+                                icon: Image.asset(
+                                  'assets/icons/chevronLeftArrow.png',
                                 ),
-
-                                Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    budget['Title'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 33,
-                                    ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    "Budget Goal",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 23,
-                                      color: const Color.fromARGB(51, 0, 0, 0),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
                             ),
-                          ),
 
-                          SizedBox(height: 10),
-
-                          ValueListenableBuilder(
-                            valueListenable: goalSaved,
-                            builder: (context, currentSaved, _) {
-                              IconData arrowIcon;
-                              Color arrowColor;
-
-                              if (currentSaved > previousSaved) {
-                                arrowIcon = Icons.arrow_upward;
-                                arrowColor = Colors.green;
-                              } else if (currentSaved < previousSaved) {
-                                arrowIcon = Icons.arrow_downward;
-                                arrowColor = Colors.red;
-                              } else {
-                                arrowIcon = Icons.remove; // no change
-                                arrowColor = const Color.fromARGB(6, 0, 0, 0);
-                              }
-
-                              return Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 240,
-                                    height: 240,
-                                    child: CircularPercentIndicator(
-                                      radius: 120,
-                                      lineWidth: 38,
-                                      percent:
-                                          (goalSaved.value /
-                                                  overallGoalAmount.value)
-                                              .clamp(0.0, 1.0),
-                                      center: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            arrowIcon,
-                                            color: arrowColor,
-                                            size: 40,
-                                          ),
-                                          Text(
-                                            "${((goalSaved.value / overallGoalAmount.value) * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 40,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      backgroundColor: const Color.fromARGB(
-                                        6,
-                                        0,
-                                        0,
-                                        0,
-                                      ),
-                                      progressColor: budgetColor,
-                                      circularStrokeCap:
-                                          CircularStrokeCap.round,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 20),
-
-                          ValueListenableBuilder<double>(
-                            valueListenable: overallGoalAmount,
-                            builder: (context, overallGoalAmount, _) {
-                              return Text(
-                                "Budget Goal \$${budget['Goal'].toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 25,
-                                ),
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 20),
-
-                          ValueListenableBuilder<double>(
-                            valueListenable: goalSaved,
-                            builder: (context, goalSaved, _) {
-                              return Text(
-                                "\$${goalSaved.toStringAsFixed(2)} Saved",
+                            Padding(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text(
+                                budget.title,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 25,
+                                  fontSize: 33,
                                 ),
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 2),
-
-                          ValueListenableBuilder<double>(
-                            valueListenable: goalNeeded,
-                            builder: (context, goalNeeded, _) {
-                              return Text(
-                                "\$${goalNeeded.toStringAsFixed(2)} Needed",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 19,
-                                  color: const Color.fromARGB(87, 8, 8, 8),
-                                ),
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 15),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: Image.asset(
-                                  'assets/icons/plusCircle.png',
-                                ),
-                                onPressed: () {
-                                  _showAmountDialog(isAddition: true);
-                                },
                               ),
-                              SizedBox(width: 50),
-                              IconButton(
-                                icon: Image.asset(
-                                  'assets/icons/minusCircle.png',
+                            ),
+
+                            Padding(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text(
+                                "Budget Goal",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 23,
+                                  color: const Color.fromARGB(51, 0, 0, 0),
                                 ),
-                                onPressed: () {
-                                  _showAmountDialog(isAddition: false);
-                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 10),
+
+                      ValueListenableBuilder(
+                        valueListenable: goalSaved,
+                        builder: (context, currentSaved, _) {
+                          IconData arrowIcon;
+                          Color arrowColor;
+
+                          if (currentSaved > previousSaved) {
+                            arrowIcon = Icons.arrow_upward;
+                            arrowColor = Colors.green;
+                          } else if (currentSaved < previousSaved) {
+                            arrowIcon = Icons.arrow_downward;
+                            arrowColor = Colors.red;
+                          } else {
+                            arrowIcon = Icons.remove; // no change
+                            arrowColor = const Color.fromARGB(6, 0, 0, 0);
+                          }
+
+                          final pct = budget.percentComplete;
+                          final pctText = (pct * 100).toStringAsFixed(0);
+
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 240,
+                                height: 240,
+                                child: CircularPercentIndicator(
+                                  radius: 120,
+                                  lineWidth: 38,
+                                  percent:
+                                      (goalSaved.value /
+                                              overallGoalAmount.value)
+                                          .clamp(0.0, 1.0),
+                                  center: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        arrowIcon,
+                                        color: arrowColor,
+                                        size: 40,
+                                      ),
+                                      Text(
+                                        "$pctText%",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 40,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: const Color.fromARGB(
+                                    6,
+                                    0,
+                                    0,
+                                    0,
+                                  ),
+                                  progressColor: budgetColor,
+                                  circularStrokeCap:
+                                      CircularStrokeCap.round,
+                                ),
                               ),
                             ],
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: 20),
+
+                      ValueListenableBuilder<double>(
+                        valueListenable: overallGoalAmount,
+                        builder: (context, overall, _) {
+                          return Text(
+                            "Budget Goal \$${overall.toStringAsFixed(2)}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 25,
+                            ),
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: 20),
+
+                      ValueListenableBuilder<double>(
+                        valueListenable: goalSaved,
+                        builder: (context, saved, _) {
+                          return Text(
+                            "\$${saved.toStringAsFixed(2)} Saved",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 25,
+                            ),
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: 2),
+
+                      ValueListenableBuilder<double>(
+                        valueListenable: goalNeeded,
+                        builder: (context, needed, _) {
+                          return Text(
+                            "\$${needed.toStringAsFixed(2)} Needed",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 19,
+                              color: const Color.fromARGB(87, 8, 8, 8),
+                            ),
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: 15),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/icons/plusCircle.png',
+                            ),
+                            onPressed: () {
+                              _showAmountDialog(isAddition: true);
+                            },
+                          ),
+                          SizedBox(width: 50),
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/icons/minusCircle.png',
+                            ),
+                            onPressed: () {
+                              _showAmountDialog(isAddition: false);
+                            },
                           ),
                         ],
                       ),
-                    ),
-                  );
-                }),
+                    ],
+                  ),
+                ),
               );
             },
           ),

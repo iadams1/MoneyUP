@@ -10,22 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-<<<<<<< HEAD
-  plaid_flutter: ^5.0.5
   http: ^1.2.2
-=======
-  flutter_dotenv: ^5.1.0
->>>>>>> origin/mw-Mal
-  
   supabase_flutter: ^2.12.0
   percent_indicator: ^4.2.5
   fl_chart: ^0.64.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  plaid_flutter: ^5.0.5
-  http: ^1.2.0
-  
   cupertino_icons: ^1.0.8
   hexcolor: ^3.0.2
   form_field_validator: ^1.1.0
@@ -34,6 +25,7 @@ dependencies:
   shared_preferences: ^2.5.4
   plaid_flutter: ^5.0.5
   flutter_dotenv: ^6.0.0
+  flutter_slidable: ^4.0.3
 
 dev_dependencies:
   flutter_test:

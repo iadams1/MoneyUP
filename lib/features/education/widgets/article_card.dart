@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/education/screens/articledetails.dart';
-import 'category_helper.dart';
+import 'package:moneyup/models/article.dart';
+import '../../../shared/widgets/category_helper.dart';
 
 class ArticleCard extends StatelessWidget {
-  final Map<String, dynamic> article;
+  final Article article;
 
   const ArticleCard({
     super.key,
@@ -12,7 +13,7 @@ class ArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = CategoryHelper.getCategoryStyle(article['category'] ?? '');
+    final style = CategoryHelper.getCategoryStyle(article.category);
 
     return Material(
       color: Colors.transparent,
@@ -55,7 +56,7 @@ class ArticleCard extends StatelessWidget {
                     children: [
                       // Article title
                       Text(
-                        article['display_title'],
+                        article.displayTitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -67,7 +68,7 @@ class ArticleCard extends StatelessWidget {
                       ),
                       // Artile author
                       Text(
-                        article['source_author'] ?? article['source_name'],
+                        article.displaySource,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
@@ -87,7 +88,7 @@ class ArticleCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ArticleDetailsScreen(articleId: article['id']),
+                        builder: (_) => ArticleDetailsScreen(articleId: article.articleId),
                       ),
                     );
                   },
