@@ -3,6 +3,7 @@ import 'package:moneyup/models/article.dart';
 import 'package:moneyup/models/daily_tip.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+
 class ArticleService {
   final SupabaseClient _client = Supabase.instance.client;
 
