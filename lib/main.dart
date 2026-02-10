@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/budgetTracker/budget_home.dart';
-import 'package:moneyup/start/verification.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:moneyup/core/config/supabase_config.dart';
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/models/budget.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
+import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moneyup/features/auth/screens/signup.dart';
+import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/services/plaid_service.dart';
 
-import 'package:moneyup/transactions/transactions_home.dart';
-import 'package:moneyup/education/education.dart';
-import 'package:moneyup/profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Supabase.initialize(
-    url: 'https://dnzgsfovhbxsxlbpvzbt.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuemdzZm92aGJ4c3hsYnB2emJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1ODg3MDEsImV4cCI6MjA3NDE2NDcwMX0.B6wXycYdEY_HFiML1CVVaEW-IF4qWwmYPdgynUcyghQ',
+
+  await dotenv.load(fileName: ".env");
+
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
   );
 
   final prefs = await SharedPreferences.getInstance();
@@ -22,31 +33,25 @@ void main() async {
   runApp(MyApp(showHome: hasSeenOnboarding));
 }
 
-enum BudgetType {
-  food("Food & Dining"),
-  entertainment("Entertainment & Leisure"),
-  transportation("Transportation"),
-  shopping("Shopping & Personal"),
-  housing("Housing & Utilities");
-
-  final String label;
-  const BudgetType(this.label);
-}
-
 class MyApp extends StatelessWidget {
   final bool showHome;
   const MyApp({super.key, required this.showHome});
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'MoneyUP',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: "SF Pro",
       ),
-      home: VerificationScreen(email: '')
-      // home: const MyHomePage(title: 'MoneyUP'),
+      routes: {
+        '/': (context) => const SignUpScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const MyHomePage(title: 'MoneyUP'),
+        '/plaid-connect': (context) => PlaidConnectScreen(),
+      },
+      initialRoute: '/home',
     );
   }
 }
@@ -61,34 +66,102 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<Map<String, dynamic>?> _randomBudget;
+  bool _isLoading = true;
+  Budget? _budget; 
 
   @override
   void initState() {
     super.initState();
-    _randomBudget = getRandomBudget();
+    _init();
   }
 
-  Future<Map<String, dynamic>?> getRandomBudget() async {
-  try {
-    final response = await Supabase.instance.client
-        .rpc('get_random_budget', params: {'p_user_id': 1001});
+  Future<void> _init() async {
+    try {
+      // Start loading
+      setState(() => _isLoading = true);
 
-    debugPrint("RPC response: $response");
+      final user = supabaseService.currentUserId;
+      if (user != null) {
+        // await it so errors are caught
+        await supabaseService.syncAll();
+      }
 
-    if (response == null) return null;
-    if (response is List && response.isEmpty) return null;
+      await _loadHome();
+    } catch (e, st) {
+      debugPrint('Home init error: $e');
+      debugPrintStack(stackTrace: st);
 
-    return (response as List).first as Map<String, dynamic>;
-  } catch (e) {
-    debugPrint("RPC ERROR: $e");
-    rethrow;
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Home failed: $e')),
+      );
+    }
   }
-}
+
+
+  Future<void> _loadHome() async {
+    try {
+      final budget = await budgetService.getRandomBudget();
+
+      if (!mounted) return;
+
+      setState(() {
+        _budget = budget;
+        _isLoading = false;
+      });
+
+    } catch (e) {
+      debugPrint('Error loading budgets: $e');
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  Widget _buildBudgetCard(BuildContext context) {
+    final budget = _budget;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromARGB(16, 0, 0, 0),
+            offset: Offset(0, 8),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      height: 160,
+      width: 380,
+      alignment: Alignment.center,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: budget == null
+            ? const NoBudgetView()
+            : BudgetView(budget: budget),
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {required Key key}) {
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -111,15 +184,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: Image.asset('assets/icons/profileIcon.png'),
               ),
-              Container( // NOTIFICATION ICON
+              Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
                     // print('Notification icon pressed');
-                  }, 
+                  },
                   icon: Icon(
-                    Icons.notifications_outlined, 
+                    Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
                   ),
@@ -133,12 +206,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
               'assets/images/mu_bg.png',
               fit: BoxFit.fill
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -149,138 +222,41 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: Column(
                 children: [
+                  // MyWallet Card Widget
+                  SizedBox(
+                    height: 100,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Go to Wallet Screen [This is a Placeholder Button]",
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MyWallet(),
+                                ),
+                              );
+                            }, 
+                            child: Text(
+                              "See Cards"
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ),
+                
+                  // Article Card Widget
+
+                  // Budget Card Widget
                   SizedBox(
                     height: 50,
                   ),
-                  // Budget Tracker Section
-                  FutureBuilder<Map<String, dynamic>?>(
-                    future: _randomBudget, 
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (snapshot.data == null) {
-                        return const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text("No budgets available."),
-                        );
-                      }
-
-                      final budget = snapshot.data!;
-                      return Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color.fromARGB(16, 0, 0, 0),
-                                offset: Offset(0, 8),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                        height: 160,
-                        width: 380,
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Row(
-                            children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 140,
-                                    height: 140,
-                                    child: CircularPercentIndicator(
-                                      radius: 60,
-                                      lineWidth: 18,
-                                      percent:
-                                          (budget["AmountSaved"] / budget["Goal"]).clamp(0.0, 1.0),
-                                      center: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "${((budget["AmountSaved"] / budget["Goal"]) * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 25,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      backgroundColor: const Color.fromARGB(6, 0, 0, 0,),
-                                      progressColor: Color.fromRGBO(47, 52, 126, 100),
-                                      circularStrokeCap: CircularStrokeCap.round,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 30),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(height: 0),
-                                    Text(
-                                      budget["Title"],
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w600
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                                        padding: EdgeInsets.zero,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(200),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute<void>(
-                                            builder: (_) => BudgetGoalPage(),
-                                          ),
-                                        );
-                                      },
-                                      child: Ink(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [Color.fromRGBO(25, 50, 100, 100), Color.fromRGBO(47, 52, 126, 100)],
-                                          ),
-                                          borderRadius: BorderRadius.circular(200),
-                                        ),
-                                        child: Container(
-                                          width: 220,
-                                          height: 40,
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'See All',
-                                            style: TextStyle(
-                                              color: Colors.white, 
-                                              fontSize: 18
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  )
+                  _buildBudgetCard(context),
                 ],
               )
             ),
