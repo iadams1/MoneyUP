@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
 import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
       title: 'MoneyUP',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: "SF Pro",
       ),
       routes: {
         '/': (context) => const SignUpScreen(),
@@ -220,6 +222,37 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: Column(
                 children: [
+                  // MyWallet Card Widget
+                  SizedBox(
+                    height: 100,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Go to Wallet Screen [This is a Placeholder Button]",
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MyWallet(),
+                                ),
+                              );
+                            }, 
+                            child: Text(
+                              "See Cards"
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ),
+                
+                  // Article Card Widget
+
+                  // Budget Card Widget
                   SizedBox(
                     height: 50,
                   ),
