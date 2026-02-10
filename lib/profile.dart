@@ -4,6 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -122,13 +123,36 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         child:ElevatedButton(
-                          onPressed: () {
-                            // if (_formkey.currentState!.validate()) {
-                            //   Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => const MyHomePage(title: '',)),
-                            //   );
-                            // }
+                          onPressed: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Log Out'),
+                                content: const Text('Are you sure you want to log out?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text('Log Out', style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirmed != true) return;
+
+                            // Proceed with logout...
+                            try {
+                              await Supabase.instance.client.auth.signOut();
+                              if (context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                              }
+                            } catch (e) {
+                              // error handling...
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
