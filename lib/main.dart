@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
+import 'package:moneyup/features/mywallet/widgets/primary_card_view.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
@@ -15,7 +16,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/services/plaid_service.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,7 +67,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
-  Budget? _budget; 
+  Budget? _budget;
+
+  //static const double cardHeight = 250;
 
   @override
   void initState() {
@@ -82,7 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       final user = supabaseService.currentUserId;
       if (user != null) {
-        // await it so errors are caught
         await supabaseService.syncAll();
       }
 
@@ -94,24 +95,24 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Home failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
     }
   }
-
 
   Future<void> _loadHome() async {
     try {
       final budget = await budgetService.getRandomBudget();
+      final cards = await walletService.fetchLinkedCards();
 
       if (!mounted) return;
 
       setState(() {
+        cards.isNotEmpty ? cards.first : null;
         _budget = budget;
         _isLoading = false;
       });
-
     } catch (e) {
       debugPrint('Error loading budgets: $e');
       if (!mounted) return;
@@ -206,59 +207,87 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/mu_bg.png',
-              fit: BoxFit.fill
-            ),
+            child: Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           ),
           SafeArea(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
               child: Column(
                 children: [
+                  SizedBox(height: 12.5),
                   // MyWallet Card Widget
-                  SizedBox(
-                    height: 100,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Go to Wallet Screen [This is a Placeholder Button]",
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MyWallet(),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
+                          child: SizedBox(
+                            width: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                              );
-                            }, 
-                            child: Text(
-                              "See Cards"
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const MyWallet(),
+                                  ),
+                                );
+                              },
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromRGBO(25, 50, 100, 1),
+                                      Color.fromRGBO(47, 52, 126, 1),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const SizedBox(
+                                  width: 50,
+                                  height: 220,
+                                  child: Center(
+                                    child: Text(
+                                      "+",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    )
+                        ),
+                        SizedBox(
+                          height: 250,
+                          width: 330,
+                          child: PrimaryCardView(),
+                        ),
+                      ],
+                    ),
                   ),
-                
+
                   // Article Card Widget
 
                   // Budget Card Widget
-                  SizedBox(
-                    height: 50,
-                  ),
                   _buildBudgetCard(context),
                 ],
-              )
+              ),
             ),
           ),
         ],
@@ -275,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -285,9 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -296,20 +323,16 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),

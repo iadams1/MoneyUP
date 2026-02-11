@@ -1,10 +1,15 @@
 import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/mywallet/widgets/add_card_dialog.dart';
+import 'package:moneyup/features/mywallet/widgets/linked_card_tile.dart';
+import 'package:moneyup/features/mywallet/widgets/page_indicator.dart';
 import 'package:moneyup/features/mywallet/widgets/wallet_card.dart';
+import 'package:moneyup/models/linked_card.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/main.dart';
+import 'package:moneyup/services/service_locator.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
 
 class MyWallet extends StatefulWidget {
@@ -16,6 +21,7 @@ class MyWallet extends StatefulWidget {
 
 class _MyWallet extends State<MyWallet> {
   bool _isLoading = true;
+  List<LinkedCard> _cards = [];
 
   late final PageController _pageController;
   int _currentCard = 0;
@@ -34,14 +40,21 @@ class _MyWallet extends State<MyWallet> {
   }
 
   Future<void> _loadWallets() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
+      final cards = await walletService.fetchLinkedCards();
       if (!mounted) return;
 
       setState(() {
+        _cards = cards;
         _isLoading = false;
+        
       });
     } catch (e) {
-      debugPrint('Error loading article: $e');
+      debugPrint('Error loading cards: $e');
       if (!mounted) return;
 
       setState(() {
@@ -61,10 +74,13 @@ class _MyWallet extends State<MyWallet> {
   }
 
   Widget _buildContent(BuildContext context, {required Key key}) {
+    final cards = _cards;
+
     return Scaffold(
       key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
@@ -107,7 +123,7 @@ class _MyWallet extends State<MyWallet> {
               ),
 
               Padding(
-                padding: EdgeInsets.only(top: 25),
+                padding: EdgeInsets.only(top: 5),
                 child: IconButton(
                   icon: Image.asset('assets/icons/whiteChevronLeftArrow.png'),
                   alignment: Alignment.topLeft,
@@ -119,7 +135,7 @@ class _MyWallet extends State<MyWallet> {
             ],
           ),
         ),
-        toolbarHeight: 200,
+        toolbarHeight: 180,
       ),
       body: Stack(
         children: [
@@ -130,15 +146,15 @@ class _MyWallet extends State<MyWallet> {
               fit: BoxFit.fill,
             ),
           ),
-          
+
           Align(
             // WHITE BOX CONTAINER
             alignment: Alignment.bottomCenter,
             child: Container(
               width: double.infinity,
-              height: 500,
+              height: 590,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(45.0)),
                 color: Colors.white,
               ),
             ),
@@ -147,51 +163,108 @@ class _MyWallet extends State<MyWallet> {
           Positioned(
             left: 0,
             right: 0,
-            top: 240,
+            top: 220,
+            bottom: 140,
             child: SizedBox(
               height: 300,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    height: 255,
+                    height: 250,
                     child: PageView.builder(
                       controller: _pageController,
-                      itemCount: 3, // Change this later for user cards
+                      itemCount: cards.length,
                       onPageChanged: (index) {
                         setState(() {
                           _currentCard = index;
                         });
                       },
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.fromLTRB(8, 8, 8, 30),
-                          child: WalletCard(
-                            bankName: "Bank of America",
-                            mask: "4982",
-                            currentAmount: 495.32,
-                            cardholderName: "Isaiah Adams",
-                          ),
+                        final card = cards[index];
+                        return WalletCard(
+                          cardId: index,
+                          bankName: card.bankName ?? "Unknown Bank", 
+                          mask: card.mask, 
+                          currentAmount: card.currentBalance ?? 0.0, 
+                          cardholderName: card.cardholderName ?? "",
                         );
-                      },
+                      }
                     ),
                   ),
 
-                  buildDots(3), // Change this for later for user
+                  PageIndicatorDots(
+                    count: cards.length,
+                    currentIndex: _currentCard,
+                  ),
+
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Cards",
+                              style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "${cards.length} Linked",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w600,
+                                color: const Color.fromARGB(55, 0, 0, 0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 20),
+                      itemCount: cards.length,
+                      itemBuilder: (context, index) {
+                        final card = cards[index];
+                        return LinkedCardTile(
+                          cardId: index, 
+                          card: card, 
+                          onDelete: () {});
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-
-          Row(
-
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 725,
+            bottom: 0,
+            child: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const AddCardDialog(),
+                );
+              },
+              child: Image.asset("assets/icons/plusCircle.png"),
+            ),
           ),
-
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
+        color: const Color.fromARGB(0, 255, 255, 255),
+        height: 70,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -236,26 +309,6 @@ class _MyWallet extends State<MyWallet> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget buildDots(int count) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(count, (index) {
-        final isActive = index == _currentCard;
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          height: 10,
-          width: isActive ? 26 : 10,
-          decoration: BoxDecoration(
-            color: isActive ? Colors.black : Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
-          ),
-        );
-      }),
     );
   }
 }

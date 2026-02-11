@@ -14,7 +14,7 @@ class PlaidConnectScreen extends StatefulWidget {
 
 class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
   String? _linkToken;
-  bool _isLoading = true; // Start true since we fetch immediately
+  bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
   StreamSubscription? _plaidSuccessStream;
@@ -42,9 +42,6 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
         }
       }
     });
-
-    // Optional: for debugging Plaid events
-    // PlaidLink.onEvent.listen((event) => debugPrint('Plaid event: ${event.name}'));
   }
 
   @override
@@ -107,13 +104,10 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
         'exchange-public-token',
         body: {
           'public_token': success.publicToken,
-          // OPTIONAL: pass metadata so backend can store institution name without extra calls
           'institution_id': success.metadata.institution?.id,
           'institution_name': success.metadata.institution?.name,
         },
       );
-
-
 
       debugPrint('exchange response: status=${exchangeResponse.status} data=${exchangeResponse.data}');
 
@@ -125,7 +119,6 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
 
       final data = exchangeResponse.data as Map<String, dynamic>;
 
-      // If your function returns { success: true, connection: {...} }
       if (data['success'] != true) {
         throw Exception(data['error'] ?? 'Exchange failed (no success flag)');
       }
