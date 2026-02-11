@@ -6,7 +6,7 @@ class OtpInput extends StatefulWidget {
   
   const OtpInput({
     super.key,
-    this.length = 5,
+    this.length = 6,
   });
 
   @override
@@ -102,7 +102,9 @@ class _OtpInputState extends State<OtpInput> {
                 ),
               ),
               onChanged: (value) {
-                //
+                if (value.length == _nodes) {
+                  //
+                }
               },
             ),
           );

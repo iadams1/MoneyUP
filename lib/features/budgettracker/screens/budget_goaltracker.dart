@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/budgettracker/utils/category_colors.dart';
 import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/profile/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/models/budget.dart';

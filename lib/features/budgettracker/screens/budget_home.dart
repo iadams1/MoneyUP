@@ -4,7 +4,7 @@ import 'package:moneyup/features/budgettracker/utils/category_colors.dart';
 import 'package:moneyup/features/budgettracker/utils/time_range.dart';
 import 'package:moneyup/features/budgettracker/widgets/budget_listing_view.dart';
 import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/profile/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/models/budget.dart';

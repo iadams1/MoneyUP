@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/config/supabase_config.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
-import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moneyup/core/config/supabase_config.dart';
+
+import 'package:moneyup/features/auth/screens/info.dart';
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
+import 'package:moneyup/features/profile/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
+import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/models/budget.dart';
+import 'package:moneyup/services/service_locator.dart';
 import 'package:moneyup/services/plaid_service.dart';
 
 
@@ -46,12 +48,13 @@ class MyApp extends StatelessWidget {
         fontFamily: "SF Pro",
       ),
       routes: {
+        '/start': (context) => const InfoScreen(),
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
         '/plaid-connect': (context) => PlaidConnectScreen(),
       },
-      initialRoute: '/home',
+      initialRoute: '/start',
     );
   }
 }
