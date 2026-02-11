@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/main.dart';
+
+import '/main.dart';
 
 class InfoScreen extends StatefulWidget {
   const InfoScreen({super.key});

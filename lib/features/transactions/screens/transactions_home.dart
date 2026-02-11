@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/profile/screens/profile.dart';
-import 'package:moneyup/main.dart';
+
+import '/features/education/screens/education.dart';
+import '/features/profile/screens/profile.dart';
+import '/main.dart';
+import '/shared/widgets/profile_menu.dart';
 
 class TransactionsHome extends StatelessWidget {
   const TransactionsHome({super.key});
@@ -19,30 +21,7 @@ class TransactionsHome extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context, 
-                    MaterialPageRoute(builder: (_) => ProfileScreen()),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.all(0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color.fromARGB(0, 255, 255, 255),
-                    border: Border.all(
-                      width: 3,
-                      color: const Color.fromARGB(255, 121, 121, 121),
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: AssetImage('assets/icons/profileIcon.png'),
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
-              ),
+              ProfileMenuCard(),
               Container( // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/main.dart';
-import 'package:moneyup/services/auth_service.dart';
+
+import '/main.dart';
+import '/features/auth/screens/signup.dart';
+import '/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

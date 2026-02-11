@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/models/budget_type.dart';
-import 'package:moneyup/services/service_locator.dart';
+import '/models/budget.dart';
+import '/models/budget_type.dart';
+import '/services/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BudgetService {

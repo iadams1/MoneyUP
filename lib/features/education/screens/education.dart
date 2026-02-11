@@ -1,19 +1,19 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/education/screens/categorydetails.dart';
-import 'package:moneyup/features/education/screens/viewallarticles.dart';
-import 'package:moneyup/features/profile/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
-import 'package:moneyup/main.dart';
-import 'package:moneyup/models/article.dart';
-import 'package:moneyup/models/daily_tip.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/features/education/widgets/article_card.dart';
-import 'package:moneyup/services/service_locator.dart';
+import '/features/education/screens/categorydetails.dart';
+import '/features/education/screens/viewallarticles.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/main.dart';
+import '/models/article.dart';
+import '/models/daily_tip.dart';
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/profile_menu.dart';
+import '/features/education/widgets/article_card.dart';
+import '/services/service_locator.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -122,18 +122,7 @@ class _EducationScreenState extends State<EducationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
-              ),
+              ProfileMenuCard(),
               Container(
                 // NOTIFICATION ICON
                 alignment: Alignment.topRight,

@@ -1,11 +1,11 @@
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/mywallet/widgets/wallet_card.dart';
-import 'package:moneyup/features/profile/screens/profile.dart';
-
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/main.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
+
+import '/features/education/screens/education.dart';
+import '/features/mywallet/widgets/wallet_card.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/main.dart';
+import '/shared/screen/loading_screen.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});

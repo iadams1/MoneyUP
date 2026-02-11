@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:moneyup/core/config/supabase_config.dart';
 
-import 'package:moneyup/features/auth/screens/info.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
-import 'package:moneyup/features/profile/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
-import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
-import 'package:moneyup/features/auth/screens/signup.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/services/plaid_service.dart';
+import '/core/config/supabase_config.dart';
+import '/features/education/screens/education.dart';
+import '/features/mywallet/screens/my_wallet.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/features/budgettracker/widgets/budget_view.dart';
+import '/features/budgettracker/widgets/no_budget_view.dart';
+import '/features/auth/screens/signup.dart';
+import '/features/auth/screens/login.dart';
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/profile_menu.dart';
+import '/models/budget.dart';
+import '/services/service_locator.dart';
+import '/services/plaid_service.dart';
 
 
 void main() async {
@@ -48,13 +48,12 @@ class MyApp extends StatelessWidget {
         fontFamily: "SF Pro",
       ),
       routes: {
-        '/start': (context) => const InfoScreen(),
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
         '/plaid-connect': (context) => PlaidConnectScreen(),
       },
-      initialRoute: '/start',
+      initialRoute: '/home',
     );
   }
 }
@@ -175,18 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
-              ),
+              ProfileMenuCard(),
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
@@ -252,8 +240,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     )
                   ),
-                
                   // Article Card Widget
+
 
                   // Budget Card Widget
                   SizedBox(
