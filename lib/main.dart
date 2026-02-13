@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:moneyup/budgetTracker/budget_home.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+=======
+import 'package:moneyup/core/config/supabase_config.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.)
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -55,6 +60,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
     );
   }
+<<<<<<< HEAD
 }
 
 class MyHomePage extends StatefulWidget {
@@ -347,4 +353,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+=======
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.)
 }

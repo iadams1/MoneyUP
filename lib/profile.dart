@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+<<<<<<< HEAD:lib/profile.dart
 
 import 'package:moneyup/education/education.dart';
 import 'package:moneyup/main.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
+=======
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.):lib/features/proflie/screens/profile.dart
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

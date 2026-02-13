@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
+<<<<<<< HEAD:lib/start/login.dart
+=======
+import 'package:moneyup/features/auth/screens/signup.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.):lib/features/auth/screens/login.dart
 import 'package:moneyup/services/auth_service.dart';
 import 'package:moneyup/start/signup.dart';
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD:lib/education/articledetails.dart
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:moneyup/education/education.dart';
@@ -7,6 +8,16 @@ import 'package:moneyup/profile.dart';
 import 'package:moneyup/transactions/transactions_home.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+=======
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.):lib/features/education/screens/articledetails.dart
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;

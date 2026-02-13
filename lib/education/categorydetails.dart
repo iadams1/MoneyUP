@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD:lib/education/categorydetails.dart
 import 'package:moneyup/education/widgets/category_info.dart';
 import 'dart:math';
 import 'package:supabase_flutter/supabase_flutter.dart';
+=======
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/widgets/article_card.dart';
+import 'package:moneyup/shared/widgets/category_info.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.):lib/features/education/screens/categorydetails.dart
 
 import '../education/widgets/article_card.dart';
 // import '../education/widgets/category_info.dart';

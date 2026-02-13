@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD:lib/start/info.dart
 // import 'package:shared_preferences/shared_preferences.dart';
+=======
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+>>>>>>> 1a5ac9c (Finished the MyWallet screens and added widgets to the home screen. Also moved the home screen to its own folder.):lib/features/auth/screens/info.dart
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/main.dart';
 
 class InfoScreen extends StatefulWidget {
   const InfoScreen({super.key});
