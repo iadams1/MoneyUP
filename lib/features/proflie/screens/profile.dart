@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/main.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

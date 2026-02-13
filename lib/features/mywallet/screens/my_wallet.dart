@@ -1,4 +1,5 @@
 import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/mywallet/widgets/add_card_dialog.dart';
 import 'package:moneyup/features/mywallet/widgets/linked_card_tile.dart';
 import 'package:moneyup/features/mywallet/widgets/page_indicator.dart';
@@ -8,7 +9,6 @@ import 'package:moneyup/features/proflie/screens/profile.dart';
 
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/main.dart';
 import 'package:moneyup/services/service_locator.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
 
@@ -49,9 +49,8 @@ class _MyWallet extends State<MyWallet> {
       if (!mounted) return;
 
       setState(() {
-        _cards = cards;
+        _cards = cards.where((card) => card.isActive == true).toList();
         _isLoading = false;
-        
       });
     } catch (e) {
       debugPrint('Error loading cards: $e');
@@ -60,6 +59,146 @@ class _MyWallet extends State<MyWallet> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> deleteCard(
+    BuildContext context,
+    dynamic accountId,
+    String mask,
+    String accountName,
+    String? bankName,
+  ) async {
+    final bool? shouldDelete = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            "Delete Card",
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    const BoxShadow(
+                      color: Color.fromARGB(31, 0, 0, 0),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: SizedBox(
+                  height: 85,
+                  width: 300,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        accountName,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      Text(
+                        "****  ****  ****  $mask",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+
+                      Text(
+                        bankName ?? "Unknown Bank",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(65, 0, 0, 0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                "Are you sure you want to delete this card?",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: const Text(
+                        "Continue",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldDelete == true) {
+      await walletService.deleteCardAccount(accountId: accountId);
+      if (!mounted) return;
+      await _loadWallets();
     }
   }
 
@@ -184,12 +323,12 @@ class _MyWallet extends State<MyWallet> {
                         final card = cards[index];
                         return WalletCard(
                           cardId: index,
-                          bankName: card.bankName ?? "Unknown Bank", 
-                          mask: card.mask, 
-                          currentAmount: card.currentBalance ?? 0.0, 
+                          bankName: card.bankName ?? "Unknown Bank",
+                          mask: card.mask,
+                          currentAmount: card.currentBalance ?? 0.0,
                           cardholderName: card.cardholderName ?? "",
                         );
-                      }
+                      },
                     ),
                   ),
 
@@ -197,7 +336,6 @@ class _MyWallet extends State<MyWallet> {
                     count: cards.length,
                     currentIndex: _currentCard,
                   ),
-
 
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -235,9 +373,18 @@ class _MyWallet extends State<MyWallet> {
                       itemBuilder: (context, index) {
                         final card = cards[index];
                         return LinkedCardTile(
-                          cardId: index, 
-                          card: card, 
-                          onDelete: () {});
+                          cardId: index,
+                          card: card,
+                          onDelete: () {
+                            deleteCard(
+                              context,
+                              card.accountId,
+                              card.mask,
+                              card.accountName,
+                              card.bankName,
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
@@ -246,18 +393,28 @@ class _MyWallet extends State<MyWallet> {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
-            top: 725,
-            bottom: 0,
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => const AddCardDialog(),
-                );
-              },
-              child: Image.asset("assets/icons/plusCircle.png"),
+            left: 175,
+            right: 175,
+            top: 795,
+            bottom: 80,
+            child: SizedBox(
+              width: 10,
+              height: 10,
+              child: IconButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => const AddCardDialog(),
+                  );
+                },
+                icon: Image.asset("assets/icons/plusCircle.png"),
+              ),
             ),
           ),
         ],

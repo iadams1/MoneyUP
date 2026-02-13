@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/main.dart';
 
 class TransactionsHome extends StatelessWidget {
   const TransactionsHome({super.key});

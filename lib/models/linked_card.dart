@@ -3,6 +3,7 @@ class LinkedCard{
   final String accountName;
   final String mask;
   final String type;
+  final bool isActive; 
 
   final String? bankName;
   final double? currentBalance;
@@ -20,6 +21,7 @@ class LinkedCard{
     this.currentBalance,
     this.creditLimit,
     this.cardholderName,
+    required this.isActive,
   });
 
   factory LinkedCard.fromMap(Map<String, dynamic> map) {
@@ -31,6 +33,7 @@ class LinkedCard{
       accountName: map["name"] as String, 
       mask: map["mask"] as String, 
       type: map["type"] as String,
+      isActive: map["is_active"] as bool,
 
       availableBalance: (map["available_balance"] as num?)?.toDouble(),
       currentBalance: (map["current_balance"] as num?)?.toDouble(),

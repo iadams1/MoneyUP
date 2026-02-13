@@ -27,9 +27,9 @@ class _PrimaryWalletCardState extends State<PrimaryCardView> {
   @override
   void didUpdateWidget(covariant PrimaryCardView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.cards != widget.cards && widget.cards != null) {
+    if (oldWidget.cards != widget.cards) {
       setState(() {
-        _pickPrimary(widget.cards!);
+        _pickPrimary(widget.cards ?? const []);
       });
     }
   }
@@ -48,7 +48,14 @@ class _PrimaryWalletCardState extends State<PrimaryCardView> {
   }
 
   void _pickPrimary(List<LinkedCard> cards) {
-    _primary = cards.isEmpty ? null : cards.first;
+    _primary = null;
+
+    for (final c in cards) {
+      if (c.isActive == true) {
+        _primary = c;
+        break;
+      }
+    }
   }
 
   @override

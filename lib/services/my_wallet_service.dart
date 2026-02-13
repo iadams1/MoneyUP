@@ -9,10 +9,8 @@ class MyWalletService {
   final user = supabaseService.currentUserId!;
   
   Future<List<LinkedCard>> fetchLinkedCards() async {
-    debugPrint("currentUser: $user");
-    debugPrint("currentSession: ${_client.auth.currentSession != null}");
     final rows = await _client
-        .from('plaid_accounts') // <-- your table
+        .from('plaid_accounts')
         .select('''
           account_id, 
           name, 
@@ -22,7 +20,8 @@ class MyWalletService {
           current_balance, 
           credit_limit, 
           plaid_items!left(institution_name), 
-          profiles!left(full_name)
+          profiles!left(full_name),
+          is_active
         ''')
         .eq('user_id', user);
 
@@ -35,5 +34,22 @@ class MyWalletService {
     final cards = await fetchLinkedCards();
     if (cards.isEmpty) return null;
     return cards.first;
+  }
+
+  Future<void> deleteCardAccount({required dynamic accountId}) async {
+    try {
+      await _client
+        .from('plaid_accounts')
+        .update({
+          'is_active': false,
+        })
+        .eq('account_id', accountId)
+        .eq('user_id', user);
+      
+      debugPrint('Deletion was successful!');
+    } catch (error) {
+      debugPrint('Error Deleting rows: $error');
+        rethrow;
+    }
   }
 }

@@ -5,10 +5,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/education/screens/categorydetails.dart';
 import 'package:moneyup/features/education/screens/viewallarticles.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/proflie/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
-import 'package:moneyup/main.dart';
 import 'package:moneyup/models/article.dart';
 import 'package:moneyup/models/daily_tip.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
