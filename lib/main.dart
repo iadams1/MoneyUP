@@ -4,10 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '/features/home/screens/my_home_page.dart';
-import '/core/config/supabase_config.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/auth/screens/login.dart';
 import '/services/plaid_service.dart';
+import '/core/config/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
