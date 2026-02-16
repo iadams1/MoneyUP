@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import '/features/budgettracker/utils/category_colors.dart';
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
-import '/main.dart';
 import '/models/budget.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';

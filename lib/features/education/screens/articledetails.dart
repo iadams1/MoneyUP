@@ -7,7 +7,7 @@ import '/features/transactions/screens/transactions_home.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
-import '/main.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;

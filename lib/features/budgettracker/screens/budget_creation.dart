@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '/features/education/screens/education.dart';
+import '/features/home/screens/my_home_page.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
 import '/models/budget_type.dart';
-import '/main.dart';
 import '/services/service_locator.dart';
 
 // -------------- Budget Creation Page Widget -------------- //
