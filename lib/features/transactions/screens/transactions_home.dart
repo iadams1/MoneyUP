@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
 
-class TransactionsHome extends StatelessWidget {
+import '/features/transactions/widgets/no_transaction_view.dart';
+import '/features/transactions/widgets/transaction_card.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/profile_menu.dart';
+import '/models/transaction.dart';
+
+class TransactionsHome extends StatefulWidget {
   const TransactionsHome({super.key});
+
+  @override
+  State<TransactionsHome> createState() => _TransactionsHomeState();
+}
   
+class _TransactionsHomeState extends State<TransactionsHome> {
+  // final bool _isLoading = true;
+  
+  List<Transaction> transactions = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,30 +31,45 @@ class TransactionsHome extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
+              ProfileMenuCard(),
+              TextButton(
+                onPressed: () {
+                  //
+                }, 
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.white,
                 ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+                child: Text(
+                  'View Debit',
+                ),
               ),
-              Container( // NOTIFICATION ICON
-                alignment: Alignment.topRight,
-                padding: EdgeInsets.all(5),
-                child: IconButton(
-                  onPressed: () {
-                    // print('Notification icon pressed');
-                  }, 
-                  icon: Icon(
-                    Icons.notifications_outlined, 
-                    color: Colors.white,
-                    size: 30.0,
-                  ),
+              TextButton(
+                onPressed: () {
+                  //
+                },
+                child: Text(
+                  'View Credit',
+                  style: TextStyle(color: Colors.white)
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  //
+                },
+                icon: Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 25,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  // print('Notification icon pressed');
+                }, 
+                icon: Icon(
+                  Icons.notifications_outlined, 
+                  color: Colors.white,
+                  size: 25,
                 ),
               ),
             ],
@@ -67,63 +94,57 @@ class TransactionsHome extends StatelessWidget {
                 ),
                 color: Colors.white,
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Latest Transactions',
+                          style: TextStyle(
+                            fontFamily: 'SF Pro',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 28
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            //
+                          },
+                          icon: Icon(Icons.filter_alt_outlined),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child: transactions.isEmpty
+                      ? NoTransactionView()
+                      : ListView.builder(
+                        itemCount: transactions.length,
+                        itemBuilder: (context, index) {
+                          final t = transactions[index];
+                        
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom:15),
+                            child: TransactionCard(transaction: t,),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/transactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                 Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 }

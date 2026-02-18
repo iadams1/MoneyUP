@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/config/supabase_config.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:moneyup/features/auth/screens/signup.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/services/plaid_service.dart';
+
+import '/features/home/screens/my_home_page.dart';
+import '/features/auth/screens/signup.dart';
+import '/features/auth/screens/login.dart';
+import '/services/plaid_service.dart';
+import '/core/config/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,3 +47,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

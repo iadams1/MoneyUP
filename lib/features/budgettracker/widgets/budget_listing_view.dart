@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_list_item.dart';
-import 'package:moneyup/models/budget.dart';
+
+import '/features/budgettracker/widgets/budget_list_item.dart';
+import '/models/budget.dart';
 
 class BudgetListingView extends StatelessWidget {
   final List<Budget> budgets;

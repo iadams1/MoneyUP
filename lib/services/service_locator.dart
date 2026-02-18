@@ -1,7 +1,7 @@
-import 'package:moneyup/services/article_service.dart';
-import 'package:moneyup/services/my_wallet_service.dart';
-import 'package:moneyup/services/supabase_service.dart';
-import 'package:moneyup/services/budget_service.dart';
+import '/services/article_service.dart';
+import '/services/supabase_service.dart';
+import '/services/budget_service.dart';
+import '/services/my_wallet_service.dart';
 
 final supabaseService = SupabaseService();
 final budgetService = BudgetService();

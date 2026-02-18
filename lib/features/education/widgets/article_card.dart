@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/articledetails.dart';
-import 'package:moneyup/models/article.dart';
-import '../../../shared/widgets/category_helper.dart';
+
+import '/features/education/screens/articledetails.dart';
+import '/models/article.dart';
+import '/shared/widgets/category_helper.dart';
 
 class ArticleCard extends StatelessWidget {
   final Article article;

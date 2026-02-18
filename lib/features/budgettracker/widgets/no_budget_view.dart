@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
+
+import '/features/budgettracker/screens/budget_home.dart';
 
 class NoBudgetView extends StatelessWidget {
 
