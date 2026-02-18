@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,15 +31,16 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: Image.asset('assets/icons/profileIcon.png'),
               ),
-              Container( // NOTIFICATION ICON
+              Container(
+                // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
                     // print('Notification icon pressed');
-                  }, 
+                  },
                   icon: Icon(
-                    Icons.notifications_outlined, 
+                    Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
                   ),
@@ -54,90 +54,77 @@ class ProfileScreen extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
+              // BACKGROUND
               'assets/images/mu_bg.png',
-              fit: BoxFit.fill
+              fit: BoxFit.fill,
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
+            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   children: [
-                    SizedBox(height: 20,),
-                    ProfileMenu(
-                      text: 'Edit Account',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Reset Password',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Change Theme',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Language',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Currency',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Help & Support',
-                      press: () => {},
-                    ),
-                    ProfileMenu(
-                      text: 'Terms and Conditions',
-                      press: () => {},
-                    ),
-                    Padding( // LOGIN BUTTON
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: AlignmentGeometry.centerRight,
-                            colors: <HexColor>[
-                              HexColor('#124074'), 
-                              HexColor('#332677'),
-                              HexColor('#124074'), 
-                              HexColor('#0D1250'),
-                            ],
-                            tileMode: TileMode.mirror,
+                    const SizedBox(height: 20),
+                    ProfileMenu(text: 'Edit Account', press: () => {}),
+                    ProfileMenu(text: 'Reset Password', press: () => {}),
+                    ProfileMenu(text: 'Change Theme', press: () => {}),
+                    ProfileMenu(text: 'Language', press: () => {}),
+                    ProfileMenu(text: 'Currency', press: () => {}),
+                    ProfileMenu(text: 'Help & Support', press: () => {}),
+                    ProfileMenu(text: 'Terms and Conditions', press: () => {}),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: 370,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: SizedBox(
+                                width: 370,
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(25, 50, 100, 1),
+                                        Color.fromRGBO(47, 52, 126, 1),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        "Logout",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        child:ElevatedButton(
-                          onPressed: () {
-                            // if (_formkey.currentState!.validate()) {
-                            //   Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => const MyHomePage(title: '',)),
-                            //   );
-                            // }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            foregroundColor: const Color.fromARGB(255, 144, 68, 232),
-                          ),
-                          child: Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
@@ -159,7 +146,7 @@ class ProfileScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -169,9 +156,7 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -180,20 +165,16 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/settingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),
@@ -208,39 +189,34 @@ class ProfileMenu extends StatelessWidget {
   final String text;
   final VoidCallback? press;
 
-  const ProfileMenu({
-    super.key,
-    required this.text,
-    this.press,
-  });
+  const ProfileMenu({super.key, required this.text, this.press});
 
- @override
- Widget build(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 10),
-    child: ElevatedButton(
-      onPressed: press,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Color.fromARGB(16, 0, 0, 0),
-        padding: const EdgeInsets.all(15),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: Colors.white,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 20
-              )
-            ),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 10),
+      child: ElevatedButton(
+        onPressed: press,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Color.fromARGB(16, 0, 0, 0),
+          padding: const EdgeInsets.all(15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black)
-        ],
-      )
-    ),
-  );
- }
+          backgroundColor: Colors.white,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(color: Colors.black, fontSize: 20),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black),
+          ],
+        ),
+      ),
+    );
+  }
 }

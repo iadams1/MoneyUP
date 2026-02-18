@@ -145,12 +145,10 @@ class _LoginState extends State<LoginScreen> {
                                 if (!(_formkey.currentState?.validate() ?? false)) return;
 
                                 try {
-                                  final response = await AuthService().login(
+                                  await AuthService().login(
                                     email: _emailController.text.trim(),
                                     password: _passwordController.text,
                                   );
-
-                                  final user = response.user;
 
                                   if (!mounted) return;
 
