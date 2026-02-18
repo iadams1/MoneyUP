@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD:lib/features/proflie/screens/profile.dart
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+=======
+import 'package:hexcolor/hexcolor.dart';
+
+import '/shared/widgets/bottom_nav.dart';
+>>>>>>> origin/mw-Dan:lib/features/profile/screens/profile.dart
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -134,6 +140,7 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+<<<<<<< HEAD:lib/features/proflie/screens/profile.dart
       bottomNavigationBar: BottomAppBar(
         color: const Color.fromARGB(0, 255, 253, 249),
         height: 80,
@@ -181,6 +188,9 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+=======
+      bottomNavigationBar: BottomNavBar(currentIndex: 3),
+>>>>>>> origin/mw-Dan:lib/features/profile/screens/profile.dart
     );
   }
 }

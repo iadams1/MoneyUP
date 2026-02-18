@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
-import 'package:moneyup/features/budgettracker/utils/category_colors.dart';
-import 'package:moneyup/features/budgettracker/utils/time_range.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_listing_view.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/services/service_locator.dart';
-
 import 'package:fl_chart/fl_chart.dart';
+
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import '/features/budgettracker/ui/time_filter.dart';
+import '/features/budgettracker/utils/category_colors.dart';
+import '/features/budgettracker/utils/time_range.dart';
+import '/features/budgettracker/widgets/budget_listing_view.dart';
+import '/features/education/screens/education.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/models/budget.dart';
+import '/shared/screen/loading_screen.dart';
+import '/services/service_locator.dart';
 import 'budget_creation.dart';
 
 // ---------------- Budget Goal Page Widget ---------------- //

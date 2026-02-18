@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
-import 'package:moneyup/models/budget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
+import '/features/budgettracker/screens/budget_home.dart';
+import '/models/budget.dart';
 
 class BudgetView extends StatelessWidget{
   final Budget budget;

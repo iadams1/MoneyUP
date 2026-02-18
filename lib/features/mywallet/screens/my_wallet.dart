@@ -1,16 +1,16 @@
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/mywallet/widgets/add_card_dialog.dart';
-import 'package:moneyup/features/mywallet/widgets/linked_card_tile.dart';
-import 'package:moneyup/features/mywallet/widgets/page_indicator.dart';
-import 'package:moneyup/features/mywallet/widgets/wallet_card.dart';
-import 'package:moneyup/models/linked_card.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
+
+import '/features/education/screens/education.dart';
+import '/features/mywallet/widgets/wallet_card.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/shared/screen/loading_screen.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/features/mywallet/widgets/add_card_dialog.dart';
+import '/features/mywallet/widgets/linked_card_tile.dart';
+import '/features/mywallet/widgets/page_indicator.dart';
+import '/models/linked_card.dart';
+import '/services/service_locator.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});

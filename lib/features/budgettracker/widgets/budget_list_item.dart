@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:moneyup/features/budgettracker/screens/budget_goaltracker.dart';
-import 'package:moneyup/features/budgettracker/utils/category_colors.dart';
-import 'package:moneyup/models/budget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
+import '/features/budgettracker/screens/budget_goaltracker.dart';
+import '/features/budgettracker/utils/category_colors.dart';
+import '/models/budget.dart';
+
 
 class BudgetListItem extends StatelessWidget {
   final Budget budget;

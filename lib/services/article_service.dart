@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/models/article.dart';
-import 'package:moneyup/models/daily_tip.dart';
+import '/models/article.dart';
+import '/models/daily_tip.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 

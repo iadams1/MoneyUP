@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
-import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
-import 'package:moneyup/features/mywallet/widgets/primary_card_view.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/models/linked_card.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
+
+import '/features/budgettracker/widgets/budget_view.dart';
+import '/features/budgettracker/widgets/no_budget_view.dart';
+import '/features/mywallet/screens/my_wallet.dart';
+import '/features/mywallet/widgets/primary_card_view.dart';
+import '/models/budget.dart';
+import '/models/linked_card.dart';
+import '/services/service_locator.dart';
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/bottom_nav.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -248,53 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

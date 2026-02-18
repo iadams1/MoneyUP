@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/models/budget_type.dart';
-import 'package:moneyup/services/service_locator.dart';
+
+import '/features/education/screens/education.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/models/budget_type.dart';
+import '/services/service_locator.dart';
 
 // -------------- Budget Creation Page Widget -------------- //
 class BudgetCreationPage extends StatefulWidget {
