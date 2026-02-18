@@ -94,7 +94,37 @@ class ProfileScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Log Out'),
+                                content: const Text('Are you sure you want to log out?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text('Log Out', style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirmed != true) return;
+
+                            // Proceed with logout...
+                            try {
+                              await Supabase.instance.client.auth.signOut();
+                              if (context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                              }
+                            } catch (e) {
+                              // error handling...
+                            }
+                          },
                               child: SizedBox(
                                 width: 370,
                                 child: Ink(
