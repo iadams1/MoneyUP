@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 import '/features/profile/screens/profile.dart';
 
 class ProfileMenuCard extends StatelessWidget{
@@ -45,20 +46,8 @@ class ProfileMenuCard extends StatelessWidget{
           ),
         ),
       ],
-      child: Container(
-        padding: EdgeInsets.all(0),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            width: 3,
-            color: const Color.fromARGB(255, 121, 121, 121),
-          ),
-        ),
-        child: CircleAvatar(
-          radius: 25,
-          backgroundImage: AssetImage('assets/icons/profileIcon.png'),
-          backgroundColor: Colors.transparent,
-        ),
+      child: AppAvatar(
+        size: 60,
       ),
     );
   }

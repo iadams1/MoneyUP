@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/features/auth/screens/user_select.dart';
+import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -41,9 +43,11 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
-        '/plaid-connect': (context) => PlaidConnectScreen(),
+        '/plaid-connect': (context) => const PlaidConnectScreen(),
+        '/verify': (context) => const VerificationScreen(email: ''),
+        '/user': (context) => const UserSelectScreen(),
       },
-      initialRoute: '/home',
+      initialRoute: '/user',
     );
   }
 }

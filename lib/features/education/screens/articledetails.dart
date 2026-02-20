@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/features/education/screens/education.dart';
@@ -96,17 +97,8 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
               Container(
                 // NOTIFICATION ICON

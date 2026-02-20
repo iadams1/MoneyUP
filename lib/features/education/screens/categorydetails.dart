@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
@@ -87,17 +88,8 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
               Container(
                 // NOTIFICATION ICON

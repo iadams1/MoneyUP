@@ -119,7 +119,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'SF Pro'
                       ),
                     ),

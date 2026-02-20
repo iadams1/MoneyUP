@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/features/mywallet/widgets/empty_wallet.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/mywallet/widgets/wallet_card.dart';
@@ -231,17 +233,8 @@ class _MyWallet extends State<MyWallet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: const Color.fromARGB(0, 255, 255, 255),
-                      border: Border.all(
-                        width: 3,
-                        color: const Color.fromARGB(255, 121, 121, 121),
-                      ),
-                    ),
-                    child: Image.asset('assets/icons/profileIcon.png'),
+                  AppAvatar(
+                    size: 60,
                   ),
                   Container(
                     // NOTIFICATION ICON
@@ -309,85 +302,94 @@ class _MyWallet extends State<MyWallet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    height: 250,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: cards.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentCard = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        final card = cards[index];
-                        return WalletCard(
-                          cardId: index,
-                          bankName: card.bankName ?? "Unknown Bank",
-                          mask: card.mask,
-                          currentAmount: card.currentBalance ?? 0.0,
-                          cardholderName: card.cardholderName ?? "",
-                        );
-                      },
-                    ),
-                  ),
-
-                  PageIndicatorDots(
-                    count: cards.length,
-                    currentIndex: _currentCard,
-                  ),
-
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Cards",
-                              style: TextStyle(
-                                fontSize: 35,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              "${cards.length} Linked",
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w600,
-                                color: const Color.fromARGB(55, 0, 0, 0),
-                              ),
-                            ),
-                          ],
+                  if (cards.isEmpty) ...[
+                    emptyWalletState(),
+                    // Optional: show an empty list placeholder instead of nothing
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          "Your linked cards will appear here.",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromARGB(79, 0, 0, 0),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-
-                  Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(bottom: 20),
-                      itemCount: cards.length,
-                      itemBuilder: (context, index) {
-                        final card = cards[index];
-                        return LinkedCardTile(
-                          cardId: index,
-                          card: card,
-                          onDelete: () {
-                            deleteCard(
-                              context,
-                              card.accountId,
-                              card.mask,
-                              card.accountName,
-                              card.bankName,
-                            );
-                          },
-                        );
-                      },
                     ),
-                  ),
+                  ] else ...[
+                    SizedBox(
+                      height: 250,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: cards.length,
+                        onPageChanged: (index) =>
+                            setState(() => _currentCard = index),
+                        itemBuilder: (context, index) {
+                          final card = cards[index];
+                          return WalletCard(
+                            cardId: index,
+                            bankName: card.bankName ?? "Unknown Bank",
+                            mask: card.mask,
+                            currentAmount: card.currentBalance ?? 0.0,
+                            cardholderName: card.cardholderName ?? "",
+                          );
+                        },
+                      ),
+                    ),
+
+                    PageIndicatorDots(
+                      count: cards.length,
+                      currentIndex: _currentCard,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Cards",
+                            style: TextStyle(
+                              fontSize: 35,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            "${cards.length} Linked",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w600,
+                              color: const Color.fromARGB(55, 0, 0, 0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(bottom: 20),
+                        itemCount: cards.length,
+                        itemBuilder: (context, index) {
+                          final card = cards[index];
+                          return LinkedCardTile(
+                            cardId: index,
+                            card: card,
+                            onDelete: () {
+                              deleteCard(
+                                context,
+                                card.accountId,
+                                card.mask,
+                                card.accountName,
+                                card.bankName,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

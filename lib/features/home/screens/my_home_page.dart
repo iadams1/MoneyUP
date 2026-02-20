@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/budgettracker/widgets/budget_view.dart';
 import '/features/budgettracker/widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
-import '/features/mywallet/widgets/primary_card_view.dart';
+import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
 import '/models/linked_card.dart';
 import '/services/service_locator.dart';
@@ -28,6 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _init();
+    profileService.loadProfileIcon();
   }
 
   Future<void> _init() async {
@@ -48,9 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
     }
   }
 
@@ -126,17 +128,8 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
               Container(
                 alignment: Alignment.topRight,
@@ -197,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     builder: (_) => const MyWallet(),
                                   ),
                                 );
-                                
+
                                 await _init();
                               },
                               child: Ink(
