@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
@@ -214,7 +215,7 @@ class _SignUpState extends State<SignUpScreen> {
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => ConfirmationScreen(),//VerificationScreen(email: _emailController.text.trim()),
+                                                builder: (context) => PlaidConnectScreen(),//VerificationScreen(email: _emailController.text.trim()),
                                               ),
                                             );
                                           }

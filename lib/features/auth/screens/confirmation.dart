@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/auth/screens/info.dart';
-import 'package:moneyup/services/plaid_service.dart';
+import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
