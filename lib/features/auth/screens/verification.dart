@@ -1,42 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hexcolor/hexcolor.dart';
+// Import the new Plaid screen
+import 'plaid_connect_screen.dart'; // Adjust path, e.g., '../../screens/plaid_connect_screen.dart'
+// Import ConfirmationScreen if needed, e.g.:
+// import 'confirmation.dart';
 
-class VerificationScreen extends StatefulWidget{
+class VerificationScreen extends StatefulWidget {
   final String email;
-
-  const VerificationScreen({
-    super.key, 
-    required this.email
-  });
+  const VerificationScreen({super.key, required this.email});
 
   @override
-  _VerificationScreenState createState() => _VerificationScreenState();
+  State<VerificationScreen> createState() => _VerificationScreenState();
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  // String _otpCode = "";
-  // bool _isResendEnabled = true;
-
-  // final _formKey = GlobalKey<FormState>();
-  final TextEditingController _codeController  = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
   final int _codeLength = 6;
 
   @override
   void initState() {
     super.initState();
   }
-  // This listens for when the user finishes the Plaid flow
-  // PlaidLink.onSuccess.listen((Success success) {
-  //   if (mounted) {
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const ConfirmationScreen()),
-  //     );
-  //   }
-
-  // });
 
   @override
   void dispose() {
@@ -55,8 +40,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
       if (response.session != null) {
         if (mounted) {
           Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ConfirmationScreen())
+            context,
+            MaterialPageRoute(builder: (context) => const PlaidConnectScreen()),
           );
         }
       }
@@ -67,9 +52,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     }
   }
 
-
   Future<void> _onResendCodePressed() async {
-    // IMPLEMENT RESEND CODE LOGIC
     try {
       await Supabase.instance.client.auth.resend(
         type: OtpType.signup,
@@ -85,18 +68,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
     }
   }
 
-  // void _openPlaidLink() {
-  //   // Note: You will eventually need to fetch a real 'link_token' from your server here
-  //   LinkTokenConfiguration config = LinkTokenConfiguration(
-  //     token: "GENERATED_LINK_TOKEN", 
-  //   );
-  //   PlaidLink.open(configuration: config);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack( // BACKGROUND
+      body: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset(
@@ -109,7 +84,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // const SizedBox(height: 20.0),
                   Container(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(top: 20.0),
@@ -152,7 +126,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       ),
                     ),
                   ),
-                  Container( // WHITE BOX CONTAINER
+                  Container(
                     alignment: Alignment.bottomCenter,
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     decoration: BoxDecoration(
@@ -184,7 +158,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             }
                           },
                         ),
-                        Padding( // CONTINUE BUTTON
+                        Padding(
                           padding: EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Padding(
                             padding: EdgeInsets.all(10.0),
@@ -195,8 +169,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 borderRadius: BorderRadius.all(Radius.circular(50.0)),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
-                                  end: AlignmentGeometry.centerRight,
-                                  colors: <HexColor>[
+                                  end: Alignment.centerRight,
+                                  colors: [
                                     HexColor('#124074'), 
                                     HexColor('#332677'),
                                     HexColor('#124074'), 
@@ -215,7 +189,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             ),
                           ),
                         ),
-                        TextButton( // RESEND CODE BUTTON
+                        TextButton(
                           onPressed: _onResendCodePressed,
                           child: Text(
                             'Resend Code',
