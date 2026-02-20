@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '/features/transactions/widgets/no_transaction_view.dart';
 import '/features/transactions/widgets/transaction_card.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/profile_menu.dart';
+import '/shared/widgets/profile_menu_card.dart';
 import '/models/transaction.dart';
 
 class TransactionsHome extends StatefulWidget {
@@ -16,7 +16,9 @@ class TransactionsHome extends StatefulWidget {
 class _TransactionsHomeState extends State<TransactionsHome> {
   // final bool _isLoading = true;
   
-  List<Transaction> transactions = [];
+  List<Transaction> transactions = [
+    Transaction(title: 'Starbucks', category: 'Food & Dining', amount: 50, authorizedDate: DateTime.now())
+  ];
 
   @override
   Widget build(BuildContext context) {

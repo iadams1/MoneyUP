@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '/models/budget.dart';
 import '/models/budget_type.dart';
 import '/services/service_locator.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
