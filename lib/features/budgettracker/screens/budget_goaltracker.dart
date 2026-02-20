@@ -38,7 +38,7 @@ class _BudgetPageState extends State<BudgetPage> {
   ValueNotifier<double> goalSaved = ValueNotifier<double>(0,); // Amount saved towards the goal
   ValueNotifier<double> goalNeeded = ValueNotifier<double>(0);
 
-  initBudget(double saved, double goal, double needed) {
+  void initBudget(double saved, double goal, double needed) {
     goalSaved.value = saved;
     overallGoalAmount.value = goal;
     goalNeeded.value = needed;
@@ -46,7 +46,7 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   // Calculates the updated amounts based on user input
-  calculateBudget(double userAmount, bool isAddition) {
+  void calculateBudget(double userAmount, bool isAddition) {
     previousSaved = goalSaved.value;
 
     if (isAddition) {

@@ -4,13 +4,14 @@ import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
 import '/features/home/screens/my_home_page.dart';
+import '/models/nav_items.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
   const BottomNavBar({
     super.key,
-    required this.currentIndex
+    required this.currentIndex,
   });
 
   @override
@@ -22,22 +23,22 @@ class BottomNavBar extends StatelessWidget {
       const ProfileScreen(),
     ];
 
-    final List<_NavItem> items = [
-      _NavItem(
-        selected: 'assets/icons/homeIcon.png',
-        unselected: 'assets/icons/unselectedHomeIcon.png'
+    final List<NavItem> items = [
+      NavItem(
+        selectedIcon: 'assets/icons/homeIcon.png',
+        unselectedIcon: 'assets/icons/unselectedHomeIcon.png'
       ),
-      _NavItem(
-        selected: 'assets/icons/transactionsIcon.png',
-        unselected: 'assets/icons/unselectedTransactionsIcon.png'
+      NavItem(
+        selectedIcon: 'assets/icons/transactionsIcon.png',
+        unselectedIcon: 'assets/icons/unselectedTransactionsIcon.png'
       ),
-      _NavItem(
-        selected: 'assets/icons/educationIcon.png',
-        unselected: 'assets/icons/unselectedEducationIcon.png'
+      NavItem(
+        selectedIcon: 'assets/icons/educationIcon.png',
+        unselectedIcon: 'assets/icons/unselectedEducationIcon.png'
       ),
-      _NavItem(
-        selected: 'assets/icons/settingsIcon.png',
-        unselected: 'assets/icons/unselectedSettingsIcon.png'
+      NavItem(
+        selectedIcon: 'assets/icons/settingsIcon.png',
+        unselectedIcon: 'assets/icons/unselectedSettingsIcon.png'
       ),
     ];
 
@@ -52,12 +53,12 @@ class BottomNavBar extends StatelessWidget {
           return IconButton(
             onPressed: () {
               if (index == currentIndex) return;
-              Navigator.push(context, MaterialPageRoute(builder: (_) => pages[index]));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => pages[index]));
             }, 
             icon: Image.asset(
               isSelected
-                ? items[index].selected
-                : items[index].unselected,
+                ? items[index].selectedIcon
+                : items[index].unselectedIcon,
               // height: 28,
             ),
           );
@@ -65,14 +66,4 @@ class BottomNavBar extends StatelessWidget {
       ),
     );
   }
-}
-
-class _NavItem {
-  final String selected;
-  final String unselected;
-
-  _NavItem({
-    required this.selected,
-    required this.unselected
-  });
 }

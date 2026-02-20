@@ -14,40 +14,30 @@ class OtpInput extends StatefulWidget {
 }
 
 class _OtpInputState extends State<OtpInput> {
-  late List<TextEditingController> _codeController;
-  late List<FocusNode> _nodes;
+  late TextEditingController _codeController;
+  late FocusNode _nodes;
   bool _isActive = false;
 
   @override
   void initState() {
     super.initState();
-    _codeController = List.generate(widget.length, (_) => TextEditingController());
-    _nodes = List.generate(widget.length, (_) => FocusNode());
+    _codeController =  TextEditingController();
+    _nodes = FocusNode();
   }
 
   @override
   void dispose() {
-    for (final c in _codeController) {
-      c.dispose();
-    }
-    for (final f in _nodes) {
-      f.dispose();
-    }
+    _codeController.dispose();
+    _nodes.dispose();
     super.dispose();
   }
 
-  void _focusFirst() {
+  void _focusInput() {
     setState(() {
       _isActive = true;
     });
 
-    for (int i = 0; i < _codeController.length; i++) {
-      if (_codeController[i].text.isEmpty) {
-        _nodes[0].requestFocus();
-        return;
-      }
-    }
-    _nodes.last.requestFocus();
+    _nodes.requestFocus();
   }
 
   // void _handleChange(String value, int index) {
@@ -75,40 +65,93 @@ class _OtpInputState extends State<OtpInput> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: _focusFirst,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(widget.length, (index) {
-          return SizedBox(
-            width: 40,
-            child: TextFormField(
-              controller: _codeController[index],
-              focusNode: _nodes[index],
+      onTap: _focusInput,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Opacity(
+            opacity: 0,
+            child: TextField(
+              controller: _codeController,
+              focusNode: _nodes,
               keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              maxLength: 1,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              decoration: InputDecoration(
-                counterText: "",
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: _isActive ? Colors.transparent : Colors.black),
-                  ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-              ),
+              maxLength: widget.length,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
               onChanged: (value) {
-                if (value.length == _nodes) {
-                  //
-                }
+                setState(() {});
               },
+              decoration: const InputDecoration(
+                counterText: '',
+                border: InputBorder.none,
+              ),
             ),
-          );
-        }),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(widget.length, (index) {
+              String digit = '';
+              if (index < _codeController.text.length) {
+                digit = _codeController.text[index];
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    child: Center(
+                      child: Text(
+                        digit,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        )
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8,),
+                  Container(
+                    width: 40,
+                    height: 2,
+                    color: _isActive
+                    ? Colors.transparent
+                    : Colors.black,
+                  ),
+                ],
+              );
+              // return SizedBox(
+              //   width: 40,
+              //   child: TextFormField(
+              //     controller: _codeController[index],
+              //     focusNode: _nodes[index],
+              //     keyboardType: TextInputType.number,
+              //     textAlign: TextAlign.center,
+              //     maxLength: 1,
+              //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              //     style: TextStyle(
+              //       fontSize: 24,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //     decoration: InputDecoration(
+              //       counterText: "",
+              //       enabledBorder: UnderlineInputBorder(
+              //         borderSide: BorderSide(color: _isActive ? Colors.transparent : Colors.black),
+              //         ),
+              //       focusedBorder: UnderlineInputBorder(
+              //         borderSide: BorderSide(color: Colors.transparent),
+              //       ),
+              //     ),
+              //     onChanged: (value) {
+              //       if (value.length == _nodes) {
+              //         //
+              //       }
+              //     },
+              //   ),
+              // );
+            }),
+          ),
+        ],
       ),
     );
   }

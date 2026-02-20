@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD:lib/features/proflie/screens/profile.dart
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-=======
-import 'package:hexcolor/hexcolor.dart';
 
+import '/features/profile/widgets/profile_menu.dart';
 import '/shared/widgets/bottom_nav.dart';
->>>>>>> origin/mw-Dan:lib/features/profile/screens/profile.dart
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -140,93 +134,7 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-<<<<<<< HEAD:lib/features/proflie/screens/profile.dart
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/settingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-=======
       bottomNavigationBar: BottomNavBar(currentIndex: 3),
->>>>>>> origin/mw-Dan:lib/features/profile/screens/profile.dart
-    );
-  }
-}
-
-class ProfileMenu extends StatelessWidget {
-  final String text;
-  final VoidCallback? press;
-
-  const ProfileMenu({super.key, required this.text, this.press});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 10),
-      child: ElevatedButton(
-        onPressed: press,
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Color.fromARGB(16, 0, 0, 0),
-          padding: const EdgeInsets.all(15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Colors.white,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(color: Colors.black, fontSize: 20),
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black),
-          ],
-        ),
-      ),
     );
   }
 }
