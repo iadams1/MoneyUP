@@ -57,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
             child: Image.asset(
               // BACKGROUND
               'assets/images/mu_bg.png',
-              fit: BoxFit.fill,
+              fit: BoxFit.cover,
             ),
           ),
           SafeArea(
@@ -68,67 +68,59 @@ class ProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    ProfileMenu(text: 'Edit Account', press: () => {}),
-                    ProfileMenu(text: 'Reset Password', press: () => {}),
-                    ProfileMenu(text: 'Change Theme', press: () => {}),
-                    ProfileMenu(text: 'Language', press: () => {}),
-                    ProfileMenu(text: 'Currency', press: () => {}),
-                    ProfileMenu(text: 'Help & Support', press: () => {}),
-                    ProfileMenu(text: 'Terms and Conditions', press: () => {}),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: 370,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: SizedBox(
-                                width: 370,
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color.fromRGBO(25, 50, 100, 1),
-                                        Color.fromRGBO(47, 52, 126, 1),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Center(
-                                      child: Text(
-                                        "Logout",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                children: [
+                  const SizedBox(height: 20),
+                  ProfileMenu(text: 'Edit Account', press: () => {}),
+                  ProfileMenu(text: 'Reset Password', press: () => {}),
+                  ProfileMenu(text: 'Change Theme', press: () => {}),
+                  ProfileMenu(text: 'Language', press: () => {}),
+                  ProfileMenu(text: 'Currency', press: () => {}),
+                  ProfileMenu(text: 'Help & Support', press: () => {}),
+                  ProfileMenu(text: 'Terms and Conditions', press: () => {}),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        onPressed: () {},
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color.fromRGBO(25, 50, 100, 1),
+                                Color.fromRGBO(47, 52, 126, 1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(
+                                "Logout",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
-                        ],
+                        ), 
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),

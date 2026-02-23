@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '/models/transaction.dart';
+import '/features/transactions/widgets/category_color.dart';
 
 class TransactionCard extends StatelessWidget {
   final Transaction transaction;
-
   const TransactionCard({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context) {
     final formatedDate = DateFormat('yyyy-MM-dd').format(transaction.authorizedDate);
     final formattedAmount = NumberFormat.currency(symbol: '\$').format(transaction.amount);
+    final categoryColor = categoryColors[transaction.category] ?? defaultColor;
 
     return Material(
       color: Colors.transparent,
@@ -35,10 +36,10 @@ class TransactionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Category Icon
+                // Transaction Icon
                 Container(
-                  height: 80,
-                  width: 66,
+                  height: 60,
+                  width: 65,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.grey.shade200,
@@ -53,7 +54,7 @@ class TransactionCard extends StatelessWidget {
                   )
                 ),
                 const SizedBox(width: 14,),
-                Expanded(
+                Expanded( // MERCHANT NAME AND AUTHORIZED DATE
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,8 +62,8 @@ class TransactionCard extends StatelessWidget {
                       Text(
                         transaction.title,
                         style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -76,26 +77,44 @@ class TransactionCard extends StatelessWidget {
                     ],
                   )
                 ),
-                // SHOWS TRANSACTION CATEGORY
-                Padding(
+                // CATEGORY BOX
+                SizedBox(
+                width: 110,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    transaction.category,
-                    style: TextStyle(fontSize: 12),
-                    textAlign: TextAlign.center,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: categoryColor.backgroundColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      transaction.category,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: categoryColor.textColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
                 ),
                 // SHOWS MONEY SPENT
-                Text(
-                  formattedAmount,
-                  style:TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Colors.black,
+                SizedBox(
+                  width: 70,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      formattedAmount,
+                      style:TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
                 ),
               ],
-               
             ),
           ),
         ),

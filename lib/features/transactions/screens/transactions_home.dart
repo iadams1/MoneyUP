@@ -14,11 +14,73 @@ class TransactionsHome extends StatefulWidget {
 }
   
 class _TransactionsHomeState extends State<TransactionsHome> {
-  // final bool _isLoading = true;
+  // bool _isLoading = false;
+  // TransactionType? _selectedFilter;
   
-  List<Transaction> transactions = [
-    Transaction(title: 'Starbucks', category: 'Food & Dining', amount: 50, authorizedDate: DateTime.now())
+  List<Transaction> _filteredTransactions = [];
+  final List<Transaction> _allTransactions = [
+    Transaction(
+      title: 'Starbucks', 
+      category: 'Food & Drink', 
+      amount: 7.50, 
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.debit
+    ),  
+    Transaction(
+      title: 'American Airlines', 
+      category: 'Travel', 
+      amount: 180, 
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.credit
+    ), 
+    Transaction(
+      title: 'Royal Farms', 
+      category: 'Transportation', 
+      amount: 24.25, 
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.credit
+    ), 
+    Transaction(
+      title: 'Topgolf', 
+      category: 'Entertainment', 
+      amount: 8, 
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.debit
+    ),
+    Transaction(
+      title: 'Planet Fitness', 
+      category: 'Personal Care', 
+      amount: 10, 
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.debit
+    ), 
+    Transaction(
+      title: 'Walmart', 
+      category: 'General Merchandise', 
+      amount: 20.18,
+      authorizedDate: DateTime.now(), 
+      // type: TransactionType.debit
+    ), 
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredTransactions = _allTransactions;
+  }
+
+  // void _applyFilter() {
+  //   setState(() {
+  //     if (_selectedFilter == null) {
+  //       _filteredTransactions = _allTransactions;
+  //     }
+  //     else {
+  //       _filteredTransactions = _allTransactions
+  //           .where((t) => t.type == _selectedFilter)
+  //           .toList();
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +98,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ProfileMenuCard(),
               TextButton(
                 onPressed: () {
-                  //
+                  // setState(() {
+                  //   _selectedFilter = TransactionType.debit;
+                  //   _applyFilter();
+                  // });
                 }, 
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -47,7 +112,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ),
               TextButton(
                 onPressed: () {
-                  //
+                  // setState(() {
+                  //   _selectedFilter = TransactionType.credit;
+                  //   _applyFilter();
+                  // });
                 },
                 child: Text(
                   'View Credit',
@@ -124,13 +192,13 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: transactions.isEmpty
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: _allTransactions.isEmpty
                       ? NoTransactionView()
                       : ListView.builder(
-                        itemCount: transactions.length,
+                        itemCount: _filteredTransactions.length,
                         itemBuilder: (context, index) {
-                          final t = transactions[index];
+                          final t = _filteredTransactions[index];
                         
                           return Padding(
                             padding: const EdgeInsets.only(bottom:15),

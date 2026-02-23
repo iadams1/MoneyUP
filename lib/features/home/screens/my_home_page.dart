@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/profile_menu_card.dart';
 import '/features/budgettracker/widgets/budget_view.dart';
 import '/features/budgettracker/widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
@@ -126,18 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
-              ),
+              ProfileMenuCard(),
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
