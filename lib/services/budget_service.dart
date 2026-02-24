@@ -103,13 +103,13 @@ class BudgetService {
   }) async {
     
     final response = await _client
-        .from('budget_transactions')
+        .from('plaid_transactions')
         .select(
           'category_table!inner(category_ID, Title), spendingAmount, transactionDate',
         )
         .eq('user_ID', user)
-        .gte('transactionDate', start.toIso8601String().split("T")[0])
-        .lt('transactionDate', end.toIso8601String().split("T")[0]);
+        .gte('date', start.toIso8601String().split("T")[0])
+        .lt('date', end.toIso8601String().split("T")[0]);
     
     return List<Map<String, dynamic>>.from(response);
   }

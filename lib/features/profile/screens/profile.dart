@@ -4,7 +4,6 @@ import 'package:moneyup/shared/widgets/bottom_nav.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '/features/profile/widgets/profile_menu.dart';
-import '/shared/widgets/bottom_nav.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import '/features/auth/screens/verification.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/auth/screens/login.dart';
