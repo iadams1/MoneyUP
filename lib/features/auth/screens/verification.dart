@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hexcolor/hexcolor.dart';
-// Import the new Plaid screen
-import 'plaid_connect_screen.dart'; // Adjust path, e.g., '../../screens/plaid_connect_screen.dart'
-// Import ConfirmationScreen if needed, e.g.:
-// import 'confirmation.dart';
+import 'package:moneyup/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'plaid_connect_screen.dart'; // adjust path as needed
 
 class VerificationScreen extends StatefulWidget {
   final String email;
+
   const VerificationScreen({super.key, required this.email});
 
   @override
@@ -18,10 +17,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _codeController = TextEditingController();
   final int _codeLength = 6;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  // Instance of AuthService
+  final AuthService _authService = AuthService();
+
+  bool _isVerifying = false;
+  bool _isResending = false;
 
   @override
   void dispose() {
@@ -30,41 +30,96 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Future<void> _onContinuePressed() async {
+    final code = _codeController.text.trim();
+    if (code.length != _codeLength) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter the full 6-digit code"),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isVerifying = true);
+
     try {
-      final response = await Supabase.instance.client.auth.verifyOTP(
+      final response = await _authService.verifyOtp(
         email: widget.email,
-        token: _codeController.text.trim(),
+        token: code,
         type: OtpType.signup,
       );
 
-      if (response.session != null) {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const PlaidConnectScreen()),
-          );
-        }
+      if (response.session != null && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PlaidConnectScreen()),
+        );
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid verification code"), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Verification failed: ${e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isVerifying = false);
+      }
     }
   }
 
   Future<void> _onResendCodePressed() async {
+    setState(() => _isResending = true);
+
     try {
-      await Supabase.instance.client.auth.resend(
-        type: OtpType.signup,
+      await _authService.resendOtp(
         email: widget.email,
+        type: OtpType.signup,
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Code resent successfully!")),
-      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Code resent successfully! Check your email."),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error resending code"), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error resending code"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isResending = false);
+      }
     }
   }
 
@@ -74,10 +129,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-              'assets/images/mu_bg.png',
-              fit: BoxFit.fill
-          ),
+          Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -87,42 +139,42 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   Container(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(top: 20.0),
-                    child: Text(
+                    child: const Text(
                       'MONEYUP',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
-                        fontFamily: 'SF Pro'
+                        fontFamily: 'SF Pro',
                       ),
                     ),
                   ),
                   Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: Text(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: const Text(
                       'VERIFICATION',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'SF Pro'
+                        fontFamily: 'SF Pro',
                       ),
                     ),
                   ),
                   Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                    child: Text(
+                    padding: const EdgeInsets.only(top: 20.0, bottom: 40.0),
+                    child: const Text(
                       'Please enter the code we sent to the email address',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
-                        fontFamily: 'SF Pro'
+                        fontFamily: 'SF Pro',
                       ),
                     ),
                   ),
@@ -140,7 +192,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           maxLength: _codeLength,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 24,
                             letterSpacing: 10,
                           ),
@@ -150,54 +202,71 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             counterText: "",
                             filled: true,
                             fillColor: Colors.grey[200],
-                            contentPadding: EdgeInsets.symmetric(vertical: 100),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 40), // adjusted for better look
                           ),
-                          onChanged: (value) {
-                            if (value.length == _codeLength) {
-                              //
-                            }
-                          },
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Padding(
-                            padding: EdgeInsets.all(10.0),
+                            padding: const EdgeInsets.all(10.0),
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                   colors: [
-                                    HexColor('#124074'), 
+                                    HexColor('#124074'),
                                     HexColor('#332677'),
-                                    HexColor('#124074'), 
+                                    HexColor('#124074'),
                                     HexColor('#0D1250'),
                                   ],
                                   tileMode: TileMode.mirror,
                                 ),
                               ),
                               child: ElevatedButton(
-                                onPressed: _onContinuePressed, 
-                                child: const Text(
-                                  'Continue',
-                                  style: TextStyle(fontSize: 18.0,)
+                                onPressed: _isVerifying ? null : _onContinuePressed,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
                                 ),
+                                child: _isVerifying
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Continue',
+                                        style: TextStyle(fontSize: 18.0, color: Colors.white),
+                                      ),
                               ),
                             ),
                           ),
                         ),
                         TextButton(
-                          onPressed: _onResendCodePressed,
-                          child: Text(
-                            'Resend Code',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16.0,
-                            ),
-                          )
+                          onPressed: _isResending ? null : _onResendCodePressed,
+                          child: _isResending
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black54),
+                                  ),
+                                )
+                              : const Text(
+                                  'Resend Code',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
                         ),
                       ],
                     ),

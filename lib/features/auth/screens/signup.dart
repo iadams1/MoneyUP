@@ -2,10 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/features/auth/screens/verification.dart';
+import 'package:moneyup/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -22,6 +22,13 @@ class _SignUpState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+
+  // Password visibility toggles
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  // Instance of AuthService
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -142,6 +149,7 @@ class _SignUpState extends State<SignUpScreen> {
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
                                   controller: _passwordController,
+                                  obscureText: _obscurePassword,
                                   validator: MultiValidator([
                                     RequiredValidator(errorText: 'Enter password'),
                                     MinLengthValidator(8, errorText: 'Minimum 8 characters'),
@@ -156,6 +164,17 @@ class _SignUpState extends State<SignUpScreen> {
                                       borderSide: BorderSide.none,
                                       borderRadius: BorderRadius.all(Radius.circular(9.0)),
                                     ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                        color: Colors.grey[700],
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
@@ -163,7 +182,7 @@ class _SignUpState extends State<SignUpScreen> {
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
                                   controller: _confirmController,
-                                  obscureText: true,
+                                  obscureText: _obscureConfirmPassword,
                                   validator: (val) {
                                     if (val == null || val.isEmpty) return 'Re-type password';
                                     if (val != _passwordController.text) return 'Passwords do not match';
@@ -178,6 +197,17 @@ class _SignUpState extends State<SignUpScreen> {
                                     border: const OutlineInputBorder(
                                       borderSide: BorderSide.none,
                                       borderRadius: BorderRadius.all(Radius.circular(9.0)),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                        color: Colors.grey[700],
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                                        });
+                                      },
                                     ),
                                   ),
                                 ),
@@ -194,35 +224,47 @@ class _SignUpState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: () async {
+                                    onPressed: () async 
+                                    {
                                       if (_formkey.currentState!.validate()) {
                                         try {
-                                          final response = await Supabase.instance.client.auth.signUp(
+                                          final response = await _authService.signUp(
                                             email: _emailController.text.trim(),
                                             password: _passwordController.text.trim(),
-                                            data: {
-                                              'full_name': _nameController.text.trim(),
-                                              'username': _usernameController.text.trim()
-                                            },
+                                            fullName: _nameController.text.trim(),
+                                            username: _usernameController.text.trim(),
                                           );
-
-                                          final user = response.user;
-                                          if (user != null) 
+                                          if (mounted) 
                                           {
-                                          }
-
-                                          if (mounted) {
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => PlaidConnectScreen(),//VerificationScreen(email: _emailController.text.trim()),
+                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
+                                                // builder: (context) => PlaidConnectScreen(),
+                                              ),
+                                              
+                                            );
+                                          }
+                                        } on AuthException catch (error) {
+                                          // This is the proper way → catch the specific type
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(error.message),
+                                                backgroundColor: Colors.red,
                                               ),
                                             );
                                           }
                                         } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Signup Failed: ${e.toString()}')),
-                                          );
+                                          // Fallback for any other unexpected errors
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text('An unexpected error occurred: $e'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
                                         }
                                       }
                                     },

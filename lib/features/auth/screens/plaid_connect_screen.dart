@@ -14,7 +14,8 @@ class PlaidConnectScreen extends StatefulWidget {
   State<PlaidConnectScreen> createState() => _PlaidConnectScreenState();
 }
 
-class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
+class _PlaidConnectScreenState extends State<PlaidConnectScreen> 
+{
   String? _linkToken;
   bool _isLoading = true;
   bool _hasError = false;
@@ -23,7 +24,8 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
   StreamSubscription<LinkSuccess>? _onSuccessSubscription;
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     _fetchLinkToken();
 
