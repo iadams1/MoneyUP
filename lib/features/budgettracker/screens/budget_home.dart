@@ -477,12 +477,11 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                       ],
                     ),
                   ),
-
                   if (_budgets.isEmpty)
                     const Expanded(
                       child: Center(
                         child: Padding(
-                          padding: EdgeInsets.all(68.0),
+                          padding: EdgeInsets.fromLTRB(58, 18, 58, 0),
                           child: Center(
                             child: Text(
                               "Nothing here… yet. Tap the Add button and give your first budget a home!",
