@@ -52,7 +52,7 @@ class BottomNavBar extends StatelessWidget {
 
           return IconButton(
             onPressed: () {
-              if (index == currentIndex) return;
+              //if (index == currentIndex) return;
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => pages[index]));
             }, 
             icon: Image.asset(

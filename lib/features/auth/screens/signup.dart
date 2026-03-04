@@ -197,7 +197,7 @@ class _SignUpState extends State<SignUpScreen> {
                                     onPressed: () async {
                                       if (_formkey.currentState!.validate()) {
                                         try {
-                                          final response = await Supabase.instance.client.auth.signUp(
+                                          await Supabase.instance.client.auth.signUp(
                                             email: _emailController.text.trim(),
                                             password: _passwordController.text.trim(),
                                             data: {
@@ -206,10 +206,10 @@ class _SignUpState extends State<SignUpScreen> {
                                             },
                                           );
 
-                                          final user = response.user;
-                                          if (user != null) 
-                                          {
-                                          }
+                                          // final user = response.user;
+                                          // if (user != null) 
+                                          // {
+                                          // }
 
                                           if (mounted) {
                                             Navigator.pushReplacement(

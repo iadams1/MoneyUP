@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
         '/verify': (context) => const VerificationScreen(email: ''),
         '/user': (context) => const UserSelectScreen(),
       },
-      initialRoute: '/user',
+      initialRoute: '/home',
     );
   }
 }

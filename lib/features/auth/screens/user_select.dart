@@ -21,10 +21,14 @@ class _UserSelectScreen extends State<UserSelectScreen> {
   }
 
   Future<void> _loadIcon() async {
-    final iconId = await profileService.getProfileIconId();
-
-    if (!mounted) return;
-    setState(() => _selectedUserIndex = iconId);
+    try {
+      final iconId = await profileService.getProfileIconId();
+      if (!mounted) return;
+      setState(() => _selectedUserIndex = iconId);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _selectedUserIndex = UserImages.defaultId);
+    }
   }
 
   @override
@@ -199,7 +203,7 @@ class _UserSelectScreen extends State<UserSelectScreen> {
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("Failed to save profile"),
+                                        content: Text("Failed to save profile: $e",),
                                       ),
                                     );
                                   } finally {

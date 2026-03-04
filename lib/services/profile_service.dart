@@ -4,17 +4,17 @@ import 'package:moneyup/shared/contrants/user_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileService {
-  final ValueNotifier<int> iconIdNotifier = ValueNotifier<int>(UserImages.defaultId);
-
   final SupabaseClient _client = Supabase.instance.client;
 
   final user = supabaseService.currentUserId!;
 
+  final ValueNotifier<int> iconIdNotifier = ValueNotifier<int>(UserImages.defaultId);
+
   Future<void> saveProfileSelection({required int profileIconId}) async {
-    await _client.from('profiles')
-    .update({'icon_id': profileIconId})
-    .eq('id', user)
-    .select();
+    await _client
+        .from('profiles')
+        .update({'icon_id': profileIconId})
+        .eq('id', user);
 
     iconIdNotifier.value = profileIconId;
   }
@@ -24,15 +24,26 @@ class ProfileService {
     return iconIdNotifier.value;
   }
 
-  Future<int> getProfileIconId({int fallback = 12}) async {
-
+  Future<int> getProfileIconId({int fallback = UserImages.defaultId}) async {
     final row = await _client
-      .from('profiles')
-      .select('icon_id')
-      .eq('id', user)
-      .maybeSingle();
-    
-    iconIdNotifier.value = (row?['icon_id'] as int?) ?? UserImages.defaultId;
-    return iconIdNotifier.value;
+        .from('profiles')
+        .select('icon_id')
+        .eq('id', user)
+        .maybeSingle();
+
+    final iconId = (row?['icon_id'] as int?) ?? fallback;
+    iconIdNotifier.value = iconId;
+
+    return iconId;
+  }
+
+   Future<String?> getUserName() async {
+    final response = await _client
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user)
+        .maybeSingle();
+
+    return response?['full_name'] as String?;
   }
 }

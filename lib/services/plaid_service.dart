@@ -198,8 +198,8 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
                     children: [
                       const Text(
                         'Use fake sandbox credentials:\n'
-                        'Username: user_good\n'
-                        'Password: pass_good',
+                        'Username: user_transactions_dynamic\n'
+                        'Password: Anything ',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16),
                       ),

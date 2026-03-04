@@ -105,9 +105,9 @@ class BudgetService {
     final response = await _client
         .from('plaid_transactions')
         .select(
-          'category_table!inner(category_ID, Title), spendingAmount, transactionDate',
+          'category_table!inner(category_ID, Title), amount, authorized_date',
         )
-        .eq('user_ID', user)
+        .eq('user_id', user)
         .gte('date', start.toIso8601String().split("T")[0])
         .lt('date', end.toIso8601String().split("T")[0]);
     
@@ -129,7 +129,7 @@ class BudgetService {
   }
 
   Future<void> updateBudget({
-    required budgetId, 
+    required dynamic budgetId, 
     required double amountSaved, 
     required double amountNeeded
   }) async {

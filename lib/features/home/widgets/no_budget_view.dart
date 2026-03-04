@@ -14,7 +14,7 @@ class NoBudgetView extends StatelessWidget {
         const Text(
           "No budgets available yet.",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         ElevatedButton(

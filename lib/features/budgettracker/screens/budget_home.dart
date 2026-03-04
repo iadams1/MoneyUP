@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:moneyup/core/utils/formatters.dart';
 
-import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/widgets/bottom_nav.dart';
 import '/features/budgettracker/ui/time_filter.dart';
 import '/features/budgettracker/utils/category_colors.dart';
 import '/features/budgettracker/utils/time_range.dart';
 import '/features/budgettracker/widgets/budget_listing_view.dart';
-import '/features/education/screens/education.dart';
-import '/features/profile/screens/profile.dart';
-import '/features/transactions/screens/transactions_home.dart';
 import '/models/budget.dart';
 import '/shared/screen/loading_screen.dart';
 import '/services/service_locator.dart';
 import 'budget_creation.dart';
 
-// ---------------- Budget Goal Page Widget ---------------- //
 class BudgetGoalPage extends StatefulWidget {
   const BudgetGoalPage({super.key});
 
@@ -25,6 +22,7 @@ class BudgetGoalPage extends StatefulWidget {
 
 class _BudgetGoalPageState extends State<BudgetGoalPage> {
   bool _isLoading = true;
+  bool _showLegend = true;
 
   List<Budget> _budgets = [];
 
@@ -146,12 +144,14 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
 
     for (final row in response) {
       final categoryId = row['category_table']['category_ID'] as int;
-      final categoryTitle = row['category_table']['Title'] as String;
-      final amount = ((row['spendingAmount'] as num?) ?? 0).toDouble();
+      final categoryTitle = Formatters.formatCategoryTitle(
+        row['category_table']['Title'] as String,
+      );
+      final amount = ((row['amount'] as num?) ?? 0).toDouble();
 
       tempData.update(
         categoryId,
-        (value) => value + amount,
+        (value) => value.abs() + amount.abs(),
         ifAbsent: () => amount,
       );
       titlesById[categoryId] = categoryTitle;
@@ -185,19 +185,13 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 10, left: 15),
+          padding: EdgeInsets.only(top: 50, left: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              AppAvatar(
-                size: 60,
-              ),
-
-              SizedBox(height: 40),
-            ],
+            children: [AppAvatar(size: 60), SizedBox(height: 40)],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 110,
       ),
 
       body: Stack(
@@ -218,7 +212,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 35),
+                  SizedBox(height: 15),
 
                   // ---------- Spending Overview Section ----------- //
                   Padding(
@@ -236,158 +230,209 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
 
                         SizedBox(height: 10),
 
-                        Row(
-                          spacing: 5,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              children: [
-                                // Time Filter
-                                Container(
-                                  height: 40,
-                                  padding: EdgeInsets.symmetric(horizontal: 0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color.fromARGB(
-                                          20,
-                                          0,
-                                          0,
-                                          0,
+                            // Time Filter
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    height: 40,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color.fromARGB(
+                                            20,
+                                            0,
+                                            0,
+                                            0,
+                                          ),
+                                          spreadRadius: 0,
+                                          blurRadius: 12,
+                                          offset: Offset(0, 8),
                                         ),
-                                        spreadRadius: 0,
-                                        blurRadius: 12,
-                                        offset: Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: DropdownMenu<TimeFilter>(
-                                    width: 162.7,
-                                    textStyle: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
+                                      ],
                                     ),
-                                    initialSelection: selectedFilter,
-                                    inputDecorationTheme: InputDecorationTheme(
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      filled: false,
-                                      contentPadding: EdgeInsets.all(15),
-                                      constraints: BoxConstraints.tight(
-                                        const Size.fromHeight(40),
+                                    child: DropdownMenu<TimeFilter>(
+                                      width: 162.7,
+                                      textStyle: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
                                       ),
-                                    ),
-                                    onSelected: (value) {
-                                      if (value != null) {
-                                        setState(() {
-                                          selectedFilter = value;
-                                        });
-                                        loadSpendingData();
-                                      }
-                                    },
-                                    dropdownMenuEntries: TimeFilter.values.map((
-                                      filter,
-                                    ) {
-                                      return DropdownMenuEntry(
-                                        value: filter,
-                                        label: filterLabels[filter]!,
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-
-                                SizedBox(height: 10),
-
-                                // Legend
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: spendingData.keys.map((categoryId) {
-                                    final categoryTitle =
-                                        categoryTitles[categoryId] ?? "Unknown";
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 2,
-                                      ),
-                                      child: Row(
-                                        textBaseline: TextBaseline.alphabetic,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: 12,
-                                            height: 12,
-                                            margin: const EdgeInsets.only(
-                                              top: 3,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: getCategoryColor(
-                                                categoryId,
-                                              ),
-                                              shape: BoxShape.circle,
+                                      initialSelection: selectedFilter,
+                                      inputDecorationTheme:
+                                          InputDecorationTheme(
+                                            enabledBorder: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            filled: false,
+                                            contentPadding: EdgeInsets.all(15),
+                                            constraints: BoxConstraints.tight(
+                                              const Size.fromHeight(40),
                                             ),
                                           ),
-                                          const SizedBox(width: 8),
-                                          SizedBox(
-                                            width: 140,
-                                            child: Text(
-                                              categoryTitle,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ],
+                                      onSelected: (value) {
+                                        if (value != null) {
+                                          setState(() {
+                                            selectedFilter = value;
+                                          });
+                                          loadSpendingData();
+                                        }
+                                      },
+                                      dropdownMenuEntries: TimeFilter.values
+                                          .map((filter) {
+                                            return DropdownMenuEntry(
+                                              value: filter,
+                                              label: filterLabels[filter]!,
+                                            );
+                                          })
+                                          .toList(),
+                                    ),
+                                  ),
+
+                                  TextButton(
+                                    onPressed: () => setState(
+                                      () => _showLegend = !_showLegend,
+                                    ),
+                                    child: Text(
+                                      _showLegend
+                                          ? "Hide Legend"
+                                          : "Show Legend",
+                                      style: TextStyle(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          190,
+                                          190,
+                                          190,
+                                        ),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+
+                            SizedBox(height: 10),
 
                             // Pie chart
-                            SizedBox(
-                              height: 200,
-                              width: 200,
-                              child: spendingData.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        "📊 No spending data currently.",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : PieChart(
-                                      PieChartData(
-                                        sectionsSpace: 0,
-                                        centerSpaceRadius: 20,
-                                        sections: spendingData.entries.map((e) {
-                                          return PieChartSectionData(
-                                            value: e.value,
-                                            color: getCategoryColor(e.key),
-                                            radius: 75,
-                                            titleStyle: const TextStyle(
-                                              color: Colors.transparent,
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                child: SizedBox(
+                                  height: 200,
+                                  width: 180,
+                                  child: spendingData.isEmpty
+                                      ? const Center(
+                                          child: Text(
+                                            "📊 No spending data currently.",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
                                             ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      : PieChart(
+                                          PieChartData(
+                                            sectionsSpace: 0,
+                                            centerSpaceRadius: 20,
+                                            sections: spendingData.entries.map((
+                                              e,
+                                            ) {
+                                              return PieChartSectionData(
+                                                value: e.value.abs(),
+                                                color: getCategoryColor(e.key),
+                                                radius: 75,
+                                                titleStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                ),
+                              ),
                             ),
                           ],
+                        ),
+
+                        SizedBox(height: 10),
+
+                        // Legend
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 200),
+                          crossFadeState: _showLegend
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                          firstChild: Container(
+                            width: 360,
+                            color: Colors.transparent,
+                            child: Wrap(
+                              spacing: 0,
+                              runSpacing: 0,
+                              children: spendingData.keys.map((categoryId) {
+                                final categoryTitle =
+                                    categoryTitles[categoryId] ?? "Unknown";
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                  ),
+                                  child: SizedBox(
+                                    width: 180,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 12,
+                                          height: 12,
+                                          margin: const EdgeInsets.only(top: 3),
+                                          decoration: BoxDecoration(
+                                            color: getCategoryColor(categoryId),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            categoryTitle,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            softWrap: true,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          secondChild: const SizedBox.shrink(),
                         ),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 20),
+                  SizedBox(height: 5),
 
                   Padding(
                     padding: const EdgeInsets.fromLTRB(35, 0, 0, 10),
@@ -435,15 +480,17 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
 
                   if (_budgets.isEmpty)
                     const Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.all(68.0),
-                        child: Center(
-                          child: Text(
-                            "Nothing here… yet. Tap the Add button and give your first budget a home!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(68.0),
+                          child: Center(
+                            child: Text(
+                              "Nothing here… yet. Tap the Add button and give your first budget a home!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -462,53 +509,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
         ],
       ),
 
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }
