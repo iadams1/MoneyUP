@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import 'package:moneyup/features/home/screens/my_home_page.dart';
@@ -228,17 +229,8 @@ class _BudgetPageState extends State<BudgetPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 0, 0, 0),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
 
               SizedBox(height: 20),

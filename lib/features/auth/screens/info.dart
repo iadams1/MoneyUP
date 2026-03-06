@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/auth/screens/user_select.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -160,7 +160,7 @@ class _InfoScreenState extends State<InfoScreen> {
                             } else {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const MyHomePage(title: '')),
+                                MaterialPageRoute(builder: (_) => const UserSelectScreen()),
                               );
                               // _completeOnboarding();
                             }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -39,19 +40,9 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: Colors.transparent,
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
-
               SizedBox(height: 40),
             ],
           ),

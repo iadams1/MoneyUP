@@ -1,44 +1,41 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '/services/service_locator.dart';
+import 'package:moneyup/shared/widgets/plaid_connect_dialog.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// Adjust path to match your folder structure
 
-class PlaidConnectScreen extends StatefulWidget {
-  const PlaidConnectScreen({super.key});
+class PlaidService extends StatefulWidget {
+  const PlaidService({super.key});
 
   @override
-  State<PlaidConnectScreen> createState() => _PlaidConnectScreenState();
+  State<PlaidService> createState() => _PlaidServiceState();
 }
 
-class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
+class _PlaidServiceState extends State<PlaidService> {
   String? _linkToken;
   bool _isLoading = true;
   bool _hasError = false;
-  String? _errorMessage;
-  StreamSubscription? _plaidSuccessStream;
+  String _errorMessage = '';
 
-  final _supabase = Supabase.instance.client;
+  StreamSubscription<LinkSuccess>? _onSuccessSubscription;
 
   @override
   void initState() {
     super.initState();
     _fetchLinkToken();
 
-    _plaidSuccessStream = PlaidLink.onSuccess.listen(_onPlaidSuccess);
-
+    _onSuccessSubscription = PlaidLink.onSuccess.listen(_handlePlaidSuccess);
     PlaidLink.onExit.listen((exit) {
       if (exit.error != null) {
-        debugPrint('Plaid exited with error: ${exit.error?.message}');
+        debugPrint('Plaid exit with error: ${exit.error}');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Plaid setup cancelled or failed: ${exit.error?.message ?? "Unknown error"}',
-              ),
-            ),
-          );
+          setState(() {
+            _hasError = true;
+            _errorMessage = exit.error?.message ?? 'Connection cancelled';
+          });
         }
       }
     });
@@ -46,7 +43,7 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
 
   @override
   void dispose() {
-    _plaidSuccessStream?.cancel();
+    _onSuccessSubscription?.cancel();
     super.dispose();
   }
 
@@ -54,95 +51,98 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
     setState(() {
       _isLoading = true;
       _hasError = false;
-      _errorMessage = null;
+      _errorMessage = '';
     });
 
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('No authenticated user found');
-      }
-
-      final response = await _supabase.functions.invoke(
+      final response = await Supabase.instance.client.functions.invoke(
         'create-plaid-link-token',
-        body: {},
       );
 
-      if (response.status == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final linkToken = data['link_token'] as String?;
-        if (linkToken == null || linkToken.isEmpty) {
-          throw Exception('No link_token returned from function');
-        }
-        setState(() {
-          _linkToken = linkToken;
-        });
-      } else {
-        throw Exception(
-          'Function error: ${response.status} - ${response.data ?? "No data"}',
-        );
+      if (response.status != 200) {
+        throw Exception('Failed to get link token: ${response.status}');
       }
-    } catch (e) {
-      debugPrint('Link token fetch error: $e');
-      setState(() {
-        _hasError = true;
-        _errorMessage = e.toString();
-      });
+
+      final data = response.data as Map<String, dynamic>;
+      final token = data['link_token'] as String?;
+
+      if (token == null || token.isEmpty) {
+        throw Exception('No link_token in response');
+      }
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to prepare Plaid: $e')),
-        );
+        setState(() {
+          _linkToken = token;
+          _isLoading = false;
+        });
       }
-    } finally {
-      setState(() => _isLoading = false);
+    } catch (e, stack) {
+      debugPrint('Link token error: $e\n$stack');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = e.toString();
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  void _onPlaidSuccess(LinkSuccess success) async {
+  Future<void> _handlePlaidSuccess(LinkSuccess success) async {
     try {
-      final exchangeResponse = await _supabase.functions.invoke(
+      final exchangeResponse = await Supabase.instance.client.functions.invoke(
         'exchange-public-token',
-        body: {
-          'public_token': success.publicToken,
-          'institution_id': success.metadata.institution?.id,
-          'institution_name': success.metadata.institution?.name,
-        },
+        body: {'public_token': success.publicToken},
       );
 
-      debugPrint('exchange response: status=${exchangeResponse.status} data=${exchangeResponse.data}');
-
       if (exchangeResponse.status != 200) {
-        throw Exception(
-          'Exchange failed: ${exchangeResponse.status} - ${exchangeResponse.data ?? "No data"}',
-        );
+        throw Exception('Token exchange failed: ${exchangeResponse.status}');
       }
 
       final data = exchangeResponse.data as Map<String, dynamic>;
-
       if (data['success'] != true) {
-        throw Exception(data['error'] ?? 'Exchange failed (no success flag)');
+        throw Exception(data['error'] ?? 'Exchange did not succeed');
       }
 
-      final connection = data['connection'] as Map<String, dynamic>?;
-      final itemId = connection?['item_id'] as String?;
+      debugPrint('Plaid connection saved successfully');
 
-      if (itemId == null) {
-        throw Exception('Missing connection.item_id in response');
+      // ────────────────────────────────────────────────
+      // NEW: Mark that the user has completed Plaid onboarding
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId != null) {
+        final updateResult = await supabase
+            .from('profiles')
+            .update({'has_plaid_connected': true})
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (updateResult == null) {
+          debugPrint(
+            'Warning: No profile row found to update for user $userId',
+          );
+        } else {
+          debugPrint('has_plaid_connected set to true for user $userId');
+        }
+      } else {
+        debugPrint('Warning: No current user when trying to update profile');
       }
+      // ────────────────────────────────────────────────
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bank connected! Item: $itemId')),
-      );
 
-      supabaseService.syncAll();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Bank account connected!')));
+
       Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      debugPrint('Plaid success handling error: $e');
+    } catch (e, stack) {
+      debugPrint('Exchange error: $e\n$stack');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save connection: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to connect: $e')));
       }
     }
   }
@@ -150,73 +150,31 @@ class _PlaidConnectScreenState extends State<PlaidConnectScreen> {
   void _openPlaidLink() async {
     if (_linkToken == null) return;
 
-    final configuration = LinkTokenConfiguration(
-      token: _linkToken!,
-    );
-
     try {
-      await PlaidLink.create(configuration: configuration);
+      await PlaidLink.create(
+        configuration: LinkTokenConfiguration(token: _linkToken!),
+      );
       PlaidLink.open();
     } catch (e) {
-      debugPrint("Error launching Plaid Link: $e");
+      debugPrint('Error launching Plaid Link: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to open Plaid: $e')),
-        );
+        setState(() {
+          _hasError = true;
+          _errorMessage = e.toString();
+        });
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Connect Bank Account')),
-      body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : _hasError
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Failed to prepare connection:\n$_errorMessage',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: _fetchLinkToken,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Retry'),
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Use fake sandbox credentials:\n'
-                        'Username: user_good\n'
-                        'Password: pass_good',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 40),
-                      ElevatedButton.icon(
-                        onPressed: _linkToken != null ? _openPlaidLink : null,
-                        icon: const Icon(Icons.account_balance),
-                        label: const Text('Connect with Plaid (Sandbox)'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          textStyle: const TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-      ),
+    return AddCardDialog(
+      isLoading: _isLoading,
+      hasError: _hasError,
+      errorMessage: _errorMessage,
+      onRetry: _fetchLinkToken,
+      linkToken: _linkToken,
+      onConnect: _openPlaidLink,
     );
   }
 }

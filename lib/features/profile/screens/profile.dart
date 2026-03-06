@@ -1,10 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/features/profile/widgets/profile_menu.dart';
+import 'package:moneyup/services/auth_service.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/widgets/bottom_nav.dart';
 
-import '/features/profile/widgets/profile_menu.dart';
-import '/shared/widgets/bottom_nav.dart';
-
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _authService = AuthService();
+
+  Future<void> _handleLogout() async {
+    try {
+      await _authService.signOut();
+
+      if (!mounted) return;
+
+      // Clear navigation stack and go to login
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false, // removes all previous routes
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,31 +48,19 @@ class ProfileScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 10, left: 15),
+          padding: const EdgeInsets.only(top: 10, left: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              AppAvatar(size: 60),
               Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
-              ),
-              Container(
-                // NOTIFICATION ICON
                 alignment: Alignment.topRight,
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    // TODO: Implement notifications
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.notifications_outlined,
                     color: Colors.white,
                     size: 30.0,
@@ -61,10 +82,9 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           SafeArea(
-            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
@@ -91,7 +111,94 @@ class ProfileScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(50),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                                final confirmed = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text(
+                                      'Log Out',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 27,
+                                      ),
+                                    ),
+                                    content: Padding(
+                                      padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
+                                      child: Text(
+                                        'Are you sure you want to log out?',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    actions: [
+                                      Center(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                  context,
+                                                  false,
+                                                ),
+                                                child: const Text(
+                                                  "Cancel",
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color.fromARGB(
+                                                        255,
+                                                        184,
+                                                        27,
+                                                        27,
+                                                      ),
+                                                  padding: EdgeInsets.zero,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context, true);
+                                                },
+                                                child: const Text(
+                                                  "Logout",
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirmed != true) return;
+
+                                // Proceed with logout...
+                                _handleLogout();
+                              },
                         child: Ink(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(

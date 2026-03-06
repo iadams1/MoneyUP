@@ -63,7 +63,19 @@ class _PrimaryWalletCardState extends State<PrimaryCardView> {
     if (_primary == null) {
       return SizedBox(
         height: 100,
-        child: const Center(child: Text("No linked cards yet.")),
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: const Center(
+            child: Text(
+              "No cards linked so far. Hit the button to start exploring your wallet!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w600
+              ),
+            )
+          ),
+        ),
       );
     }
 

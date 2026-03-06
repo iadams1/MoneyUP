@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/services/plaid_service.dart';
 
 import '/features/auth/screens/info.dart';
-import '/services/plaid_service.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   const ConfirmationScreen({super.key});
@@ -12,20 +12,21 @@ class ConfirmationScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(// BACKGROUND
+          Image.asset(
+            // BACKGROUND
             'assets/images/mu_bg.png',
-            fit: BoxFit.fill
+            fit: BoxFit.fill,
           ),
           Center(
             child: Padding(
               padding: EdgeInsets.only(top: 150.0, left: 55.0, right: 55.0),
               child: Column(
-                children: <Widget> [
+                children: <Widget>[
                   Image.asset(
                     'assets/images/mu_check.png',
                     width: 240,
                     height: 240,
-                    fit: BoxFit.cover
+                    fit: BoxFit.cover,
                   ),
                   SizedBox(height: 40.0),
                   Text(
@@ -34,7 +35,7 @@ class ConfirmationScreen extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 36,
-                      fontWeight: FontWeight.bold
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 12.0),
@@ -44,28 +45,33 @@ class ConfirmationScreen extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18.0,
-                      fontWeight: FontWeight.w500
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: 90.0),
-                  Padding( // GET STARTED BUTTON
-                    padding: EdgeInsets.only(top:20.0),
+                  Padding(
+                    // GET STARTED BUTTON
+                    padding: EdgeInsets.only(top: 20.0),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 45,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
-                      child:ElevatedButton(
+                      child: ElevatedButton(
                         onPressed: () {
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (context) => PlaidConnectScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => PlaidService(),
+                            ),
                             (route) => false,
                           );
                           Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => InfoScreen()),
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InfoScreen(),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -73,8 +79,8 @@ class ConfirmationScreen extends StatelessWidget {
                           foregroundColor: Colors.transparent,
                         ),
                         child: Text(
-                        'Get Started',
-                        style: TextStyle(color: Colors.black, fontSize: 18),
+                          'Get Started',
+                          style: TextStyle(color: Colors.black, fontSize: 18),
                         ),
                       ),
                     ),
