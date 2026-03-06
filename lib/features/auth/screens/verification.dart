@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
+import 'package:moneyup/services/plaid_service.dart';
 import 'package:moneyup/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'plaid_connect_screen.dart'; // adjust path as needed
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -55,16 +53,13 @@ class _VerificationScreenState extends State<VerificationScreen> {
       if (response.session != null && mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const PlaidConnectScreen()),
+          MaterialPageRoute(builder: (context) => const PlaidService()),
         );
       }
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -87,10 +82,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() => _isResending = true);
 
     try {
-      await _authService.resendOtp(
-        email: widget.email,
-        type: OtpType.signup,
-      );
+      await _authService.resendOtp(email: widget.email, type: OtpType.signup);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -103,10 +95,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -182,7 +171,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                   Container(
                     alignment: Alignment.bottomCenter,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(50.0),
@@ -204,18 +196,25 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             counterText: "",
                             filled: true,
                             fillColor: Colors.grey[200],
-                            contentPadding: const EdgeInsets.symmetric(vertical: 40), // adjusted for better look
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 40,
+                            ), // adjusted for better look
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                          padding: const EdgeInsets.only(
+                            left: 20.0,
+                            right: 20.0,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(50.0),
+                                ),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -229,7 +228,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 ),
                               ),
                               child: ElevatedButton(
-                                onPressed: _isVerifying ? null : _onContinuePressed,
+                                onPressed: _isVerifying
+                                    ? null
+                                    : _onContinuePressed,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
@@ -245,7 +246,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                       )
                                     : const Text(
                                         'Continue',
-                                        style: TextStyle(fontSize: 18.0, color: Colors.white),
+                                        style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.white,
+                                        ),
                                       ),
                               ),
                             ),
@@ -259,7 +263,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black54),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.black54,
+                                    ),
                                   ),
                                 )
                               : const Text(

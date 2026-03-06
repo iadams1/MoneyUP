@@ -46,4 +46,21 @@ class ProfileService {
 
     return response?['full_name'] as String?;
   }
+
+  Future<bool> hasSeenPlaidConnectDialog() async {
+    final row = await _client
+        .from('profiles')
+        .select('has_plaid_connected')
+        .eq('id', user)
+        .maybeSingle();
+
+    return row?['has_plaid_connected'] as bool? ?? false;
+  }
+
+  Future<void> markPlaidConnectDialogSeen() async {
+    await _client
+        .from('profiles')
+        .update({'has_plaid_connected': true})
+        .eq('id', user);
+  }
 }

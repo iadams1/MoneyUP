@@ -242,59 +242,52 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                 children: [
                                   Container(
                                     height: 40,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 0,
-                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(50),
-                                      boxShadow: [
+                                      boxShadow: const [
                                         BoxShadow(
-                                          color: const Color.fromARGB(
-                                            20,
-                                            0,
-                                            0,
-                                            0,
-                                          ),
+                                          color: Color.fromARGB(20, 0, 0, 0),
                                           spreadRadius: 0,
                                           blurRadius: 12,
                                           offset: Offset(0, 8),
                                         ),
                                       ],
                                     ),
-                                    child: DropdownMenu<TimeFilter>(
-                                      width: 162.7,
-                                      textStyle: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      initialSelection: selectedFilter,
-                                      inputDecorationTheme:
-                                          InputDecorationTheme(
-                                            enabledBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            filled: false,
-                                            contentPadding: EdgeInsets.all(15),
-                                            constraints: BoxConstraints.tight(
-                                              const Size.fromHeight(40),
-                                            ),
-                                          ),
-                                      onSelected: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            selectedFilter = value;
-                                          });
-                                          loadSpendingData();
-                                        }
+                                    child: PopupMenuButton<TimeFilter>(
+                                      color: Colors.white,
+                                      onSelected: (value) async {
+                                        setState(() => selectedFilter = value);
+                                        await loadSpendingData();
                                       },
-                                      dropdownMenuEntries: TimeFilter.values
-                                          .map((filter) {
-                                            return DropdownMenuEntry(
-                                              value: filter,
-                                              label: filterLabels[filter]!,
-                                            );
-                                          })
-                                          .toList(),
+                                      itemBuilder: (context) => TimeFilter.values.map((filter) {
+                                        return PopupMenuItem<TimeFilter>(
+                                          value: filter,
+                                          child: Text(filterLabels[filter]!),
+                                        );
+                                      }).toList(),
+                                      offset: const Offset(0, 45),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              filterLabels[selectedFilter]!,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
 

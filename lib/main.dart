@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
+import 'package:moneyup/services/plaid_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,11 +43,11 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
-        '/plaid-connect': (context) => const PlaidConnectScreen(),
+        '/plaid-connect': (context) => const PlaidService(),
         '/verify': (context) => const VerificationScreen(email: ''),
         '/user': (context) => const UserSelectScreen(),
       },
-      initialRoute: '/',
+      initialRoute: '/home',
     );
   }
 }

@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
 
 class AddCardDialog extends StatelessWidget {
-  const AddCardDialog({super.key});
+  final bool isLoading;
+  final bool hasError;
+  final String errorMessage;
+  final VoidCallback onRetry;
+  final String? linkToken;
+  final VoidCallback onConnect;
+
+  const AddCardDialog({
+    super.key,
+    required this.isLoading,
+    required this.hasError,
+    required this.errorMessage,
+    required this.onRetry,
+    required this.linkToken,
+    required this.onConnect,
+  });
+
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +31,6 @@ class AddCardDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 18),
 
@@ -168,7 +182,34 @@ class AddCardDialog extends StatelessWidget {
 
             Row(
               children: [
-                Expanded(
+                isLoading
+            ? Expanded(
+              child: Center(
+                child: const CircularProgressIndicator(
+                  color: Colors.black
+                  )
+                ),
+            )
+            : hasError
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Failed to prepare connection:\n$errorMessage',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: onRetry,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  )
+                : Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
@@ -177,14 +218,7 @@ class AddCardDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => PlaidConnectScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: linkToken != null ? onConnect : null,
                     child: const Text(
                       "Continue",
                       style: TextStyle(

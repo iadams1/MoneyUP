@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/services/plaid_service.dart';
 import 'package:moneyup/features/mywallet/widgets/empty_wallet.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 
@@ -8,7 +9,6 @@ import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
 import '/shared/screen/loading_screen.dart';
 import '/features/home/screens/my_home_page.dart';
-import '/features/mywallet/widgets/add_card_dialog.dart';
 import '/features/mywallet/widgets/linked_card_tile.dart';
 import '/features/mywallet/widgets/page_indicator.dart';
 import '/models/linked_card.dart';
@@ -233,9 +233,7 @@ class _MyWallet extends State<MyWallet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppAvatar(
-                    size: 60,
-                  ),
+                  AppAvatar(size: 60),
                   Container(
                     // NOTIFICATION ICON
                     alignment: Alignment.topRight,
@@ -412,7 +410,7 @@ class _MyWallet extends State<MyWallet> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) => const AddCardDialog(),
+                    builder: (_) => const PlaidService(),
                   );
                 },
                 icon: Image.asset("assets/icons/plusCircle.png"),

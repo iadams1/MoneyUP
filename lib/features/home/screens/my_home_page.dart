@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
@@ -28,12 +29,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Budget? _budget;
   String? _name;
   List<LinkedCard> _cards = [];
+  bool _hasCheckedPlaidDialog = false;
 
   @override
   void initState() {
     super.initState();
     _init();
-    profileService.loadProfileIcon();
   }
 
   Future<void> _init() async {
@@ -50,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
+      profileService.loadProfileIcon();
       await _loadHome();
     } catch (e, st) {
       debugPrint('Home init error: $e');
@@ -78,6 +80,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _name = name;
         _isLoading = false;
       });
+
+      if (!_hasCheckedPlaidDialog) {
+      _hasCheckedPlaidDialog = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await _maybeShowPlaidDialog();
+      });
+      }
     } catch (e) {
       debugPrint('Error loading budgets: $e');
       if (!mounted) return;
@@ -86,6 +97,13 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _maybeShowPlaidDialog() async {
+    final hasSeen = await profileService.hasSeenPlaidConnectDialog();
+    if (!mounted || hasSeen == true) return;
+
+    await showFirstTimePlaidConnect(context);
   }
 
   @override

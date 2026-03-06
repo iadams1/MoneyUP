@@ -5,7 +5,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:moneyup/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -229,7 +228,7 @@ class _SignUpState extends State<SignUpScreen> {
                                     {
                                       if (_formkey.currentState!.validate()) {
                                         try {
-                                          final response = await _authService.signUp(
+                                          await _authService.signUp(
                                             email: _emailController.text.trim(),
                                             password: _passwordController.text.trim(),
                                             fullName: _nameController.text.trim(),
