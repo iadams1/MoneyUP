@@ -113,16 +113,6 @@ async def startup_event():
 # API ENDPOINTS
 # ============================================================================
 
-@app.get("/health")
-def root():
-    """Health check endpoint"""
-    return {
-        "status": "online",
-        "message": "Budget Prediction API",
-        "model_trained": predictor is not None
-    }
-
-
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_budget(request: PredictionRequest):
     """
@@ -351,7 +341,5 @@ async def debug_budget(budget_id: int):
 # ============================================================================
 # RUN SERVER
 # ============================================================================
-
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+# 1. Make sure you are in the backend/ folder (cd into the folder)
+# 2. Run the command: uvicorn main:app --port 8000 --reload
