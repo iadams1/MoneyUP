@@ -3,7 +3,7 @@ One-time script to train models on synthetic data and save them
 Run this once to create your saved models
 """
 
-from budget_forecast import (
+from backend.models.ai.budget_forecast import (
     RealisticBudgetDataGenerator,
     BudgetPredictor,
     BudgetProphetPredictor

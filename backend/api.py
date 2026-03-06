@@ -4,19 +4,20 @@ Matches your Supabase schema exactly
 """
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from supabase import create_client, Client
-import budget_forecast
+import backend.models.ai.budget_forecast as budget_forecast
 import pandas as pd
+from fastapi import status
+
+from models.response import PredictionResponse
+from models.request import PredictionRequest
 
 
 # Import your ML models
-from budget_forecast import (
+from backend.models.ai.budget_forecast import (
     BudgetPredictor,
     RealisticBudgetDataGenerator,
     get_prediction_for_user
@@ -25,23 +26,12 @@ from budget_forecast import (
 # Load environment variables
 load_dotenv()
 
-# Initialize FastAPI
-app = FastAPI(title="Budget Prediction API")
-
-# Add CORS for Flutter
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Initialize Supabase client
-supabase: Client = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_KEY")
-)
+# supabase: Client = create_client(
+#     os.getenv("SUPABASE_URL"),
+#     os.getenv("SUPABASE_KEY")
+# )
 
 # Global ML predictor
 predictor = None
@@ -79,28 +69,7 @@ def get_category_id_from_title(title: str) -> Optional[int]:
 
 
 
-# ============================================================================
-# PYDANTIC MODELS
-# ============================================================================
 
-class PredictionRequest(BaseModel):
-    """Request from Flutter app"""
-    user_id: int
-    budget_id: int
-
-class PredictionResponse(BaseModel):
-    """Response to Flutter app"""
-    success: bool
-    message: Optional[str] = None
-    model_used: Optional[str] = None
-    budget_amount: Optional[float] = None
-    current_spent: Optional[float] = None
-    predicted_final_spending: Optional[float] = None
-    predicted_overage: Optional[float] = None
-    predicted_spending_range: Optional[dict] = None
-    status: Optional[str] = None
-    percentage_over_under: Optional[float] = None
-    category_name: Optional[str] = None
 
 
 # ============================================================================
@@ -144,7 +113,7 @@ async def startup_event():
 # API ENDPOINTS
 # ============================================================================
 
-@app.get("/")
+@app.get("/health")
 def root():
     """Health check endpoint"""
     return {
@@ -167,7 +136,7 @@ async def predict_budget(request: PredictionRequest):
     
     if predictor is None:
         raise HTTPException(
-            status_code=503, 
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="ML model not trained yet. Please wait."
         )
     
@@ -185,7 +154,8 @@ async def predict_budget(request: PredictionRequest):
         if not budget_response.data or len(budget_response.data) == 0:
             return PredictionResponse(
                 success=False,
-                message=f"Budget {request.budget_id} not found for user {request.user_id}"
+                message=f"Budget request not found!",
+                status=status.HTTP_404_NOT_FOUND
             )
         
         budget = budget_response.data[0]
@@ -382,6 +352,6 @@ async def debug_budget(budget_id: int):
 # RUN SERVER
 # ============================================================================
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
