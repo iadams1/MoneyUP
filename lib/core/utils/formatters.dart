@@ -64,4 +64,12 @@ class Formatters {
 
     return formatted;
   }
+
+  static String category(String? raw) {
+    if (raw == null || raw.isEmpty) return '';
+    
+    return raw
+      .toLowerCase().replaceAll('_', ' ').split(' ')
+      .map((word) => word.isEmpty ? '' : word[0].toUpperCase()+word.substring(1)).join(' ');
+  }
 }
