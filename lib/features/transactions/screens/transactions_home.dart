@@ -38,7 +38,14 @@ class _TransactionsHomeState extends State<TransactionsHome> {
         filters: _currentFilters
       );
 
-      final totals = await _transactionService.fetchTotals();
+      final type = filter == TransactionType.credit ? 'credit' : 'depository';
+
+      final totals = await _transactionService.fetchTotals(
+        bankName: _currentFilters.selectedBanks.isEmpty
+            ? null
+            : _currentFilters.selectedBanks.toList(),
+        type: type,
+      );
 
       setState(() {
         _filteredTransactions = transactions;
