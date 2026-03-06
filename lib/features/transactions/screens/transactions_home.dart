@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '/features/transactions/widgets/active_filter_chips.dart';
+import '../widgets/filters/active_filter_chips.dart';
 import '/features/transactions/widgets/filter_dialog.dart';
 import '/features/transactions/widgets/total_amount.dart';
 import '/features/transactions/widgets/no_transaction_view.dart';

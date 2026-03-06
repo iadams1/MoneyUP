@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '/features/transactions/widgets/bank_filter_section.dart';
-import '/features/transactions/widgets/category_filter_section.dart';
-import '/features/transactions/widgets/date_filter_section.dart';
+import 'filters/bank_filter_section.dart';
+import 'filters/category_filter_section.dart';
+import 'filters/date_filter_section.dart';
 import '/services/transaction_service.dart';
 import '/models/transaction.dart';
 import '/models/filter_state.dart';
@@ -45,7 +45,7 @@ class _FilterDialogState extends State<FilterDialog> {
   }
 
   Future<void> _loadFilters() async {
-    final filterData = await _service.fetchFilters(widget.selectedType);
+    final filterData = await _service.fetchFilters(widget.selectedType, widget.initialState);
 
     setState(() {
       bankAccounts = filterData.institutions;

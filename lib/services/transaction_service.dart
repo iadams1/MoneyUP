@@ -13,19 +13,44 @@ class TransactionService {
       FilterState? filters,
     }) async {
     final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
-    final response = await _client
+    var query = _client
         .from('plaid_transactions')
         .select('''
           name,
           amount,
           category,
           authorized_date,
-          plaid_accounts!inner(type)
+          plaid_accounts!inner(type),
+          plaid_items!inner(institution_name)
           ''')
         .eq('user_id', user)
-        .eq('plaid_accounts.type', accountType)
-        .order('authorized_date', ascending: false);
+        .eq('plaid_accounts.type', accountType);
 
+    if (filters != null) {
+      if (filters.selectedCategories.isNotEmpty) {
+        query = query.inFilter('category', filters.selectedCategories.toList());
+      }
+      if (filters.selectedBanks.isNotEmpty) {
+        query = query.inFilter(
+          'plaid_items.institution_name',
+          filters.selectedBanks.toList(),
+        );
+      }
+      if (filters.startDate != null) {
+        query = query.gte(
+          'authorized_date',
+          filters.startDate!.toIso8601String(),
+        );
+      }
+      if (filters.endDate != null) {
+        query = query.lte(
+          'authorized_date',
+          filters.endDate!.toIso8601String(),
+        );
+      }
+    }
+    
+    final response = await query.order('authorized_date', ascending: false);
     final rows = List<Map<String, dynamic>>.from(response);
     return rows.map(Transaction.fromJson).toList();
   }
@@ -75,30 +100,35 @@ class TransactionService {
     };
   }
 
-  Future<FilterData> fetchFilters(TransactionType? filter, {
+  Future<FilterData> fetchFilters(
+    TransactionType? filter, 
+    FilterState? filters, {
     List<String>? bankNames,
-    String? category
+    String? category,
   }) async {
-    final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
-
-    final response = await _client
-        .from('plaid_transactions')
-        .select('''
-          category,
-          authorized_date,
-          plaid_items!inner(institution_name),
-          plaid_accounts!inner(type)
-        ''')
-        .eq('user_id', user)
-        .eq('plaid_accounts.type', accountType);
     
+    final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
+    
+    final transactions = await fetchTransactions(
+      filter: filter,
+      filters: filters,
+    );
+
     final categories = <String>{};
     final institutions = <String>{};
     final dates = <DateTime>{};
-    final rows = List<Map<String, dynamic>>.from(response);
 
-    for (final row in rows) {
-      categories.add(row['category'] ?? '');
+    for (final t in transactions) {
+      categories.add(t.category);
+      dates.add(t.authorizedDate);
+    }
+
+    final response = await _client
+        .from('plaid_transactions')
+        .select('plaid_items!inner(institution_name)')
+        .eq('user_id', user);
+    
+    for (final row in response) {
       institutions.add(row['plaid_items']['institution_name']);
     }
 
