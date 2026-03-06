@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '/core/utils/formatters.dart';
 import '/models/transaction.dart';
 import '/features/transactions/widgets/category_color.dart';
 
@@ -13,6 +14,8 @@ class TransactionCard extends StatelessWidget {
     final formatedDate = DateFormat('yyyy-MM-dd').format(transaction.authorizedDate);
     final formattedAmount = NumberFormat.currency(symbol: '\$').format(transaction.amount);
     final categoryColor = categoryColors[transaction.category] ?? defaultColor;
+    final isNegative = transaction.amount < 0;
+    final amountColor = isNegative ? Colors.grey[700] : Colors.black;
 
     return Material(
       color: Colors.transparent,
@@ -27,19 +30,20 @@ class TransactionCard extends StatelessWidget {
               width: 2.0
             )
           ),
-          height: 85,
+          // TRANSACTION CARD HEIGHT & WIDTH
+          height: 70,
           width: 380,
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsetsGeometry.all(10),
+            padding: EdgeInsetsGeometry.all(8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Transaction Icon
+                // TRANSACTION ICON
                 Container(
-                  height: 60,
-                  width: 65,
+                  height: 55,
+                  width: 55,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.grey.shade200,
@@ -53,7 +57,7 @@ class TransactionCard extends StatelessWidget {
                     color: Colors.grey,
                   )
                 ),
-                const SizedBox(width: 14,),
+                const SizedBox(width: 10,),
                 Expanded( // MERCHANT NAME AND AUTHORIZED DATE
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +67,7 @@ class TransactionCard extends StatelessWidget {
                         transaction.title,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                          fontSize: 12,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -72,47 +76,60 @@ class TransactionCard extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 12,
+                          fontWeight: FontWeight.w300
                         ),
                       ),
                     ],
                   )
                 ),
+                SizedBox(width: 8),
                 // CATEGORY BOX
-                SizedBox(
-                width: 110,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: categoryColor.backgroundColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      transaction.category,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: categoryColor.textColor,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 13,),
+                    SizedBox(
+                    width: 90,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: categoryColor.backgroundColor,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      child: Text(
+                        Formatters.category(transaction.category),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: categoryColor.textColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      
                     ),
-                  ),
+                  ],
                 ),
                 // SHOWS MONEY SPENT
-                SizedBox(
-                  width: 70,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      formattedAmount,
-                      style:TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.black,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 12,),
+                    SizedBox(
+                      width: 80,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          formattedAmount,
+                          style:TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: amountColor,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

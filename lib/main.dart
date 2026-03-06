@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
         '/plaid-connect': (context) => PlaidConnectScreen(),
       },
-      initialRoute: '/home',
+      initialRoute: '/login',
     );
   }
 }
