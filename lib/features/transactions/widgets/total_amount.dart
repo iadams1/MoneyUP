@@ -7,17 +7,20 @@ class TotalAmountView extends StatelessWidget {
   final TransactionType selectedFilter;
   final double totalDebit;
   final double totalCredit;
+  final double availableCredit;
 
   const TotalAmountView({
     super.key,
     required this.selectedFilter,
     required this.totalDebit,
     required this.totalCredit,
+    required this.availableCredit,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDebit = selectedFilter == TransactionType.debit;
+    final isCredit = selectedFilter == TransactionType.credit;
     final amount = isDebit ? totalDebit : totalCredit;
     final title = isDebit ? 'Total Debit Balance' : 'Total Current Credit';
 
@@ -40,6 +43,16 @@ class TotalAmountView extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        if (isCredit) ...[
+          Text(
+            '${Formatters.currency(availableCredit)} Total Available Credit',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[400],
+            ),
+          ),
+        ],
       ],
     );
   }

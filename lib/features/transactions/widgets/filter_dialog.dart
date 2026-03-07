@@ -45,7 +45,7 @@ class _FilterDialogState extends State<FilterDialog> {
   }
 
   Future<void> _loadFilters() async {
-    final filterData = await _service.fetchFilters(widget.selectedType, widget.initialState);
+    final filterData = await _service.fetchFilters(widget.selectedType);
 
     setState(() {
       bankAccounts = filterData.institutions;

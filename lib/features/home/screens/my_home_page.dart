@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/home/widgets/greeting_text.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
-import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 
+import '/features/home/widgets/greeting_text.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/first_time_plaid_connect.dart';
+// import '/shared/widgets/profile_menu_card.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
@@ -160,10 +161,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Row(
                 children: [
-                  AppAvatar(size: 60),
-
+                  AppAvatar(size: 60,),
                   const SizedBox(width: 17),
-
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -175,7 +174,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontSize: 22,
                         ),
                       ),
-
                       // Text for username
                       Text(
                         displayName,
@@ -190,7 +188,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
@@ -215,7 +212,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Positioned.fill(
             child: Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -241,7 +237,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -284,7 +279,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       builder: (_) => const MyWallet(),
                                     ),
                                   );
-
                                   await _init();
                                 },
                                 child: Ink(

@@ -55,11 +55,30 @@ class TransactionService {
     return rows.map(Transaction.fromJson).toList();
   }
 
-  Future<Map<String, double>> fetchTotals() async {
-    final response = await _client
+  Future<Map<String, double>> fetchTotals({
+    List<String>? bankName,
+    String? type,
+  }) async {
+    
+    var query = _client
       .from('plaid_accounts')
-      .select('type, current_balance, is_active')
-      .eq('user_id', user);
+      .select('''
+            type, 
+            current_balance,
+            plaid_items!inner(institution_name), 
+            is_active''')
+      .eq('user_id', user)
+      .eq('is_active', true);
+
+    if (type != null && type.isNotEmpty) {
+      query = query.eq('type', type);
+    }
+
+    if (bankName != null && bankName.isNotEmpty) {
+      query = query.inFilter('plaid_items.institution_name', bankName);
+    }
+
+    final response = await query;
 
     double totalCredit = 0;
     double totalDebit = 0;
@@ -81,37 +100,42 @@ class TransactionService {
     };
   }
 
-  Future<FilterData> fetchFilters(
-    TransactionType? filter,
-    FilterState? filters,
-    ) async {
-    final transactions = await fetchTransactions(
-      filter: filter,
-      filters: filters,
-    );
-
-    final categories = <String>{};
-    final institutions = <String>{};
-    final dates = <DateTime>{};
-
-    for (final t in transactions) {
-      categories.add(t.category);
-      dates.add(t.authorizedDate);
-    }
+  Future<FilterData> fetchFilters(TransactionType? filter) async {
+    final accountType = filter == TransactionType.credit
+        ? 'credit'
+        : 'depository';
 
     final response = await _client
         .from('plaid_transactions')
-        .select('plaid_items!inner(institution_name)')
-        .eq('user_id', user);
-    
-    for (final row in response) {
-      institutions.add(row['plaid_items']['institution_name']);
+        .select('''
+          category,
+          plaid_items!inner(institution_name),
+          plaid_accounts!inner(type)
+        ''')
+        .eq('user_id', user)
+        .eq('plaid_accounts.type', accountType);
+
+    final categories = <String>{};
+    final institutions = <String>{};
+
+    final rows = List<Map<String, dynamic>>.from(response);
+
+    for (final row in rows) {
+      final category = row['category'];
+      final instituion = row['plaid_items']?['institution_name'];
+      
+      if (category != null && category.isNotEmpty) {
+        categories.add(category);
+      }
+      if (instituion != null && instituion.isNotEmpty) {
+        institutions.add(instituion);
+      }
     }
 
     return FilterData(
       categories: categories.toList()..sort(), 
       institutions: institutions.toList()..sort(), 
-      dates: dates.toList()..sort(),
+      dates: [],
     );
   }
 }

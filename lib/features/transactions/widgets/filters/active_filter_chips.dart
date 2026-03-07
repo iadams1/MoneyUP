@@ -7,8 +7,7 @@ class ActiveFilterChips extends StatelessWidget {
   final VoidCallback onClearAll;
   final Function(String) onRemoveBank;
   final Function(String) onRemoveCategory;
-  final VoidCallback onRemoveStartDate;
-  final VoidCallback onRemoveEndDate;
+  final VoidCallback onRemoveDate;
 
   const ActiveFilterChips({
     super.key,
@@ -16,14 +15,12 @@ class ActiveFilterChips extends StatelessWidget {
     required this.onClearAll,
     required this.onRemoveBank,
     required this.onRemoveCategory,
-    required this.onRemoveStartDate,
-    required this.onRemoveEndDate,
+    required this.onRemoveDate,
   });
 
   @override
   Widget build(BuildContext context) {
     List<Widget> chips = [];
-    if (!filters.hasFilters) return const SizedBox();
 
     for (final bank in filters.selectedBanks) {
       chips.add(
@@ -59,21 +56,27 @@ class ActiveFilterChips extends StatelessWidget {
         ),
       );
     }
-    
     if (filters.startDate != null || filters.endDate != null) {
       chips.add(
         Padding(
           padding: EdgeInsets.only(right: 6),
           child: Chip(
             label: Text(
-              "From ${filters.startDate!.toLocal().toString().split(' ')[0]}"
-              "To ${filters.endDate!.toLocal().toString().split(' ')[0]}",),
+              "${filters.startDate!.toLocal().toString().split(' ')[0]} to "
+              "${filters.endDate!.toLocal().toString().split(' ')[0]}",
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+            ),
+            backgroundColor: Colors.white,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             deleteIcon: Icon(Icons.close, size: 18,),
-            onDeleted: onRemoveStartDate,
+            onDeleted: onRemoveDate,
           ),
         ),
       );
     }
+    if (chips.isEmpty) return const SizedBox();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
@@ -86,7 +89,12 @@ class ActiveFilterChips extends StatelessWidget {
           ),
           TextButton(
             onPressed: onClearAll,
-            child: const Text("Clear Filters"),
+            child: const Text(
+              "Clear Filters",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
           )
         ],
       ),
