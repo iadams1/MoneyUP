@@ -9,7 +9,7 @@ supabase = get_supabase()
 def get_categories():
     """Get all categories from category_table"""
     try:
-        response = supabase.table("category_table").select("*").execute()
+        response = supabase.table("ml_categories").select("*").execute()
         return {
             "success": True,
             "categories": response.data

@@ -260,7 +260,7 @@ class BudgetPredictor:
         self.models = {}
         self.scaler = StandardScaler()
         self.feature_names = None
-        self.best_model = None      # ADDED TO TRACK BEST MODEL
+        self.best_model = "Random Forest"      # ADDED TO TRACK BEST MODEL
         
     def calculate_features(self, budgets_df, transactions_df):
         """

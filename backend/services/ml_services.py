@@ -1,6 +1,7 @@
 from models.ai.budget_forecast import BudgetPredictor
 from pathlib import Path
 
+
 budgetPredictor = None
 
 def load_models():

@@ -8,7 +8,7 @@ from core.lifespan import lifespan
 # from middleware 
 
 # API route groups
-from api.routes import health, categories
+from api.routes import health, categories, debug, prediction
 
 # Initialize FastAPI
 app = FastAPI(
@@ -29,4 +29,6 @@ app.add_middleware(
 # Add Router Groups
 app.include_router(health.router)
 app.include_router(categories.router)
+app.include_router(debug.router)
+app.include_router(prediction.router)
 
