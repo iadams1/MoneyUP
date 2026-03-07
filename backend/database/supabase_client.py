@@ -16,6 +16,9 @@ def init_supabase():
 def get_supabase() -> Client:
 
     if supabase is None:
-        raise RuntimeError("Supabase client not initialized")
+        try:
+            init_supabase()
+        except Exception as ex:
+            print(f"Exception while trying to init supabase client: {ex}")
 
     return supabase

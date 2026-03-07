@@ -136,9 +136,9 @@ async def predict_budget(request: PredictionRequest):
         # =====================================================================
         # ⚠️ UPDATE these column names to match YOUR budgets table exactly
         budget_response = supabase.table("budgets").select("*").eq(
-            "budget_id", request.budget_id
+            "budget_ID", request.budget_id
         ).eq(
-            "user_id", request.user_id
+            "user_ID", request.user_id
         ).execute()
         
         if not budget_response.data or len(budget_response.data) == 0:
@@ -157,7 +157,7 @@ async def predict_budget(request: PredictionRequest):
         budget_category_id = budget.get('category_id') or budget.get('category_ID')
         
         if budget_category_id:
-            category_response = supabase.table("category_table").select("*").eq(
+            category_response = supabase.table("category_table1").select("*").eq(
                 "category_ID", budget_category_id
             ).execute()
             
@@ -286,17 +286,7 @@ async def predict_budget(request: PredictionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/categories")
-def get_categories():
-    """Get all categories from category_table"""
-    try:
-        response = supabase.table("category_table").select("*").execute()
-        return {
-            "success": True,
-            "categories": response.data
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/model/info")
