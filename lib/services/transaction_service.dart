@@ -20,11 +20,12 @@ class TransactionService {
           amount,
           category,
           authorized_date,
-          plaid_accounts!inner(type),
+          plaid_accounts!inner(type, is_active),
           plaid_items!inner(institution_name)
           ''')
         .eq('user_id', user)
-        .eq('plaid_accounts.type', accountType);
+        .eq('plaid_accounts.type', accountType)
+        .eq('plaid_accounts.is_active', true);
 
     if (filters != null) {
       if (filters.selectedCategories.isNotEmpty) {
@@ -128,10 +129,11 @@ class TransactionService {
         .select('''
           category,
           plaid_items!inner(institution_name),
-          plaid_accounts!inner(type)
+          plaid_accounts!inner(type, is_active)
         ''')
         .eq('user_id', user)
-        .eq('plaid_accounts.type', accountType);
+        .eq('plaid_accounts.type', accountType)
+        .eq('plaid_accounts.is_active', true);
 
     // final categories = <String>{};
     // final institutions = <String>{};
