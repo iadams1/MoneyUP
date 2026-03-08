@@ -100,13 +100,13 @@ async def predict_budget(request: PredictionRequest):
             ).execute()
             
             if category_response.data and len(category_response.data) > 0:
-                category_title = category_response.data[0].get('Title', 'Unknown')
+                category_title = category_response.data[0].get('title', 'Unknown')
                 ml_category_id = get_category_id_from_title(category_title)
             else:
-                category_title = 'Unknown'
+                category_title = 'Groceries'
                 ml_category_id = 1  # Default to Groceries
         else:
-            category_title = 'Unknown'
+            category_title = 'Groceries'
             ml_category_id = 1
         
         # =====================================================================
