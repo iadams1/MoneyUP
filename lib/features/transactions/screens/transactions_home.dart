@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
 
 import '../widgets/filters/active_filter_chips.dart';
 import '/features/transactions/widgets/filter_dialog.dart';
@@ -67,7 +68,17 @@ class _TransactionsHomeState extends State<TransactionsHome> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {required Key key}) {
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -91,6 +102,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                 ),
                 child: Text(
                   'View Debit',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600
+                  ),
                 ),
               ),
               TextButton(
@@ -105,6 +120,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                 ),
                 child: Text(
                   'View Credit',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600
+                  ),
                 ),
               ),
               IconButton( // INFO ICON BUTTON
@@ -191,12 +210,12 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                               _loadTransactions(filter: _selectedFilter);
                             }
                           },
-                          icon: Icon(Icons.filter_alt_outlined),
+                          icon: Icon(Icons.filter_alt_outlined, size: 30,),
                         )
                       ],
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(height: 0),
                   ActiveFilterChips(
                     filters: _currentFilters,
                     onRemoveBank: (bank) {

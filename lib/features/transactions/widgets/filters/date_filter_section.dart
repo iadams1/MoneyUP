@@ -50,10 +50,7 @@ class DateFilterSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 5),
         GestureDetector(
@@ -63,6 +60,28 @@ class DateFilterSection extends StatelessWidget {
               initialDate: value ?? DateTime.now(),
               firstDate: DateTime(2020),
               lastDate: DateTime.now(),
+
+              helpText: 'Select a Date',
+              cancelText: 'Close',
+              confirmText: 'Confirm',
+              fieldHintText: 'MM/DD/YYYY',
+              fieldLabelText: 'Enter date',
+
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Color.fromARGB(255, 30, 28, 117), 
+                      onPrimary: Colors.white,
+                      onSurface: Colors.black,
+                    ),
+                    dialogTheme: const DialogThemeData(
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
             );
             if (picked != null) onPicked(picked);
           },

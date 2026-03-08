@@ -30,14 +30,19 @@ class ActiveFilterChips extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(right: 6),
           child: Chip(
-            label: Text(bank),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
+            label: Text(
+              bank,
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
-            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(9),
+              side: BorderSide(color: Colors.transparent),
+            ),
+            backgroundColor: const Color.fromARGB(255, 225, 225, 225),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            deleteIcon: Icon(Icons.close, size: 18,),
-            onDeleted: () => onRemoveBank(bank),
+
+            //deleteIcon: Icon(Icons.close, size: 18),
+            //onDeleted: () => onRemoveBank(bank),
           ),
         ),
       );
@@ -47,47 +52,57 @@ class ActiveFilterChips extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(right: 6),
           child: Chip(
-            label: Text(Formatters.category(category)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
+            label: Text(
+              Formatters.category(category),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
-            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(9),
+              side: BorderSide(color: Colors.transparent),
+            ),
+            backgroundColor: const Color.fromARGB(255, 225, 225, 225),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            deleteIcon: Icon(Icons.close, size: 18,),
-            onDeleted: () => onRemoveCategory(category),
+
+            //deleteIcon: Icon(Icons.close, size: 18),
+            //onDeleted: () => onRemoveBank(bank),
           ),
         ),
       );
     }
-    
+
     if (filters.startDate != null || filters.endDate != null) {
       chips.add(
         Padding(
           padding: EdgeInsets.only(right: 6),
           child: Chip(
             label: Text(
-              "From ${filters.startDate!.toLocal().toString().split(' ')[0]}"
-              "To ${filters.endDate!.toLocal().toString().split(' ')[0]}",),
-            deleteIcon: Icon(Icons.close, size: 18,),
-            onDeleted: onRemoveStartDate,
+              "From ${filters.startDate!.toLocal().toString().split(' ')[0]} To ${filters.endDate!.toLocal().toString().split(' ')[0]}",
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(9),
+              side: BorderSide(color: Colors.transparent),
+            ),
+            backgroundColor: const Color.fromARGB(255, 225, 225, 225),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+            //deleteIcon: Icon(Icons.close, size: 18),
+            //onDeleted: () => onRemoveBank(bank),
           ),
         ),
       );
     }
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
             child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: chips,),
+              scrollDirection: Axis.horizontal,
+              child: Row(children: chips),
             ),
           ),
-          TextButton(
-            onPressed: onClearAll,
-            child: const Text("Clear Filters"),
-          )
+          // TextButton(onPressed: onClearAll, child: const Text("Clear Filters")),
         ],
       ),
     );

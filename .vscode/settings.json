@@ -1,7 +1,5 @@
 {
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
+  "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "deno.unstable": [
     "bare-node-builtins",
@@ -21,5 +19,5 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "cmake.sourceDirectory": "C:/Users/Dan/Documents/MoneyUP/windows"
+  "cmake.sourceDirectory": "C:/Users/IJAda/Downloads/MoneyUP/windows"
 }

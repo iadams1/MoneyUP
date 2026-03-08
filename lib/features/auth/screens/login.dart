@@ -164,8 +164,9 @@ class _LoginState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   if (!(_formkey.currentState?.validate() ??
-                                      false))
+                                      false)) {
                                     return;
+                                  }
 
                                   try {
                                     await AuthService().login(

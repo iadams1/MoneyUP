@@ -33,13 +33,22 @@ class CategoryFilterSection extends StatelessWidget {
           runSpacing: 8,
           children: categories.map((category) {
             return FilterChip(
-              label: Text(Formatters.category(category)),
+              label: Text(
+                Formatters.category(category),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+              ),
               selected: selectedCategories.contains(category),
               onSelected: (_) => onToggle(category),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              backgroundColor: Colors.white,
+              selectedColor: const Color.fromARGB(255, 231, 221, 255),
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.white,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             );
           }).toList(),
