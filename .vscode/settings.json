@@ -19,5 +19,8 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "cmake.sourceDirectory": "C:/Users/IJAda/Downloads/MoneyUP/windows"
+  "cmake.sourceDirectory": "C:/Users/IJAda/Downloads/MoneyUP/windows",
+  "cSpell.words": [
+    "supabase"
+  ]
 }
