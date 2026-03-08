@@ -212,7 +212,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
             ),
           ),
           Positioned(
-            top: 165,
+            top: 155,
             left: 25,
             right: 25,
             child: TotalAmountView(
@@ -271,7 +271,6 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 0),
                   ActiveFilterChips(
                     filters: _currentFilters,
                     onRemoveCategory: _removeCategory,
@@ -284,6 +283,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                       await _loadTransactions(filter: _selectedFilter);
                     },
                   ),
+                  SizedBox(height: 10),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),

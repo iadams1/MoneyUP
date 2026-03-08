@@ -19,7 +19,9 @@ class TransactionCard extends StatelessWidget {
     ).format(transaction.amount);
     final categoryColor = categoryColors[transaction.category] ?? defaultColor;
     final isNegative = transaction.amount < 0;
-    final amountColor = isNegative ? Colors.grey[700] : Colors.black;
+    final amountColor = isNegative
+        ? const Color.fromARGB(255, 150, 41, 41)
+        : const Color.fromARGB(255, 32, 133, 47);
 
     return Material(
       color: Colors.transparent,
@@ -114,7 +116,7 @@ class TransactionCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             color: categoryColor.textColor,
-                            fontWeight: FontWeight.w600
+                            fontWeight: FontWeight.w600,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

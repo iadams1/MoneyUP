@@ -20,8 +20,8 @@ class Formatters {
   static String getFormattedDate() {
     final now = DateTime.now();
 
-    final weekday = DateFormat('EEEE').format(now);   // Tuesday
-    final month = DateFormat('MMMM').format(now);     // March
+    final weekday = DateFormat('EEEE').format(now);  
+    final month = DateFormat('MMMM').format(now); 
     final day = now.day;
     final year = now.year;
 

@@ -48,10 +48,11 @@ class TotalAmountView extends StatelessWidget {
             '${Formatters.currency(availableCredit)} Total Available Credit',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey[400],
+              fontWeight: FontWeight.w500,
+              color: const Color.fromARGB(114, 255, 255, 255),
             ),
           ),
+          SizedBox(height: 20),
         ],
       ],
     );
