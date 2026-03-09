@@ -19,6 +19,9 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // Add password visibility state
+  bool _obscurePassword = true;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -103,10 +106,11 @@ class _LoginState extends State<LoginScreen> {
                             ),
                           ),
                           Padding(
-                            // PASSWORD ENTRY
+                            // PASSWORD ENTRY – with show/hide toggle
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,
+                              obscureText: _obscurePassword,
                               validator: MultiValidator([
                                 RequiredValidator(errorText: 'Enter password'),
                                 MinLengthValidator(
@@ -136,6 +140,30 @@ class _LoginState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(9.0),
                                   ),
+                                ),
+                                // ── Added suffix icon for visibility toggle ──
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.grey[700],
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                                // ── Added suffix icon for visibility toggle ──
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.grey[700],
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
                                 ),
                               ),
                             ),

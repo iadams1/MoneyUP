@@ -238,7 +238,8 @@ class _SignUpState extends State<SignUpScreen> {
                                           {
                                             Navigator.pushReplacement(
                                               context,
-                                              MaterialPageRoute(
+                                              MaterialPageRoute
+                                              (
                                                 builder: (context) => VerificationScreen(email: _emailController.text.trim()),
                                                 // builder: (context) => PlaidConnectScreen(),
                                               ),
