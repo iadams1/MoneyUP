@@ -153,18 +153,6 @@ class _LoginState extends State<LoginScreen> {
                                     });
                                   },
                                 ),
-                                // ── Added suffix icon for visibility toggle ──
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                    color: Colors.grey[700],
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
-                                ),
                               ),
                             ),
                           ),
