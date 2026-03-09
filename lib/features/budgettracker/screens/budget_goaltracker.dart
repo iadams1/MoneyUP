@@ -35,8 +35,12 @@ class _BudgetPageState extends State<BudgetPage> {
 
   double previousSaved = 0;
 
-  ValueNotifier<double> overallGoalAmount = ValueNotifier<double>(0,); // Overall budget goal
-  ValueNotifier<double> goalSaved = ValueNotifier<double>(0,); // Amount saved towards the goal
+  ValueNotifier<double> overallGoalAmount = ValueNotifier<double>(
+    0,
+  ); // Overall budget goal
+  ValueNotifier<double> goalSaved = ValueNotifier<double>(
+    0,
+  ); // Amount saved towards the goal
   ValueNotifier<double> goalNeeded = ValueNotifier<double>(0);
 
   void initBudget(double saved, double goal, double needed) {
@@ -174,7 +178,7 @@ class _BudgetPageState extends State<BudgetPage> {
         });
         return;
       }
-      
+
       setState(() {
         _budget = budget;
         _isLoading = false;
@@ -228,13 +232,7 @@ class _BudgetPageState extends State<BudgetPage> {
           padding: EdgeInsets.only(top: 10, left: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              AppAvatar(
-                size: 60,
-              ),
-
-              SizedBox(height: 20),
-            ],
+            children: [AppAvatar(size: 60), SizedBox(height: 20)],
           ),
         ),
         toolbarHeight: 120,
@@ -252,9 +250,7 @@ class _BudgetPageState extends State<BudgetPage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
               ),
               height: 680,
               child: Column(
@@ -316,16 +312,16 @@ class _BudgetPageState extends State<BudgetPage> {
 
                       if (currentSaved > previousSaved) {
                         arrowIcon = Icons.arrow_upward;
-                        arrowColor = Colors.green;
+                        arrowColor = Colors.red;
                       } else if (currentSaved < previousSaved) {
                         arrowIcon = Icons.arrow_downward;
-                        arrowColor = Colors.red;
+                        arrowColor = Colors.green;
                       } else {
                         arrowIcon = Icons.remove; // no change
                         arrowColor = const Color.fromARGB(6, 0, 0, 0);
                       }
 
-                      final pct = budget.percentComplete;
+                      final pct = overallGoalAmount.value == 0 ? 0.0 : (currentSaved / overallGoalAmount.value).clamp(0.0, 1.0);
                       final pctText = (pct * 100).toStringAsFixed(0);
 
                       return Stack(
@@ -338,18 +334,12 @@ class _BudgetPageState extends State<BudgetPage> {
                               radius: 120,
                               lineWidth: 38,
                               percent:
-                                  (goalSaved.value /
-                                          overallGoalAmount.value)
+                                  (goalSaved.value / overallGoalAmount.value)
                                       .clamp(0.0, 1.0),
                               center: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    arrowIcon,
-                                    color: arrowColor,
-                                    size: 40,
-                                  ),
+                                  Icon(arrowIcon, color: arrowColor, size: 40),
                                   Text(
                                     "$pctText%",
                                     style: TextStyle(
@@ -359,15 +349,9 @@ class _BudgetPageState extends State<BudgetPage> {
                                   ),
                                 ],
                               ),
-                              backgroundColor: const Color.fromARGB(
-                                6,
-                                0,
-                                0,
-                                0,
-                              ),
+                              backgroundColor: const Color.fromARGB(6, 0, 0, 0),
                               progressColor: budgetColor,
-                              circularStrokeCap:
-                                  CircularStrokeCap.round,
+                              circularStrokeCap: CircularStrokeCap.round,
                             ),
                           ),
                         ],
@@ -394,9 +378,9 @@ class _BudgetPageState extends State<BudgetPage> {
 
                   ValueListenableBuilder<double>(
                     valueListenable: goalSaved,
-                    builder: (context, saved, _) {
+                    builder: (context, spent, _) {
                       return Text(
-                        "\$${saved.toStringAsFixed(2)} Saved",
+                        "\$${spent.toStringAsFixed(2)} Spent",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 25,
@@ -409,9 +393,9 @@ class _BudgetPageState extends State<BudgetPage> {
 
                   ValueListenableBuilder<double>(
                     valueListenable: goalNeeded,
-                    builder: (context, needed, _) {
+                    builder: (context, remain, _) {
                       return Text(
-                        "\$${needed.toStringAsFixed(2)} Needed",
+                        "\$${remain.toStringAsFixed(2)} Remaining",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 19,
@@ -427,18 +411,14 @@ class _BudgetPageState extends State<BudgetPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: Image.asset(
-                          'assets/icons/plusCircle.png',
-                        ),
+                        icon: Image.asset('assets/icons/plusCircle.png'),
                         onPressed: () {
                           _showAmountDialog(isAddition: true);
                         },
                       ),
                       SizedBox(width: 50),
                       IconButton(
-                        icon: Image.asset(
-                          'assets/icons/minusCircle.png',
-                        ),
+                        icon: Image.asset('assets/icons/minusCircle.png'),
                         onPressed: () {
                           _showAmountDialog(isAddition: false);
                         },
@@ -464,7 +444,7 @@ class _BudgetPageState extends State<BudgetPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -474,9 +454,7 @@ class _BudgetPageState extends State<BudgetPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -485,20 +463,16 @@ class _BudgetPageState extends State<BudgetPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),
