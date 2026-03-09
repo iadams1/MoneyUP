@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
 import 'package:moneyup/features/auth/screens/user_select.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
+import 'package:moneyup/features/auth/screens/welcome.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MoneyUP',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: "SF Pro",
@@ -46,8 +48,9 @@ class MyApp extends StatelessWidget {
         '/plaid-connect': (context) => const PlaidService(),
         '/verify': (context) => const VerificationScreen(email: ''),
         '/user': (context) => const UserSelectScreen(),
+        '/start': (context) => const WelcomeScreen(),
       },
-      initialRoute: '/home',
+      initialRoute: '/login',
     );
   }
 }

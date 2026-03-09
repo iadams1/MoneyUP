@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProfileService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  final user = supabaseService.currentUserId!;
+  String get user => supabaseService.currentUserId!;
 
   final ValueNotifier<int> iconIdNotifier = ValueNotifier<int>(UserImages.defaultId);
 

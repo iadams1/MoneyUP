@@ -8,7 +8,7 @@ import '/services/service_locator.dart';
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  final user = supabaseService.currentUserId!;
+  String get user => supabaseService.currentUserId!;
 
   Future<Budget?> getRandomBudget() async {
     try {
