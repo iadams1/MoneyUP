@@ -242,7 +242,6 @@ class _SignUpState extends State<SignUpScreen> {
                                                 builder: (context) => VerificationScreen(email: _emailController.text.trim()),
                                                 // builder: (context) => PlaidConnectScreen(),
                                               ),
-                                              
                                             );
                                           }
                                         } on AuthException catch (error) {
