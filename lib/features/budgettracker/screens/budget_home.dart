@@ -330,7 +330,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                             "📊 No spending data currently.",
                                             style: TextStyle(
                                               color: Colors.black,
-                                              fontSize: 16,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w700,
                                             ),
                                             textAlign: TextAlign.center,

@@ -195,7 +195,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             border: InputBorder.none,
                             counterText: "",
                             filled: true,
-                            fillColor: Colors.grey[200],
+                            fillColor: Colors.transparent,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 40,
                             ), // adjusted for better look

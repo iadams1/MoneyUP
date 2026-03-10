@@ -147,4 +147,21 @@ class BudgetService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getMonthlySpending({
+    required DateTime start,
+    required DateTime end,
+  }) async {
+    
+    final response = await _client.rpc(
+      'get_top_spending_categories',
+      params: {
+        'user_uuid': user,
+        'start_date': start.toIso8601String(),
+        'end_date': end.toIso8601String(),
+      },
+    );
+
+    return List<Map<String, dynamic>>.from(response);
+  }
+
 }

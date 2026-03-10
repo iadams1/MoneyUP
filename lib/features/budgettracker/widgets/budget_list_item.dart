@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:moneyup/core/utils/formatters.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '/features/budgettracker/screens/budget_goaltracker.dart';
@@ -22,8 +23,8 @@ class BudgetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String title = budget.title;
-    final double saved = budget.amountSaved;
-    final double needed = budget.amountNeeded;
+    final double spent = budget.amountSaved;
+    final double remaining = budget.amountNeeded;
     final double percent = budget.percentComplete;
 
     return Padding(
@@ -83,14 +84,14 @@ class BudgetListItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "\$${saved.toStringAsFixed(2)} Saved",
+                        "${Formatters.currency(spent)} Spent",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        "\$${needed.toStringAsFixed(2)} Needed",
+                        "${Formatters.currency(remaining)} Remaining",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

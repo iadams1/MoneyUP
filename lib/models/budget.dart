@@ -33,4 +33,7 @@ class Budget {
       categoryId: (json['category_ID'] as int?) ?? 0,
     );
   }
+
+  double get percentComplete =>
+      goal <= 0 ? 0.0 : (amountSaved / goal).clamp(0.0, 1.0);
 }

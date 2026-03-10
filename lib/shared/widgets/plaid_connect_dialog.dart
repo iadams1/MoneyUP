@@ -218,7 +218,10 @@ class AddCardDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: linkToken != null ? onConnect : null,
+                    onPressed: linkToken != null ? () {
+                      Navigator.of(context).pop(); 
+                      onConnect();                
+                    } : null,
                     child: const Text(
                       "Continue",
                       style: TextStyle(

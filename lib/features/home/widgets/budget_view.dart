@@ -52,6 +52,7 @@ class BudgetView extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
+                  height: 1,
                 ),
               ),
               const SizedBox(height: 10),
