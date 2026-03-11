@@ -1,17 +1,19 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/features/education/screens/categorydetails.dart';
+import 'package:moneyup/features/education/screens/viewallarticles.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 
-import '/features/education/screens/categorydetails.dart';
-import '/features/education/screens/viewallarticles.dart';
-import '/models/article.dart';
-import '/models/daily_tip.dart';
-import '/shared/screen/loading_screen.dart';
-import '/shared/widgets/profile_menu_card.dart';
-import '/shared/widgets/bottom_nav.dart';
-import '/features/education/widgets/article_card.dart';
-import '/services/service_locator.dart';
+import 'package:moneyup/models/article.dart';
+import 'package:moneyup/models/daily_tip.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/widgets/article_card.dart';
+import 'package:moneyup/services/service_locator.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -120,7 +122,18 @@ class _EducationScreenState extends State<EducationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ProfileMenuCard(),
+              Container(
+                padding: EdgeInsets.all(0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: const Color.fromARGB(0, 255, 255, 255),
+                  border: Border.all(
+                    width: 3,
+                    color: const Color.fromARGB(255, 121, 121, 121),
+                  ),
+                ),
+                child: Image.asset('assets/icons/profileIcon.png'),
+              ),
               Container(
                 // NOTIFICATION ICON
                 alignment: Alignment.topRight,
@@ -269,7 +282,7 @@ class _EducationScreenState extends State<EducationScreen> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.baseline,
                               textBaseline: TextBaseline.alphabetic,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              spacing: 170,
                               children: [
                                 Text(
                                   "Articles",
@@ -381,7 +394,53 @@ class _EducationScreenState extends State<EducationScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 2),
+      bottomNavigationBar: BottomAppBar(
+        color: const Color.fromARGB(0, 255, 253, 249),
+        height: 80,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Image.asset('assets/icons/educationIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

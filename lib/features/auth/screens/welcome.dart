@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-
-import '/features/auth/screens/signup.dart';
+import 'package:moneyup/features/auth/screens/signup.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -27,11 +26,11 @@ class WelcomeScreen extends StatelessWidget {
             'assets/images/mu_bg.png',
             fit: BoxFit.fill
           ),
-          SizedBox(height: 50),
+          SizedBox(height: 40.0),
           Image.asset(
             'assets/images/mu_start.png', 
-            height: 500,
-            width: double.infinity,
+            height: 400,
+            width: 400,
             fit: BoxFit.none,
             alignment: Alignment.topCenter,
           ),
@@ -51,6 +50,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   textAlign: TextAlign.left,
                 ),
+                // SizedBox(height:10),
                 Text(
                   'Master your money-without the stress.',
                   style: TextStyle(
@@ -65,16 +65,24 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
           Positioned( // NEXT BUTTON
-            bottom: 10,
-            right: 0,
-            child: IconButton(
-              icon: Image.asset('assets/icons/doubleArrowRight.png'),
+            bottom: 30,
+            right: 30,
+            child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SignUpScreen())
                 );
               },
+              style: ElevatedButton.styleFrom(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(10.0),
+                shape: const StadiumBorder()
+              ),
+              child: const Text(
+                '>>',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
+              ),
             ),
           ),
         ],

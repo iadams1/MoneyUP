@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '/features/budgettracker/screens/budget_home.dart';
+import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
 
 class NoBudgetView extends StatelessWidget {
 
@@ -14,7 +13,7 @@ class NoBudgetView extends StatelessWidget {
         const Text(
           "No budgets available yet.",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         ElevatedButton(

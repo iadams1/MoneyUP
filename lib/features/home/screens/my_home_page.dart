@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
+import 'package:moneyup/features/budgettracker/utils/time_range.dart';
+// import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
+// import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
 
 import '/features/home/widgets/greeting_text.dart';
 import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/first_time_plaid_connect.dart';
+// import '/shared/widgets/first_time_plaid_connect.dart';
 // import '/shared/widgets/profile_menu_card.dart';
-import '../widgets/budget_view.dart';
-import '../widgets/no_budget_view.dart';
+// import '../widgets/budget_view.dart';
+// import '../widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
-import '../widgets/primary_card_view.dart';
+// import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
 import '/models/linked_card.dart';
 import '/services/service_locator.dart';
@@ -32,10 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
   List<LinkedCard> _cards = [];
   bool _hasCheckedPlaidDialog = false;
 
+  Map<int, double> spendingData = {};
+  Map<int, String> categoryTitles = {};
+
   @override
   void initState() {
     super.initState();
     _init();
+    loadMonthlySpendingData();
   }
 
   Future<void> _init() async {
@@ -83,12 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       if (!_hasCheckedPlaidDialog) {
-      _hasCheckedPlaidDialog = true;
+        _hasCheckedPlaidDialog = true;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        await _maybeShowPlaidDialog();
-      });
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) return;
+          await _maybeShowPlaidDialog();
+        });
       }
     } catch (e) {
       debugPrint('Error loading budgets: $e');
@@ -104,7 +112,34 @@ class _MyHomePageState extends State<MyHomePage> {
     final hasSeen = await profileService.hasSeenPlaidConnectDialog();
     if (!mounted || hasSeen == true) return;
 
-    await showFirstTimePlaidConnect(context);
+    // await showFirstTimePlaidConnect(context);
+  }
+
+  Future<void> loadMonthlySpendingData() async {
+    final range = getTimeRange(TimeFilter.thisMonth, DateTime.now());
+
+    // final response = await budgetService.getMonthlySpending(
+    //   start: range.start,
+    //   end: range.end,
+    // );
+
+    final Map<int, double> tempData = {};
+    final Map<int, String> titlesById = {};
+
+    // for (final row in response) {
+    //   final id = row['category_id'] as int;
+    //   final title = Formatters.formatCategoryTitle(row['category_title']);
+    //   final total = (row['total_spent'] as num).toDouble();
+
+    //   tempData[id] = total;
+    //   titlesById[id] = title;
+    // }
+
+    if (!mounted) return;
+    setState(() {
+      spendingData = tempData;
+      categoryTitles = titlesById;
+    });
   }
 
   @override
@@ -137,9 +172,36 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment.center,
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: budget == null
-            ? const NoBudgetView()
-            : BudgetView(budget: budget),
+        // child: budget == null
+        //     ? const NoBudgetView()
+        //     : BudgetView(budget: budget),
+      ),
+    );
+  }
+
+  Widget _buildSpendingOverview(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromARGB(16, 0, 0, 0),
+            offset: Offset(0, 8),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      height: 188,
+      width: 380,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        // child: spendingData.isEmpty
+            // ? NoSpendingOverview()
+            // : MonthlySpendingOverviewView(
+              //   spendingData: spendingData,
+              //   categoryTitles: categoryTitles,
+              // ),
       ),
     );
   }
@@ -161,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Row(
                 children: [
-                  AppAvatar(size: 60,),
+                  AppAvatar(size: 60),
                   const SizedBox(width: 17),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,13 +237,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       // Text for username
-                      Text(
-                        displayName,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 29,
+                      SizedBox(
+                        width: 240,
+                        child: Text(
+                          displayName,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 29,
+                          ),
                         ),
                       ),
                     ],
@@ -312,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           SizedBox(
                             height: 243,
                             width: 330,
-                            child: PrimaryCardView(cards: _cards),
+                            // child: PrimaryCardView(cards: _cards),
                           ),
                         ],
                       ),
@@ -320,8 +386,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     // Article Card Widget
 
+                    const SizedBox(height: 10),
+
                     // Budget Card Widget
                     _buildBudgetCard(context),
+
+                    const SizedBox(height: 30),
+
+                    // Monthly Spending Overview Widget
+                    _buildSpendingOverview(context),
                   ],
                 ),
               ),

@@ -1,18 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:moneyup/services/plaid_service.dart';
-import 'package:moneyup/features/mywallet/widgets/empty_wallet.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/mywallet/widgets/add_card_dialog.dart';
+import 'package:moneyup/features/mywallet/widgets/linked_card_tile.dart';
+import 'package:moneyup/features/mywallet/widgets/page_indicator.dart';
+import 'package:moneyup/features/mywallet/widgets/wallet_card.dart';
+import 'package:moneyup/models/linked_card.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
 
-import '/features/education/screens/education.dart';
-import '/features/mywallet/widgets/wallet_card.dart';
-import '/features/profile/screens/profile.dart';
-import '/features/transactions/screens/transactions_home.dart';
-import '/shared/screen/loading_screen.dart';
-import '/features/home/screens/my_home_page.dart';
-import '/features/mywallet/widgets/linked_card_tile.dart';
-import '/features/mywallet/widgets/page_indicator.dart';
-import '/models/linked_card.dart';
-import '/services/service_locator.dart';
+import 'package:flutter/material.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});
@@ -233,7 +231,18 @@ class _MyWallet extends State<MyWallet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppAvatar(size: 60),
+                  Container(
+                    padding: EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: const Color.fromARGB(0, 255, 255, 255),
+                      border: Border.all(
+                        width: 3,
+                        color: const Color.fromARGB(255, 121, 121, 121),
+                      ),
+                    ),
+                    child: Image.asset('assets/icons/profileIcon.png'),
+                  ),
                   Container(
                     // NOTIFICATION ICON
                     alignment: Alignment.topRight,
@@ -300,94 +309,85 @@ class _MyWallet extends State<MyWallet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (cards.isEmpty) ...[
-                    emptyWalletState(),
-                    // Optional: show an empty list placeholder instead of nothing
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "Your linked cards will appear here.",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromARGB(79, 0, 0, 0),
-                          ),
+                  SizedBox(
+                    height: 250,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: cards.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentCard = index;
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        final card = cards[index];
+                        return WalletCard(
+                          cardId: index,
+                          bankName: card.bankName ?? "Unknown Bank",
+                          mask: card.mask,
+                          currentAmount: card.currentBalance ?? 0.0,
+                          cardholderName: card.cardholderName ?? "",
+                        );
+                      },
+                    ),
+                  ),
+
+                  PageIndicatorDots(
+                    count: cards.length,
+                    currentIndex: _currentCard,
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Cards",
+                              style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "${cards.length} Linked",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w600,
+                                color: const Color.fromARGB(55, 0, 0, 0),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ] else ...[
-                    SizedBox(
-                      height: 250,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: cards.length,
-                        onPageChanged: (index) =>
-                            setState(() => _currentCard = index),
-                        itemBuilder: (context, index) {
-                          final card = cards[index];
-                          return WalletCard(
-                            cardId: index,
-                            bankName: card.bankName ?? "Unknown Bank",
-                            mask: card.mask,
-                            currentAmount: card.currentBalance ?? 0.0,
-                            cardholderName: card.cardholderName ?? "",
-                          );
-                        },
-                      ),
-                    ),
+                    ],
+                  ),
 
-                    PageIndicatorDots(
-                      count: cards.length,
-                      currentIndex: _currentCard,
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 20),
+                      itemCount: cards.length,
+                      itemBuilder: (context, index) {
+                        final card = cards[index];
+                        return LinkedCardTile(
+                          cardId: index,
+                          card: card,
+                          onDelete: () {
+                            deleteCard(
+                              context,
+                              card.accountId,
+                              card.mask,
+                              card.accountName,
+                              card.bankName,
+                            );
+                          },
+                        );
+                      },
                     ),
-
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Cards",
-                            style: TextStyle(
-                              fontSize: 35,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            "${cards.length} Linked",
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              color: const Color.fromARGB(55, 0, 0, 0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.only(bottom: 20),
-                        itemCount: cards.length,
-                        itemBuilder: (context, index) {
-                          final card = cards[index];
-                          return LinkedCardTile(
-                            cardId: index,
-                            card: card,
-                            onDelete: () {
-                              deleteCard(
-                                context,
-                                card.accountId,
-                                card.mask,
-                                card.accountName,
-                                card.bankName,
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),
@@ -410,7 +410,7 @@ class _MyWallet extends State<MyWallet> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) => const PlaidService(),
+                    builder: (_) => const AddCardDialog(),
                   );
                 },
                 icon: Image.asset("assets/icons/plusCircle.png"),

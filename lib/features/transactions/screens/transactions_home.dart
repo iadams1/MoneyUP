@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/education/screens/education.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
 
-import '../widgets/filters/active_filter_chips.dart';
-import '/features/transactions/widgets/filter_dialog.dart';
-import '/features/transactions/widgets/total_amount.dart';
-import '/features/transactions/widgets/no_transaction_view.dart';
-import '/features/transactions/widgets/transaction_card.dart';
-import '/services/transaction_service.dart';
-import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/profile_menu_card.dart';
-import '/models/transaction.dart';
-import '/models/filter_state.dart';
-
-class TransactionsHome extends StatefulWidget {
+class TransactionsHome extends StatelessWidget {
   const TransactionsHome({super.key});
 
   @override
@@ -178,24 +170,18 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                   ),
                 ),
               ),
-              IconButton( // INFO ICON BUTTON
-                onPressed: () {
-                  //
-                },
-                icon: Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  // print('Notification icon pressed');
-                }, 
-                icon: Icon(
-                  Icons.notifications_outlined, 
-                  color: Colors.white,
-                  size: 25,
+              Container( // NOTIFICATION ICON
+                alignment: Alignment.topRight,
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    // print('Notification icon pressed');
+                  }, 
+                  icon: Icon(
+                    Icons.notifications_outlined, 
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
                 ),
               ),
             ],
@@ -225,7 +211,6 @@ class _TransactionsHomeState extends State<TransactionsHome> {
           SafeArea( // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
-              margin: EdgeInsets.only(top: 120),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(50.0),

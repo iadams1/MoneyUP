@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/user_select.dart';
+import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -19,7 +19,7 @@ class _InfoScreenState extends State<InfoScreen> {
     _InfoScreenData(
       logo: 'assets/images/mu_logo.png',
       image: 'assets/images/mu_info1.png',
-      description: "MoneyUp is built to help you take control of your finances-without the stress. Whether you're just starting out or leveling up, we're here to make money feel manageable."
+      description: "MoneyUp is built to help you take control of your finances--without the stress. Whether you're just starting out or leveling up, we're here to make money feel manageable."
     ),
     _InfoScreenData(
       logo: 'assets/images/mu_logo.png',
@@ -69,49 +69,53 @@ class _InfoScreenState extends State<InfoScreen> {
                   itemCount: introData.length,
                   itemBuilder: (context, i) {
                     final p = introData[i];
-                    return Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 60, 20, 0),
-                            child: Image.asset(
-                              p.logo,
-                              height: 140,
-                              fit: BoxFit.contain
+                    return Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(top:40.0),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Image.asset(
+                                p.logo,
+                                width: 140,
+                                height: 140,
+                                fit: BoxFit.contain
+                              ),
                             ),
                           ),
-                        ),
-                        // const Spacer(flex: 2),
-                        Expanded(
-                          flex: 10,
-                          child: Image.asset(
-                            p.image, 
-                            fit: BoxFit.cover,
-                            width: double.infinity,
+                          Expanded(
+                            child: Image.asset(
+                              p.image, 
+                              height: 700,
+                              width: 700,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.topCenter,
+                            ),
                           ),
-                        ),
-                        const Spacer(flex: 1),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(50, 0, 50, 30),
-                          child: Text(
-                            p.description,
-                            style:
-                              const TextStyle(
-                                fontFamily: 'SF Pro',
-                                fontSize: 20, 
-                                color: Colors.black
-                              ),
-                            textAlign: TextAlign.center,
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.all(40.0),
+                            child: Text(
+                              p.description,
+                              style:
+                                const TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 20, 
+                                  color: Colors.black
+                                ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
+                padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                     children: [ // SmoothPageIndicator with DotsDecorator
@@ -160,7 +164,7 @@ class _InfoScreenState extends State<InfoScreen> {
                             } else {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const UserSelectScreen()),
+                                MaterialPageRoute(builder: (_) => const MyHomePage(title: '')),
                               );
                               // _completeOnboarding();
                             }

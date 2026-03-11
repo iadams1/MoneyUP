@@ -1,20 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/plaid_connect_dialog.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/shared/widgets/plaid_service.dart';
 
-// Adjust path to match your folder structure
+ // Adjust path to match your folder structure
 
-class PlaidService extends StatefulWidget {
-  const PlaidService({super.key});
+class PlaidConnectScreen extends StatefulWidget {
+  const PlaidConnectScreen({super.key});
 
   @override
-  State<PlaidService> createState() => _PlaidServiceState();
+  State<PlaidConnectScreen> createState() => _PlaidConnectScreenState();
 }
 
-class _PlaidServiceState extends State<PlaidService> {
+class _PlaidConnectScreenState extends State<PlaidConnectScreen> 
+{
   String? _linkToken;
   bool _isLoading = true;
   bool _hasError = false;
@@ -23,7 +24,8 @@ class _PlaidServiceState extends State<PlaidService> {
   StreamSubscription<LinkSuccess>? _onSuccessSubscription;
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     _fetchLinkToken();
 
@@ -88,64 +90,64 @@ class _PlaidServiceState extends State<PlaidService> {
     }
   }
 
-  Future<void> _handlePlaidSuccess(LinkSuccess success) async {
-    try {
-      final exchangeResponse = await Supabase.instance.client.functions.invoke(
-        'exchange-public-token',
-        body: {'public_token': success.publicToken},
-      );
+Future<void> _handlePlaidSuccess(LinkSuccess success) async {
+  try {
+    final exchangeResponse = await Supabase.instance.client.functions.invoke(
+      'exchange-public-token',
+      body: {
+        'public_token': success.publicToken,
+      },
+    );
 
-      if (exchangeResponse.status != 200) {
-        throw Exception('Token exchange failed: ${exchangeResponse.status}');
-      }
+    if (exchangeResponse.status != 200) {
+      throw Exception('Token exchange failed: ${exchangeResponse.status}');
+    }
 
-      final data = exchangeResponse.data as Map<String, dynamic>;
-      if (data['success'] != true) {
-        throw Exception(data['error'] ?? 'Exchange did not succeed');
-      }
+    final data = exchangeResponse.data as Map<String, dynamic>;
+    if (data['success'] != true) {
+      throw Exception(data['error'] ?? 'Exchange did not succeed');
+    }
 
-      debugPrint('Plaid connection saved successfully');
+    debugPrint('Plaid connection saved successfully');
 
-      // ────────────────────────────────────────────────
-      // NEW: Mark that the user has completed Plaid onboarding
-      final supabase = Supabase.instance.client;
-      final userId = supabase.auth.currentUser?.id;
+    // ────────────────────────────────────────────────
+    // NEW: Mark that the user has completed Plaid onboarding
+    final supabase = Supabase.instance.client;
+    final userId = supabase.auth.currentUser?.id;
 
-      if (userId != null) {
-        final updateResult = await supabase
-            .from('profiles')
-            .update({'has_plaid_connected': true})
-            .eq('id', userId)
-            .maybeSingle();
+    if (userId != null) {
+      final updateResult = await supabase
+          .from('profiles')
+          .update({'has_plaid_connected': true})
+          .eq('id', userId)
+          .maybeSingle();
 
-        if (updateResult == null) {
-          debugPrint(
-            'Warning: No profile row found to update for user $userId',
-          );
-        } else {
-          debugPrint('has_plaid_connected set to true for user $userId');
-        }
+      if (updateResult == null) {
+        debugPrint('Warning: No profile row found to update for user $userId');
       } else {
-        debugPrint('Warning: No current user when trying to update profile');
+        debugPrint('has_plaid_connected set to true for user $userId');
       }
-      // ────────────────────────────────────────────────
+    } else {
+      debugPrint('Warning: No current user when trying to update profile');
+    }
+    // ────────────────────────────────────────────────
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Bank account connected!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Bank account connected!')),
+    );
 
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e, stack) {
-      debugPrint('Exchange error: $e\n$stack');
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to connect: $e')));
-      }
+    Navigator.pushReplacementNamed(context, '/home');
+  } catch (e, stack) {
+    debugPrint('Exchange error: $e\n$stack');
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to connect: $e')),
+      );
     }
   }
+}
 
   void _openPlaidLink() async {
     if (_linkToken == null) return;
@@ -163,18 +165,28 @@ class _PlaidServiceState extends State<PlaidService> {
           _errorMessage = e.toString();
         });
       }
+
+
+
+
+
+
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AddCardDialog(
+    return PlaidConnectionWidget(
       isLoading: _isLoading,
       hasError: _hasError,
       errorMessage: _errorMessage,
       onRetry: _fetchLinkToken,
       linkToken: _linkToken,
       onConnect: _openPlaidLink,
+      onSkip: () {
+          // Navigate to home when user skips
+          Navigator.pushReplacementNamed(context, '/home');
+      }
     );
   }
 }

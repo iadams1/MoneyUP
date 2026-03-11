@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-
+import 'package:moneyup/features/budgettracker/utils/category_colors.dart';
+import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
-import '/features/budgettracker/utils/category_colors.dart';
-import '/features/education/screens/education.dart';
-import '/features/profile/screens/profile.dart';
-import '/features/transactions/screens/transactions_home.dart';
-import '/models/budget.dart';
-import '/services/service_locator.dart';
-import '/shared/screen/loading_screen.dart';
+import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/models/budget.dart';
+import 'package:moneyup/services/service_locator.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class BudgetPage extends StatefulWidget {
@@ -39,7 +37,7 @@ class _BudgetPageState extends State<BudgetPage> {
   ValueNotifier<double> goalSaved = ValueNotifier<double>(0,); // Amount saved towards the goal
   ValueNotifier<double> goalNeeded = ValueNotifier<double>(0);
 
-  void initBudget(double saved, double goal, double needed) {
+  initBudget(double saved, double goal, double needed) {
     goalSaved.value = saved;
     overallGoalAmount.value = goal;
     goalNeeded.value = needed;
@@ -47,7 +45,7 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   // Calculates the updated amounts based on user input
-  void calculateBudget(double userAmount, bool isAddition) {
+  calculateBudget(double userAmount, bool isAddition) {
     previousSaved = goalSaved.value;
 
     if (isAddition) {
@@ -229,8 +227,17 @@ class _BudgetPageState extends State<BudgetPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              AppAvatar(
-                size: 60,
+              Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: const Color.fromARGB(0, 0, 0, 0),
+                  border: Border.all(
+                    width: 3,
+                    color: const Color.fromARGB(255, 121, 121, 121),
+                  ),
+                ),
+                child: Image.asset('assets/icons/profileIcon.png'),
               ),
 
               SizedBox(height: 20),
