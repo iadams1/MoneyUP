@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/budget_response.dart';
@@ -20,8 +21,8 @@ class PredictionService {
       Uri.parse('$_baseUrl/predict'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'user_id': userId,
         'budget_id': budgetId,
+        'user_id': userId,
       }),
     );
 

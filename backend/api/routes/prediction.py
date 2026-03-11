@@ -60,7 +60,6 @@ async def predict_budget(request: PredictionRequest):
     - transactions (with your column names)
     - category_table (for category info)
     """
-    
     predictor = get_budget_predictor()
     if predictor is None:
         raise HTTPException(
@@ -203,6 +202,7 @@ async def predict_budget(request: PredictionRequest):
         # =====================================================================
         # STEP 6: Return formatted response to Flutter
         # =====================================================================
+        print(True)
         return PredictionResponse(
             success=True,
             model_used=result['model_used'],
@@ -213,7 +213,8 @@ async def predict_budget(request: PredictionRequest):
             predicted_spending_range=result['predicted_spending_range'],
             status=result['status'],
             percentage_over_under=result['percentage_over_under'],
-            category_name=category_title
+            category_name=category_title,
+            # status=status.HTTP_200_OK
         )
         
     except Exception as e:
