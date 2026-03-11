@@ -1,128 +1,129 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class NotificationService {
-  static final NotificationService _instance = NotificationService._internal();
-  factory NotificationService() => _instance;
-  NotificationService._internal();
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
 
-  static FlutterLocalNotificationsPlugin? _notificationsPlugin;
+// class NotificationService {
+//   static final NotificationService _instance = NotificationService._internal();
+//   factory NotificationService() => _instance;
+//   NotificationService._internal();
 
-  // Android notification channel
-  static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-    'moneyup_channel',
-    'MoneyUP Notifications',
-    description: 'Important alerts and updates from MoneyUP',
-    importance: Importance.high,
-    playSound: true,
-  );
+//   static FlutterLocalNotificationsPlugin? _notificationsPlugin;
 
-  Future<void> initialize() async {
-    _notificationsPlugin = FlutterLocalNotificationsPlugin();
+//   // Android notification channel
+//   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
+//     'moneyup_channel',
+//     'MoneyUP Notifications',
+//     description: 'Important alerts and updates from MoneyUP',
+//     importance: Importance.high,
+//     playSound: true,
+//   );
 
-    // Initialize timezone (required for zoned scheduling)
-    tz.initializeTimeZones();
+//   Future<void> initialize() async {
+//     _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // Android init settings
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+//     // Initialize timezone (required for zoned scheduling)
+//     tz.initializeTimeZones();
 
-    // iOS init settings (Darwin = iOS + macOS)
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+//     // Android init settings
+//     const AndroidInitializationSettings androidSettings =
+//         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
+//     // iOS init settings (Darwin = iOS + macOS)
+//     const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+//       requestAlertPermission: true,
+//       requestBadgePermission: true,
+//       requestSoundPermission: true,
+//     );
 
-    // const WindowsInitializationSettings windows = WindowsInitializationSettings();
-    // Initialize plugin – use NAMED parameter 'settings'
-    await _notificationsPlugin!.initialize(
-      settings: initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTap,
-    );
+//     const InitializationSettings initSettings = InitializationSettings(
+//       android: androidSettings,
+//       iOS: iosSettings,
+//     );
 
-    // Create Android channel
-    await _notificationsPlugin!
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
-  }
+//     // const WindowsInitializationSettings windows = WindowsInitializationSettings();
+//     // Initialize plugin – use NAMED parameter 'settings'
+//     await _notificationsPlugin!.initialize(
+//       settings: initSettings,
+//       onDidReceiveNotificationResponse: _onNotificationTap,
+//     );
 
-  // Handle notification tap (when app opens from notification)
-  static void _onNotificationTap(NotificationResponse response) {
-    final payload = response.payload;
-    print('Notification tapped with payload: $payload');
-    // Add navigation logic later if needed (e.g., deep link handling)
-  }
+//     // Create Android channel
+//     await _notificationsPlugin!
+//         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+//         ?.createNotificationChannel(_channel);
+//   }
 
-  /// Show an instant notification
-  Future<void> showNotification({
-    required int id,
-    required String title,
-    required String body,
-    String? payload,
-  }) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'moneyup_channel',
-      'MoneyUP Notifications',
-      channelDescription: 'Important alerts and updates',
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-    );
+//   // Handle notification tap (when app opens from notification)
+//   static void _onNotificationTap(NotificationResponse response) {
+//     final payload = response.payload;
+//     print('Notification tapped with payload: $payload');
+//     // Add navigation logic later if needed (e.g., deep link handling)
+//   }
 
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
+//   /// Show an instant notification
+//   Future<void> showNotification({
+//     required int id,
+//     required String title,
+//     required String body,
+//     String? payload,
+//   }) async {
+//     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+//       'moneyup_channel',
+//       'MoneyUP Notifications',
+//       channelDescription: 'Important alerts and updates',
+//       importance: Importance.high,
+//       priority: Priority.high,
+//       playSound: true,
+//     );
 
-    await _notificationsPlugin?.show(
-      id: id,
-      title: title,
-      body: body,
-      notificationDetails: details,
-      payload: payload,
-    );
-  }
+//     const NotificationDetails details = NotificationDetails(android: androidDetails);
 
-  /// Schedule a notification for a future date/time
-  Future<void> scheduleNotification({
-    required int id,
-    required String title,
-    required String body,
-    required DateTime scheduledDate,
-    String? payload,
-  }) async {
-    await _notificationsPlugin?.zonedSchedule(
-      id: id,
-      title: title,
-      body: body,
-      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'moneyup_channel',
-          'MoneyUP Notifications',
-          channelDescription: 'Important alerts and updates',
-          importance: Importance.high,
-          priority: Priority.high,
-          playSound: true,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      payload: payload,
-    );
-  }
+//     await _notificationsPlugin?.show(
+//       id: id,
+//       title: title,
+//       body: body,
+//       notificationDetails: details,
+//       payload: payload,
+//     );
+//   }
 
-  /// Cancel a specific notification – use NAMED 'id'
-  Future<void> cancel(int id) async {
-    await _notificationsPlugin?.cancel(id: id);
-  }
+//   /// Schedule a notification for a future date/time
+//   Future<void> scheduleNotification({
+//     required int id,
+//     required String title,
+//     required String body,
+//     required DateTime scheduledDate,
+//     String? payload,
+//   }) async {
+//     await _notificationsPlugin?.zonedSchedule(
+//       id: id,
+//       title: title,
+//       body: body,
+//       scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+//       notificationDetails: const NotificationDetails(
+//         android: AndroidNotificationDetails(
+//           'moneyup_channel',
+//           'MoneyUP Notifications',
+//           channelDescription: 'Important alerts and updates',
+//           importance: Importance.high,
+//           priority: Priority.high,
+//           playSound: true,
+//         ),
+//         iOS: DarwinNotificationDetails(),
+//       ),
+//       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+//       payload: payload,
+//     );
+//   }
 
-  /// Cancel all notifications
-  Future<void> cancelAll() async {
-    await _notificationsPlugin?.cancelAll();
-  }
-}
+//   /// Cancel a specific notification – use NAMED 'id'
+//   Future<void> cancel(int id) async {
+//     await _notificationsPlugin?.cancel(id: id);
+//   }
+
+//   /// Cancel all notifications
+//   Future<void> cancelAll() async {
+//     await _notificationsPlugin?.cancelAll();
+//   }
+// }

@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
 
-class TransactionsHome extends StatelessWidget {
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/profile_menu_card.dart';
+import '/features/transactions/widgets/filters/active_filter_chips.dart';
+import '/features/transactions/widgets/filter_dialog.dart';
+import '/features/transactions/widgets/total_amount.dart';
+import '/features/transactions/widgets/no_transaction_view.dart';
+import '/features/transactions/widgets/transaction_card.dart';
+import '/services/transaction_service.dart';
+import '/models/transaction.dart';
+import '/models/filter_state.dart';
+
+class TransactionsHome extends StatefulWidget {
   const TransactionsHome({super.key});
 
   @override
