@@ -20,7 +20,6 @@
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "cmake.sourceDirectory": "C:/Users/IJAda/Downloads/MoneyUP/windows",
-  "cSpell.words": [
-    "supabase"
-  ]
+  "cSpell.words": ["supabase"],
+  "python-envs.defaultEnvManager": "ms-python.python:system"
 }

@@ -101,12 +101,12 @@ class MonthlySpendingOverviewView extends StatelessWidget {
                 child: PieChart(
                   PieChartData(
                     sectionsSpace: 3,
-                    centerSpaceRadius: 40,
+                    centerSpaceRadius: 42,
                     sections: spendingData.entries.map((e) {
                       return PieChartSectionData(
                         value: e.value.abs(),
                         color: getCategoryColor(e.key),
-                        radius: 15,
+                        radius: 13,
                         titleStyle: const TextStyle(
                           color: Color.fromARGB(0, 0, 0, 0),
                         ),
