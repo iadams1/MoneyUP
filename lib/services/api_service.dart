@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/budget_response.dart';
@@ -11,9 +10,8 @@ class PredictionService {
   String? get _currentUserId => Supabase.instance.client.auth.currentUser?.id;
 
   Future<PredictionResult> getPrediction({required int budgetId}) async {
-    final userId = _currentUserId;
 
-    if (userId == null) {
+    if (_currentUserId == null) {
       throw Exception('No user logged in');
     }
 
@@ -22,7 +20,7 @@ class PredictionService {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'budget_id': budgetId,
-        'user_id': userId,
+        'user_id': _currentUserId,
       }),
     );
 

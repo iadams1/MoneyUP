@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/features/budgettracker/widgets/budget_forecastor.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -256,7 +257,7 @@ class _BudgetPageState extends State<BudgetPage> {
               child: Column(
                 children: [
                   // Space to seperate AppBar and top edge
-                  SizedBox(height: 20),
+                  SizedBox(height: 9),
 
                   Container(
                     alignment: Alignment.centerLeft,
@@ -264,39 +265,116 @@ class _BudgetPageState extends State<BudgetPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: IconButton(
-                            icon: Image.asset(
-                              'assets/icons/chevronLeftArrow.png',
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(right: 25),
+                              child: IconButton(
+                                icon: Image.asset(
+                                  'assets/icons/chevronLeftArrow.png',
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context, _didUpdate);
+                                },
+                              ),
                             ),
-                            onPressed: () {
-                              Navigator.pop(context, _didUpdate);
-                            },
-                          ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          PredictiveBudgetForecastor(
+                                            budgetId: 1,
+                                            budgetName: budget!.title,
+                                            goalAmount: budget.goal,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(25, 50, 100, 1),
+                                        Color.fromRGBO(47, 52, 126, 1),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(200),
+                                  ),
+                                  child: SizedBox(
+                                    width: 155,
+                                    height: 40,
+                                    child: Center(
+                                      child: Text(
+                                        "View Forecastor",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color.fromARGB(
+                                            255,
+                                            255,
+                                            255,
+                                            255,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
 
-                        Padding(
-                          padding: EdgeInsets.only(left: 25),
-                          child: Text(
-                            budget!.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 33,
-                            ),
-                          ),
-                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 360,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 25),
+                                    child: Text(
+                                      budget!.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30,
+                                        height: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
 
-                        Padding(
-                          padding: EdgeInsets.only(left: 25),
-                          child: Text(
-                            "Budget Goal",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 23,
-                              color: const Color.fromARGB(51, 0, 0, 0),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text(
+                                    "Budget Goal",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 23,
+                                      color: const Color.fromARGB(51, 0, 0, 0),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -321,7 +399,12 @@ class _BudgetPageState extends State<BudgetPage> {
                         arrowColor = const Color.fromARGB(6, 0, 0, 0);
                       }
 
-                      final pct = overallGoalAmount.value == 0 ? 0.0 : (currentSaved / overallGoalAmount.value).clamp(0.0, 1.0);
+                      final pct = overallGoalAmount.value == 0
+                          ? 0.0
+                          : (currentSaved / overallGoalAmount.value).clamp(
+                              0.0,
+                              1.0,
+                            );
                       final pctText = (pct * 100).toStringAsFixed(0);
 
                       return Stack(
@@ -367,7 +450,7 @@ class _BudgetPageState extends State<BudgetPage> {
                       return Text(
                         "Budget Goal \$${overall.toStringAsFixed(2)}",
                         style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           fontSize: 25,
                         ),
                       );

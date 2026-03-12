@@ -8,7 +8,6 @@ import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_status_ba
 import 'package:moneyup/models/data_model.dart';
 import 'package:moneyup/services/budget_response.dart';
 import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_header.dart';
 
 // ─────────────────────────────────────────────
 // MAIN WIDGET
@@ -108,14 +107,14 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
       return Container(
         decoration: const BoxDecoration(color: ApiColors.bg),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
           child: FadeTransition(
             opacity: _fadeIn,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildHeader(data),
-                const SizedBox(height: 24),
+                // buildHeader(data),
+                // const SizedBox(height: 24),
                 buildStatusBanner(data, _isOver, _statusColor),
                 const SizedBox(height: 24),
                 buildChart(data, _statusColor, _lineGrow),
@@ -133,24 +132,3 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
     },
   );
 }}
-
-// ─────────────────────────────────────────────
-// PREVIEW WRAPPER
-// Run this file directly in Flutter Widget Preview
-// ─────────────────────────────────────────────
-// @Preview()
-// Widget previewBudgetChart() {
-//   return MaterialApp(
-//     debugShowCheckedModeBanner: false,
-//     theme: ThemeData.dark(),
-//     home: Scaffold(
-//       backgroundColor: const Color(0xFF0D0D0F),
-//       body: SafeArea(
-//         child: BudgetPredictionChart(
-//           userId: 'preview-user',
-//           budgetId: 1,
-//         ),
-//       ),
-//     ),
-//   );
-// }
