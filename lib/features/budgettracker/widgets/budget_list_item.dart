@@ -22,8 +22,8 @@ class BudgetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String title = budget.title;
-    final double spent = budget.amountSaved;
-    final double remaining = budget.amountNeeded;
+    final double spent = budget.amountSpent;
+    final double remaining = budget.amountRemaining;
     final double percent = budget.percentComplete;
 
     return Padding(

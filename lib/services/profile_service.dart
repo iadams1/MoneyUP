@@ -63,4 +63,40 @@ class ProfileService {
         .update({'has_plaid_connected': true})
         .eq('id', user);
   }
+
+  Future<void> recordUserStreak() async {
+    final today = DateTime.now().toIso8601String().split('T').first;
+
+    await _client.rpc(
+      'record_user_streak',
+      params: {
+        'p_user_id': user,
+        'p_check_in_date': today,
+      },
+    );
+
+    final response = await _client
+      .from('user_streaks')
+      .select()
+      .eq('user_ID', user)
+      .single();
+
+    print(response);
+
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    String toDateOnly(DateTime d) => d.toIso8601String().split('T').first;
+
+    final rows = await _client
+        .from('daily_user_logins')
+        .select('login_date')
+        .eq('user_ID', user)
+        .gte('login_date', toDateOnly(startOfWeek))
+        .lte('login_date', toDateOnly(endOfWeek))
+        .order('login_date');
+
+    print(rows);
+  }
 }
