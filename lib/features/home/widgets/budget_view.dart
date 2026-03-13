@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/screens/budget_home.dart';
-import 'package:moneyup/models/budget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class BudgetView extends StatelessWidget{
+import '/features/budgettracker/screens/budget_home.dart';
+import '/models/budget.dart';
+
+class BudgetView extends StatelessWidget {
   final Budget budget;
   const BudgetView({super.key, required this.budget});
 
@@ -23,8 +23,8 @@ class BudgetView extends StatelessWidget{
               width: 140,
               height: 140,
               child: CircularPercentIndicator(
-                radius: 60,
-                lineWidth: 18,
+                radius: 55,
+                lineWidth: 16,
                 percent: percent,
                 center: Text(
                   "${(percent * 100).toStringAsFixed(0)}%",
@@ -40,11 +40,12 @@ class BudgetView extends StatelessWidget{
             ),
           ],
         ),
-        const SizedBox(width: 30),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 10),
               Text(
                 budget.title,
                 textAlign: TextAlign.center,
@@ -65,7 +66,9 @@ class BudgetView extends StatelessWidget{
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute<void>(builder: (_) => const BudgetGoalPage()),
+                    MaterialPageRoute<void>(
+                      builder: (_) => const BudgetGoalPage(),
+                    ),
                   );
                 },
                 child: Ink(
@@ -93,6 +96,7 @@ class BudgetView extends StatelessWidget{
             ],
           ),
         ),
+        const SizedBox(width: 15),
       ],
     );
   }

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import '/features/auth/screens/signup.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:moneyup/services/auth_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-// Replace the line below with the actual import path to your Plaid screen
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginState();
+
+  
 }
 
 class _LoginState extends State<LoginScreen> {
@@ -32,11 +32,13 @@ class _LoginState extends State<LoginScreen> {
         body: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            Image.asset( // BACKGROUND
+            Image.asset(
+              // BACKGROUND
               'assets/images/mu_bg.png',
               fit: BoxFit.fill,
             ),
-            Container( // LOGIN IMAGE
+            Container(
+              // LOGIN IMAGE
               alignment: Alignment.topCenter,
               padding: EdgeInsets.only(top: 120),
               child: Image.asset(
@@ -46,7 +48,8 @@ class _LoginState extends State<LoginScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            Align( // LOGIN SCREEN BOX
+            Align(
+              // LOGIN SCREEN BOX
               alignment: Alignment.bottomCenter,
               child: Container(
                 width: double.infinity,
@@ -65,13 +68,19 @@ class _LoginState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Padding( // EMAIL ADDRESS
+                          Padding(
+                            // EMAIL ADDRESS
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _emailController,
                               validator: MultiValidator([
-                                RequiredValidator(errorText: 'Enter email address'),
-                                EmailValidator(errorText: 'Invalid email address. Please try again.'),
+                                RequiredValidator(
+                                  errorText: 'Enter email address',
+                                ),
+                                EmailValidator(
+                                  errorText:
+                                      'Invalid email address. Please try again.',
+                                ),
                               ]).call,
                               decoration: InputDecoration(
                                 hintText: 'Email Address',
@@ -82,25 +91,35 @@ class _LoginState extends State<LoginScreen> {
                                   fontWeight: FontWeight.w500,
                                   fontFamily: 'SF Pro',
                                 ),
-                                prefixIcon: Icon(Icons.email_outlined, color: Colors.black),
+                                prefixIcon: Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.black,
+                                ),
                                 errorStyle: TextStyle(fontSize: 16.0),
                                 filled: true,
                                 fillColor: HexColor('#E7E7E7'),
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(Radius.circular(9.0)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(9.0),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          Padding( // PASSWORD ENTRY – with show/hide toggle
+                          Padding(
+                            // PASSWORD ENTRY
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
                               validator: MultiValidator([
                                 RequiredValidator(errorText: 'Enter password'),
-                                MinLengthValidator(8, errorText: 'Password must be at least 8 characters'),
+                                MinLengthValidator(
+                                  8,
+                                  errorText:
+                                      'Password must be at least 8 characters',
+                                ),
                               ]).call,
                               decoration: InputDecoration(
                                 hintText: 'Password',
@@ -111,36 +130,32 @@ class _LoginState extends State<LoginScreen> {
                                   fontWeight: FontWeight.w500,
                                   fontFamily: 'SF Pro',
                                 ),
-                                prefixIcon: Icon(Icons.lock_outline, color: Colors.black),
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: Colors.black,
+                                ),
                                 errorStyle: TextStyle(fontSize: 16.0),
                                 filled: true,
                                 fillColor: HexColor('#E7E7E7'),
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                ),
-                                // ── Added suffix icon for visibility toggle ──
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                    color: Colors.grey[700],
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(9.0),
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
                                 ),
                               ),
                             ),
                           ),
-                          Padding( // LOGIN BUTTON
+                          Padding(
+                            // LOGIN BUTTON
                             padding: const EdgeInsets.only(top: 30.0),
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               height: 50,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(50.0),
+                                ),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -155,7 +170,9 @@ class _LoginState extends State<LoginScreen> {
                               ),
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  if (!(_formkey.currentState?.validate() ?? false)) return;
+                                  if (!(_formkey.currentState?.validate() ??
+                                      false))
+                                    return;
 
                                   try {
                                     await AuthService().login(
@@ -165,64 +182,47 @@ class _LoginState extends State<LoginScreen> {
 
                                     if (!mounted) return;
 
-                                    // Check if user has already connected Plaid
-                                    final supabase = Supabase.instance.client;
-                                    final user = supabase.auth.currentUser;
-
-                                    bool hasConnected = false;
-
-                                    if (user != null) {
-                                      try {
-                                        final response = await supabase
-                                            .from('profiles')
-                                            .select('has_plaid_connected')
-                                            .eq('id', user.id)
-                                            .maybeSingle();
-
-                                        hasConnected = response?['has_plaid_connected'] == true;
-                                      } catch (e) {
-                                        debugPrint('Error checking plaid flag: $e');
-                                        // Fail open: show Plaid screen if check fails
-                                        hasConnected = false;
-                                      }
-                                    }
-
-                                    // Navigate based on the flag
-                                    if (hasConnected) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const MyHomePage(title: ''),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const PlaidConnectScreen(),
-                                        ),
-                                      );
-                                    }
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MyHomePage(title: ''),
+                                      ),
+                                    );
+                                    
                                   } catch (e) {
                                     debugPrint('LOGIN ERROR: $e');
 
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Invalid email or password')),
+                                      SnackBar(
+                                        content: Text(
+                                          'Invalid email or password',
+                                        ),
+                                      ),
                                     );
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
-                                  foregroundColor: const Color.fromARGB(255, 144, 68, 232),
+                                  foregroundColor: const Color.fromARGB(
+                                    255,
+                                    144,
+                                    68,
+                                    232,
+                                  ),
                                 ),
                                 child: Text(
                                   'Login',
-                                  style: TextStyle(color: Colors.white, fontSize: 16),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          Center( // PUSH TO SIGNUP SCREEN
+                          Center(
+                            // PUSH TO SIGNUP SCREEN
                             child: Container(
                               alignment: FractionalOffset.bottomCenter,
                               padding: EdgeInsets.only(top: 40),
@@ -246,7 +246,10 @@ class _LoginState extends State<LoginScreen> {
                                         ..onTap = () {
                                           Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SignUpScreen(),
+                                            ),
                                           );
                                         },
                                     ),

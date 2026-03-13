@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_view.dart';
-import 'package:moneyup/features/budgettracker/widgets/no_budget_view.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/mywallet/screens/my_wallet.dart';
-import 'package:moneyup/features/mywallet/widgets/primary_card_view.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/models/linked_card.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/features/home/widgets/greeting_text.dart';
+import 'package:moneyup/services/notification_service.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
+import '../widgets/budget_view.dart';
+import '../widgets/no_budget_view.dart';
+import '/features/mywallet/screens/my_wallet.dart';
+import '../widgets/primary_card_view.dart';
+import '/models/budget.dart';
+import '/models/linked_card.dart';
+import '/services/service_locator.dart';
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/bottom_nav.dart';
+import 'package:moneyup/core/utils/formatters.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -23,7 +27,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
   Budget? _budget;
+  String? _name;
   List<LinkedCard> _cards = [];
+  bool _hasCheckedPlaidDialog = false;
+  bool _hasShownHomeNotification = false;
 
   @override
   void initState() {
@@ -38,9 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
       final user = supabaseService.currentUserId;
       if (user != null) {
-        await supabaseService.syncAll();
+        try {
+          await supabaseService.syncAll();
+        } catch (e) {
+          debugPrint("syncAll skipped: $e");
+        }
       }
 
+      profileService.loadProfileIcon();
       await _loadHome();
     } catch (e, st) {
       debugPrint('Home init error: $e');
@@ -49,9 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
     }
   }
 
@@ -59,14 +71,49 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final budget = await budgetService.getRandomBudget();
       final cards = await walletService.fetchLinkedCards();
+      final name = await profileService.getUserName();
 
       if (!mounted) return;
 
       setState(() {
         _budget = budget;
         _cards = cards;
+        _name = name;
         _isLoading = false;
       });
+
+      // ADD TEST NOTIFICATION HERE – after loading completes
+      if (!_hasShownHomeNotification) {
+        _hasShownHomeNotification = true;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) return;
+
+          // Small delay for smooth UX (UI fully rendered)
+          await Future.delayed(const Duration(milliseconds: 1200));
+
+          try {
+            await NotificationService().showNotification(
+              id: 2001,  // unique ID for this test
+              title: 'Welcome to Your Dashboard!',
+              body: 'MoneyUP is ready — check your budget and cards below 💳',
+              payload: 'home-screen-loaded', // optional for future deep linking
+            );
+            debugPrint('Home dashboard notification sent');
+          } catch (e) {
+            debugPrint('Failed to show home notification: $e');
+          }
+        });
+      }
+
+      if (!_hasCheckedPlaidDialog) {
+      _hasCheckedPlaidDialog = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await _maybeShowPlaidDialog();
+      });
+      }
     } catch (e) {
       debugPrint('Error loading budgets: $e');
       if (!mounted) return;
@@ -75,6 +122,13 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _maybeShowPlaidDialog() async {
+    final hasSeen = await profileService.hasSeenPlaidConnectDialog();
+    if (!mounted || hasSeen == true) return;
+
+    await showFirstTimePlaidConnect(context);
   }
 
   @override
@@ -102,11 +156,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      height: 160,
+      height: 140,
       width: 380,
       alignment: Alignment.center,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: budget == null
             ? const NoBudgetView()
             : BudgetView(budget: budget),
@@ -115,6 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildContent(BuildContext context, {required Key key}) {
+    final displayName = _name ?? "Guest";
+
     return Scaffold(
       key: key,
       backgroundColor: Colors.white,
@@ -127,18 +183,39 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
+              Row(
+                children: [
+                  AppAvatar(size: 60),
+
+                  const SizedBox(width: 17),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Text for time
+                      GreetingText(
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                        ),
+                      ),
+
+                      // Text for username
+                      Text(
+                        displayName,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 29,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+                ],
               ),
+
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
@@ -163,64 +240,99 @@ class _MyHomePageState extends State<MyHomePage> {
           Positioned.fill(
             child: Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           ),
-          SafeArea(
+
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 170,
+            bottom: 0,
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
-                color: Colors.white,
+                color: HexColor("0D1250"),
               ),
-              child: Column(
-                children: [
-                  SizedBox(height: 12.5),
-                  // MyWallet Card Widget
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
-                          child: SizedBox(
-                            width: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              onPressed: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const MyWallet(),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
+                child: Text(
+                  Formatters.getFormattedDate(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 30,
+            bottom: 0,
+            child: SafeArea(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(50.0),
+                  ),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 5.5),
+                    // MyWallet Card Widget
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
+                            child: SizedBox(
+                              width: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                );
-                                
-                                await _init();
-                              },
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color.fromRGBO(25, 50, 100, 1),
-                                      Color.fromRGBO(47, 52, 126, 1),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const SizedBox(
-                                  width: 70,
-                                  height: 220,
-                                  child: Center(
-                                    child: Text(
-                                      "+",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.w400,
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => const MyWallet(),
+                                    ),
+                                  );
+
+                                  await _init();
+                                },
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(25, 50, 100, 1),
+                                        Color.fromRGBO(47, 52, 126, 1),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const SizedBox(
+                                    width: 70,
+                                    height: 217,
+                                    child: Center(
+                                      child: Text(
+                                        "+",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w400,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -228,73 +340,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 250,
-                          width: 330,
-                          child: PrimaryCardView(cards: _cards),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 243,
+                            width: 330,
+                            child: PrimaryCardView(cards: _cards),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // Article Card Widget
+                    // Article Card Widget
 
-                  // Budget Card Widget
-                  _buildBudgetCard(context),
-                ],
+                    // Budget Card Widget
+                    _buildBudgetCard(context),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

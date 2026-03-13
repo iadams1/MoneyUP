@@ -1,4 +1,4 @@
-import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
+import '/features/budgettracker/ui/time_filter.dart';
 
 class TimeRange {
   final DateTime start;

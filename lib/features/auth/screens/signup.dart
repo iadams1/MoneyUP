@@ -2,11 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:moneyup/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/features/auth/screens/login.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -241,8 +240,8 @@ class _SignUpState extends State<SignUpScreen> {
                                               context,
                                               MaterialPageRoute
                                               (
-                                                // builder: (context) => VerificationScreen(email: _emailController.text.trim()),
-                                                builder: (context) => PlaidConnectScreen(),
+                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
+                                                // builder: (context) => PlaidConnectScreen(),
                                               ),
                                               
                                             );

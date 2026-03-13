@@ -20,5 +20,7 @@
   ],
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
-  }
+  },
+  "cmake.sourceDirectory": "C:/Users/Dan/Documents/MoneyUP/windows",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

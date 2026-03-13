@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 
-import 'package:moneyup/models/article.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
-import 'package:moneyup/features/education/widgets/article_card.dart';
+import '/features/education/screens/education.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/models/article.dart';
+import '/services/service_locator.dart';
+import '/shared/screen/loading_screen.dart';
+import '/features/education/widgets/article_card.dart';
 
 class ViewAllArticlesScreen extends StatefulWidget {
   const ViewAllArticlesScreen({super.key});
@@ -71,17 +72,8 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
-                ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+              AppAvatar(
+                size: 60,
               ),
               Container(
                 // NOTIFICATION ICON

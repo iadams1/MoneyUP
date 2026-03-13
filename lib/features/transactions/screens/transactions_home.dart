@@ -1,11 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
 
-class TransactionsHome extends StatelessWidget {
+import '../widgets/filters/active_filter_chips.dart';
+import '/features/transactions/widgets/filter_dialog.dart';
+import '/features/transactions/widgets/total_amount.dart';
+import '/features/transactions/widgets/no_transaction_view.dart';
+import '/features/transactions/widgets/transaction_card.dart';
+import '/services/transaction_service.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/profile_menu_card.dart';
+import '/models/transaction.dart';
+import '/models/filter_state.dart';
+
+class TransactionsHome extends StatefulWidget {
   const TransactionsHome({super.key});
+
+  @override
+  State<TransactionsHome> createState() => _TransactionsHomeState();
+}
   
+class _TransactionsHomeState extends State<TransactionsHome> {
+  bool _isLoading = true;
+  final TransactionService _transactionService = TransactionService();
+  FilterState _currentFilters = FilterState();
+
+  double _totalDebit = 0;
+  double _totalCredit = 0;
+  TransactionType? _selectedFilter = TransactionType.debit;
+  List<Transaction> _filteredTransactions = [];
+
+  Future<void> _loadTransactions({TransactionType? filter}) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final transactions = await _transactionService.fetchTransactions(
+        filter: filter,
+        filters: _currentFilters
+      );
+
+      final type = filter == TransactionType.credit ? 'credit' : 'depository';
+
+      final totals = await _transactionService.fetchTotals(
+        bankName: _currentFilters.selectedBanks.isEmpty
+            ? null
+            : _currentFilters.selectedBanks.toList(),
+        type: type,
+      );
+
+      setState(() {
+        _filteredTransactions = transactions;
+        _totalDebit = totals['debit'] ?? 0;
+        _totalCredit = totals['credit'] ?? 0;
+        _selectedFilter = filter;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading transactions: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions(filter: _selectedFilter);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,30 +78,53 @@ class TransactionsHome extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(0, 255, 255, 255),
-                  border: Border.all(
-                    width: 3,
-                    color: const Color.fromARGB(255, 121, 121, 121),
-                  ),
+              ProfileMenuCard(),
+              TextButton(
+                onPressed: () {
+                  _loadTransactions(filter: TransactionType.debit);
+                }, 
+                style: TextButton.styleFrom(
+                  backgroundColor: _selectedFilter == TransactionType.debit
+                    ? Colors.white : Colors.transparent,
+                  foregroundColor: _selectedFilter == TransactionType.debit
+                    ? Colors.black : Colors.white,
                 ),
-                child: Image.asset('assets/icons/profileIcon.png'),
+                child: Text(
+                  'View Debit',
+                ),
               ),
-              Container( // NOTIFICATION ICON
-                alignment: Alignment.topRight,
-                padding: EdgeInsets.all(5),
-                child: IconButton(
-                  onPressed: () {
-                    // print('Notification icon pressed');
-                  }, 
-                  icon: Icon(
-                    Icons.notifications_outlined, 
-                    color: Colors.white,
-                    size: 30.0,
-                  ),
+              TextButton(
+                onPressed: () {
+                   _loadTransactions(filter: TransactionType.credit);
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: _selectedFilter == TransactionType.credit
+                    ? Colors.white : Colors.transparent,
+                  foregroundColor: _selectedFilter == TransactionType.credit
+                    ? Colors.black : Colors.white,
+                ),
+                child: Text(
+                  'View Credit',
+                ),
+              ),
+              IconButton( // INFO ICON BUTTON
+                onPressed: () {
+                  //
+                },
+                icon: Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 25,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  // print('Notification icon pressed');
+                }, 
+                icon: Icon(
+                  Icons.notifications_outlined, 
+                  color: Colors.white,
+                  size: 25,
                 ),
               ),
             ],
@@ -58,72 +140,129 @@ class TransactionsHome extends StatelessWidget {
               fit: BoxFit.fill
             ),
           ),
+          Positioned(
+            top: 165,
+            left: 25,
+            right: 25,
+            child: TotalAmountView(
+              selectedFilter: _selectedFilter!, 
+              totalDebit: _totalDebit, 
+              totalCredit: _totalCredit,
+            ),
+          ),
           SafeArea( // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
+              margin: EdgeInsets.only(top: 120),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(50.0),
                 ),
                 color: Colors.white,
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Latest Transactions',
+                          style: TextStyle(
+                            fontFamily: 'SF Pro',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 28
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final result = await showDialog(
+                              context: context, 
+                              builder: (_) => FilterDialog(
+                                initialState: _currentFilters,
+                                selectedType: _selectedFilter!,
+                                ),
+                            );
+                            if (result != null) {
+                              setState(() {_currentFilters = result;});
+                              _loadTransactions(filter: _selectedFilter);
+                            }
+                          },
+                          icon: Icon(Icons.filter_alt_outlined),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  ActiveFilterChips(
+                    filters: _currentFilters,
+                    onRemoveBank: (bank) {
+                      setState(() {
+                        _currentFilters.selectedBanks.remove(bank);
+                      });
+                      _loadTransactions(filter: _selectedFilter);
+                    },
+                    onRemoveCategory: (category) {
+                      setState(() {
+                        _currentFilters.selectedBanks.remove(category);
+                      });
+                      _loadTransactions(filter: _selectedFilter);
+                    },
+                    onRemoveStartDate: () {
+                      setState(() {
+                        _currentFilters = FilterState(
+                          selectedBanks: _currentFilters.selectedBanks,
+                          selectedCategories: _currentFilters.selectedCategories,
+                          endDate: _currentFilters.endDate,
+                        );
+                      });
+                      _loadTransactions(filter: _selectedFilter);
+                    },
+                    onRemoveEndDate: () {
+                      setState(() {
+                        _currentFilters = FilterState(
+                          selectedBanks: _currentFilters.selectedBanks,
+                          selectedCategories: _currentFilters.selectedCategories,
+                          startDate: _currentFilters.startDate,
+                        );
+                      });
+                      _loadTransactions(filter: _selectedFilter);
+                    },
+                    onClearAll: () {
+                      setState(() {
+                        _currentFilters = FilterState();
+                      });
+                      _loadTransactions(filter: _selectedFilter);
+                    },
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: _filteredTransactions.isEmpty
+                      ? NoTransactionView()
+                      : ListView.builder(
+                        itemCount: _filteredTransactions.length,
+                        itemBuilder: (context, index) {
+                          final t = _filteredTransactions[index];
+                        
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom:15),
+                            child: TransactionCard(transaction: t,),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/transactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                 Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 }
