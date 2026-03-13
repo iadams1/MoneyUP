@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/budgettracker/widgets/budget_forecast.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import '/features/education/screens/education.dart';
@@ -9,17 +10,50 @@ import '/features/transactions/screens/transactions_home.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class PreviewPage extends StatefulWidget {
-  const PreviewPage({super.key});
+  final String budgetUuid;
+
+  const PreviewPage({super.key, required this.budgetUuid});
 
   @override
   State<PreviewPage> createState() => _PreviewPageState();
 }
 
 class _PreviewPageState extends State<PreviewPage> {
+  int? _mlBudgetId;
+  String? _userId;
+  bool _loading = true;
+  String? _error;
+
 
   @override
   void initState() {
     super.initState();
+    _loadMlBudgetId();
+  }
+
+  Future<void> _loadMlBudgetId() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) throw Exception('No user logged in');
+
+      final response = await Supabase.instance.client
+          .from('ml_budgets')
+          .select('id')
+          .eq('budget_id', widget.budgetUuid)
+          .eq('user_id', userId)
+          .single();
+
+      setState(() {
+        _mlBudgetId = response['id'] as int;
+        _userId = userId;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
   }
 
   

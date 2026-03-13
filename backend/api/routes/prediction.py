@@ -19,14 +19,24 @@ router = APIRouter()
 
 supabase = get_supabase()
 
-# CATEGORY MAPPING (matches your category_table)
+# CATEGORY MAPPING
 CATEGORY_MAPPING = {
-    "Groceries": 1,
-    "Entertainment": 2,
-    "Gifts": 3,
-    "Rent/Bills": 4,
-    "Debt Payments": 5,
-    # Add more as needed based on your category_table
+    "BANK_FEES": 5,              # → debt_payments (financial obligation)
+    "ENTERTAINMENT": 2,          # → entertainment
+    "FOOD_AND_DRINK": 1,         # → groceries
+    "GENERAL_MERCHANDISE": 3,    # → gifts (general shopping)
+    "GENERAL_SERVICES": 4,       # → rent_bills (service payments)
+    "GOVERNMENT_AND_NON_PROFIT": 5,  # → debt_payments (obligatory payments)
+    "INCOME": 1,                 # → groceries (default, income shouldn't be budgeted)
+    "LOAN_DISBURSEMENTS": 5,     # → debt_payments
+    "LOAN_PAYMENTS": 5,          # → debt_payments
+    "MEDICAL": 4,                # → rent_bills (regular bills)
+    "PERSONAL_CARE": 3,          # → gifts (discretionary spending)
+    "RENT_AND_UTILITIES": 4,     # → rent_bills
+    "TRANSFER_IN": 1,            # → groceries (default)
+    "TRANSFER_OUT": 5,           # → debt_payments
+    "TRANSPORTATION": 4,         # → rent_bills (regular expense)
+    "TRAVEL": 2,                 # → entertainment
 }
 
 # Reverse mapping for display
