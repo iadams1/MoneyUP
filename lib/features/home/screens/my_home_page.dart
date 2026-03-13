@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
-import 'package:moneyup/features/budgettracker/utils/time_range.dart';
-// import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
-// import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
 
+import '/features/budgettracker/ui/time_filter.dart';
+import '/features/budgettracker/utils/time_range.dart';
+import '/features/home/widgets/monthly_spending_overview_view.dart';
+import '/features/home/widgets/no_spending_overview.dart';
 import '/features/home/widgets/greeting_text.dart';
 import '/shared/widgets/app_avatar.dart';
-// import '/shared/widgets/first_time_plaid_connect.dart';
-// import '/shared/widgets/profile_menu_card.dart';
-// import '../widgets/budget_view.dart';
-// import '../widgets/no_budget_view.dart';
+import '/shared/widgets/first_time_plaid_connect.dart';
+import '/features/budgettracker/widgets/budget_view.dart';
+import '/features/budgettracker/widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
-// import '../widgets/primary_card_view.dart';
+import '/features/mywallet/widgets/primary_card_view.dart';
 import '/models/budget.dart';
 import '/models/linked_card.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
-import 'package:moneyup/core/utils/formatters.dart';
+import '/core/utils/formatters.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -69,9 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      // ScaffoldMessenger.of(
-      //   context,
-      // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
     }
   }
 
@@ -112,28 +111,28 @@ class _MyHomePageState extends State<MyHomePage> {
     final hasSeen = await profileService.hasSeenPlaidConnectDialog();
     if (!mounted || hasSeen == true) return;
 
-    // await showFirstTimePlaidConnect(context);
+    await showFirstTimePlaidConnect(context);
   }
 
   Future<void> loadMonthlySpendingData() async {
     final range = getTimeRange(TimeFilter.thisMonth, DateTime.now());
 
-    // final response = await budgetService.getMonthlySpending(
-    //   start: range.start,
-    //   end: range.end,
-    // );
+    final response = await budgetService.getMonthlySpending(
+      start: range.start,
+      end: range.end,
+    );
 
     final Map<int, double> tempData = {};
     final Map<int, String> titlesById = {};
 
-    // for (final row in response) {
-    //   final id = row['category_id'] as int;
-    //   final title = Formatters.formatCategoryTitle(row['category_title']);
-    //   final total = (row['total_spent'] as num).toDouble();
+    for (final row in response) {
+      final id = row['category_id'] as int;
+      final title = Formatters.formatCategoryTitle(row['category_title']);
+      final total = (row['total_spent'] as num).toDouble();
 
-    //   tempData[id] = total;
-    //   titlesById[id] = title;
-    // }
+      tempData[id] = total;
+      titlesById[id] = title;
+    }
 
     if (!mounted) return;
     setState(() {
@@ -172,9 +171,9 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment.center,
       child: Padding(
         padding: const EdgeInsets.all(10),
-        // child: budget == null
-        //     ? const NoBudgetView()
-        //     : BudgetView(budget: budget),
+        child: budget == null
+            ? const NoBudgetView()
+            : BudgetView(budget: budget),
       ),
     );
   }
@@ -196,12 +195,12 @@ class _MyHomePageState extends State<MyHomePage> {
       width: 380,
       child: Padding(
         padding: EdgeInsets.all(16),
-        // child: spendingData.isEmpty
-            // ? NoSpendingOverview()
-            // : MonthlySpendingOverviewView(
-              //   spendingData: spendingData,
-              //   categoryTitles: categoryTitles,
-              // ),
+        child: spendingData.isEmpty
+            ? NoSpendingOverview()
+            : MonthlySpendingOverviewView(
+                spendingData: spendingData,
+                categoryTitles: categoryTitles,
+              ),
       ),
     );
   }
@@ -378,7 +377,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           SizedBox(
                             height: 243,
                             width: 330,
-                            // child: PrimaryCardView(cards: _cards),
+                            child: PrimaryCardView(cards: _cards),
                           ),
                         ],
                       ),

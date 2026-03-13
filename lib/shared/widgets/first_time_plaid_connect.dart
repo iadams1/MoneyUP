@@ -1,8 +1,9 @@
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/services/plaid_service.dart';
-import 'package:moneyup/services/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+
+import 'plaid_service.dart';
+import '/services/service_locator.dart';
 
 Future<void> showFirstTimePlaidConnect(BuildContext context) async {
   final prefs = await SharedPreferences.getInstance();

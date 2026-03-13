@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/plaid_connect_screen.dart';
+
+import '/features/auth/screens/plaid_connect_screen.dart';
 
 class AddCardDialog extends StatelessWidget {
   const AddCardDialog({super.key});
@@ -32,9 +33,7 @@ class AddCardDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text.rich(
@@ -58,9 +57,7 @@ class AddCardDialog extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 35),
-
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -117,9 +114,7 @@ class AddCardDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 30),
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -163,9 +158,7 @@ class AddCardDialog extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: 30),
-
             Row(
               children: [
                 Expanded(
@@ -177,14 +170,10 @@ class AddCardDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => PlaidConnectScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: linkToken != null ? () {
+                      Navigator.of(context).pop(); 
+                      onConnect();                
+                    } : null,
                     child: const Text(
                       "Continue",
                       style: TextStyle(

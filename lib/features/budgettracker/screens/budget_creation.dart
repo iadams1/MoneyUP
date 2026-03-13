@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/education/screens/education.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
-import 'package:moneyup/features/transactions/screens/transactions_home.dart';
-import 'package:moneyup/models/budget_type.dart';
-import 'package:moneyup/services/service_locator.dart';
+
+import '/core/utils/formatters.dart';
+// import '/shared/widgets/app_avatar.dart';
+import '/features/education/screens/education.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/models/budget_type.dart';
+import '/services/service_locator.dart';
 
 // -------------- Budget Creation Page Widget -------------- //
 class BudgetCreationPage extends StatefulWidget {
@@ -138,7 +141,11 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                           width: 340,
                           child: DropdownMenu<BudgetType>(
                             hintText: "Select a Spending Category.",
+                            menuHeight: 300,
                             width: 340,
+                            menuStyle: MenuStyle(
+                              backgroundColor: WidgetStatePropertyAll(Colors.white),
+                            ),
                             textStyle: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.w600,
@@ -147,7 +154,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             dropdownMenuEntries: BudgetType.values.map((type) {
                               return DropdownMenuEntry(
                                 value: type,
-                                label: type.label, // use the custom string
+                                label: Formatters.formatCategoryTitle(type.label), // use the custom string
                               );
                             }).toList(),
                             onSelected: (value) {
@@ -204,7 +211,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         SizedBox(height: 20),
 
                         Text(
-                          "Amount already saved",
+                          "Amount already spent",
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w600,

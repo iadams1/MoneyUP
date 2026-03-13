@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '/features/home/screens/my_home_page.dart';
+import '/features/auth/screens/confirmation.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/auth/screens/login.dart';
-import '/core/config/supabase_config.dart';
 import '/features/auth/screens/plaid_connect_screen.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/core/config/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MoneyUP',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: "SF Pro",

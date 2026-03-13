@@ -5,7 +5,7 @@ import 'package:moneyup/features/budgettracker/utils/time_range.dart';
 import 'package:moneyup/features/budgettracker/widgets/budget_listing_view.dart';
 import 'package:moneyup/features/education/screens/education.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/profile/screens/profile.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';
 import 'package:moneyup/models/budget.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
@@ -357,35 +357,47 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                             ),
 
                             // Pie chart
-                            SizedBox(
-                              height: 200,
-                              width: 200,
-                              child: spendingData.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        "📊 No spending data currently.",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : PieChart(
-                                      PieChartData(
-                                        sectionsSpace: 0,
-                                        centerSpaceRadius: 20,
-                                        sections: spendingData.entries.map((e) {
-                                          return PieChartSectionData(
-                                            value: e.value,
-                                            color: getCategoryColor(e.key),
-                                            radius: 75,
-                                            titleStyle: const TextStyle(
-                                              color: Colors.transparent,
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                                child: SizedBox(
+                                  height: 200,
+                                  width: 180,
+                                  child: spendingData.isEmpty
+                                      ? const Center(
+                                          child: Text(
+                                            "📊 No spending data currently.",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w700,
                                             ),
-                                          );
-                                        }).toList(),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      : PieChart(
+                                          PieChartData(
+                                            sectionsSpace: 0,
+                                            centerSpaceRadius: 20,
+                                            sections: spendingData.entries.map((
+                                              e,
+                                            ) {
+                                              return PieChartSectionData(
+                                                value: e.value.abs(),
+                                                color: getCategoryColor(e.key),
+                                                radius: 75,
+                                                titleStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
                                       ),
                                     ),
                             ),

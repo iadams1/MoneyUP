@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/shared/widgets/plaid_service.dart';
 
- // Adjust path to match your folder structure
+import '../../../shared/widgets/plaid_service.dart';
 
 class PlaidConnectScreen extends StatefulWidget {
   const PlaidConnectScreen({super.key});
@@ -165,12 +163,6 @@ Future<void> _handlePlaidSuccess(LinkSuccess success) async {
           _errorMessage = e.toString();
         });
       }
-
-
-
-
-
-
     }
   }
 

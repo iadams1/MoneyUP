@@ -22,15 +22,12 @@ class WelcomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
+          Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
+          SizedBox(height: 50),
           Image.asset(
-            'assets/images/mu_bg.png',
-            fit: BoxFit.fill
-          ),
-          SizedBox(height: 40.0),
-          Image.asset(
-            'assets/images/mu_start.png', 
-            height: 400,
-            width: 400,
+            'assets/images/mu_start.png',
+            height: 500,
+            width: double.infinity,
             fit: BoxFit.none,
             alignment: Alignment.topCenter,
           ),
@@ -39,15 +36,15 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 550,),
+                SizedBox(height: 550),
                 Text(
                   'YOUR MONEY. YOUR MOVE.',
                   style: TextStyle(
-                    fontSize: 20, 
+                    fontSize: 20,
                     fontWeight: FontWeight.w400,
                     fontFamily: "SF Pro",
-                    color: Colors.white
-                    ),
+                    color: Colors.white,
+                  ),
                   textAlign: TextAlign.left,
                 ),
                 // SizedBox(height:10),
@@ -57,7 +54,7 @@ class WelcomeScreen extends StatelessWidget {
                     fontSize: 41.0,
                     fontWeight: FontWeight.bold,
                     fontFamily: "SF Pro",
-                    color: Colors.white
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -65,13 +62,14 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
           Positioned( // NEXT BUTTON
-            bottom: 30,
-            right: 30,
-            child: ElevatedButton(
+            bottom: 10,
+            right: -10,
+            child: IconButton(
+              icon: Image.asset('assets/icons/doubleArrowRight.png'),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpScreen())
+                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -79,10 +77,10 @@ class WelcomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(10.0),
                 shape: const StadiumBorder()
               ),
-              child: const Text(
-                '>>',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
-              ),
+              // child: const Text(
+              //   '>>',
+              //   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
+              // ),
             ),
           ),
         ],

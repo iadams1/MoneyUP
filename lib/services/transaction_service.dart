@@ -6,7 +6,8 @@ import '/models/filter_state.dart';
 
 class TransactionService {
   final SupabaseClient _client = Supabase.instance.client;
-  final user = supabaseService.currentUserId!;
+
+  String get user => supabaseService.currentUserId!;
 
   Future<List<Transaction>> fetchTransactions({
       TransactionType? filter,

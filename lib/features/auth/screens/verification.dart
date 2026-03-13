@@ -190,6 +190,26 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     child: Column(
                       children: [
                         OtpInput(),
+                        // TextFormField(
+                        //   controller: _codeController,
+                        //   keyboardType: TextInputType.number,
+                        //   textAlign: TextAlign.center,
+                        //   maxLength: _codeLength,
+                        //   style: const TextStyle(
+                        //     fontSize: 24,
+                        //     letterSpacing: 10,
+                        //   ),
+                        //   decoration: InputDecoration(
+                        //     hintText: '_ _ _ _ _ _',
+                        //     border: InputBorder.none,
+                        //     counterText: "",
+                        //     filled: true,
+                        //     fillColor: Colors.transparent,
+                        //     contentPadding: const EdgeInsets.symmetric(
+                        //       vertical: 40,
+                        //     ), // adjusted for better look
+                        //   ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Padding(

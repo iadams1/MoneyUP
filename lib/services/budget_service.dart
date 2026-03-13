@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  final user = supabaseService.currentUserId!;
+  String get user => supabaseService.currentUserId!;
 
   Future<Budget?> getRandomBudget() async {
     try {
@@ -144,6 +144,23 @@ class BudgetService {
     } catch (e) {
       debugPrint('Error updating budget: $e');
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getMonthlySpending({
+    required DateTime start,
+    required DateTime end,
+  }) async {
+    
+    final response = await _client.rpc(
+      'get_top_spending_categories',
+      params: {
+        'user_uuid': user,
+        'start_date': start.toIso8601String(),
+        'end_date': end.toIso8601String(),
+      },
+    );
+
+    return List<Map<String, dynamic>>.from(response);
   }
 
 }

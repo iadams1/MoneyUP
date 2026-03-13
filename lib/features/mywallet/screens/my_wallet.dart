@@ -5,7 +5,7 @@ import 'package:moneyup/features/mywallet/widgets/linked_card_tile.dart';
 import 'package:moneyup/features/mywallet/widgets/page_indicator.dart';
 import 'package:moneyup/features/mywallet/widgets/wallet_card.dart';
 import 'package:moneyup/models/linked_card.dart';
-import 'package:moneyup/features/proflie/screens/profile.dart';
+import 'package:moneyup/features/profile/screens/profile.dart';
 
 import 'package:flutter/material.dart';
 import 'package:moneyup/features/transactions/screens/transactions_home.dart';

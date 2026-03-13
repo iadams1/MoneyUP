@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class MyWalletService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  final user = supabaseService.currentUserId!;
+  String get user => supabaseService.currentUserId!;
   
   Future<List<LinkedCard>> fetchLinkedCards() async {
     final rows = await _client
