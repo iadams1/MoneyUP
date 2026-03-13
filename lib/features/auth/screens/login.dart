@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/services/service_locator.dart';
 
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -193,8 +192,6 @@ class _LoginState extends State<LoginScreen> {
                                     );
 
                                     if (!mounted) return;
-
-                                    profileService.recordUserStreak();
 
                                     Navigator.pushReplacement(
                                       context,
