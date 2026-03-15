@@ -91,18 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // Small delay for smooth UX (UI fully rendered)
           await Future.delayed(const Duration(milliseconds: 1200));
-
-          try {
-            await NotificationService().showNotification(
-              id: 2001,  // unique ID for this test
-              title: 'Welcome to Your Dashboard!',
-              body: 'MoneyUP is ready — check your budget and cards below 💳',
-              payload: 'home-screen-loaded', // optional for future deep linking
-            );
-            debugPrint('Home dashboard notification sent');
-          } catch (e) {
-            debugPrint('Failed to show home notification: $e');
-          }
         });
       }
 

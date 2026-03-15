@@ -18,40 +18,40 @@ class NotificationService {
     playSound: true,
   );
 
-  Future<void> initialize() async {
-    _notificationsPlugin = FlutterLocalNotificationsPlugin();
+Future<void> initialize() async {
+  _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // Initialize timezone (required for zoned scheduling)
-    tz.initializeTimeZones();
+  // Initialize timezone
+  tz.initializeTimeZones();
 
-    // Android init settings
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+  // Android init settings
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // iOS init settings (Darwin = iOS + macOS)
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+  // iOS settings
+  const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
 
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidSettings,
+    iOS: iosSettings,
+  );
 
-    // const WindowsInitializationSettings windows = WindowsInitializationSettings();
-    // Initialize plugin – use NAMED parameter 'settings'
-    await _notificationsPlugin!.initialize(
-      settings: initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTap,
-    );
+  // Initialize plugin
+  await _notificationsPlugin!.initialize(
+    settings: initSettings,
+    onDidReceiveNotificationResponse: _onNotificationTap,
+  );
 
-    // Create Android channel
-    await _notificationsPlugin!
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
-  }
+  // Create Android notification channel
+  await _notificationsPlugin!
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(_channel);
+}
 
   // Handle notification tap (when app opens from notification)
   static void _onNotificationTap(NotificationResponse response) {
@@ -71,7 +71,7 @@ class NotificationService {
       'moneyup_channel',
       'MoneyUP Notifications',
       channelDescription: 'Important alerts and updates',
-      importance: Importance.high,
+      importance: Importance.max, // HIGH importance ensures it shows in foreground
       priority: Priority.high,
       playSound: true,
     );
@@ -105,7 +105,7 @@ class NotificationService {
           'moneyup_channel',
           'MoneyUP Notifications',
           channelDescription: 'Important alerts and updates',
-          importance: Importance.high,
+          importance: Importance.max, // HIGH importance ensures it shows
           priority: Priority.high,
           playSound: true,
         ),

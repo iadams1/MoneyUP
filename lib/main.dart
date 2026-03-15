@@ -14,13 +14,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
-  print("FCM TOKEN: $token");
+  // print("FCM TOKEN: $token");
 }
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   await dotenv.load(fileName: ".env");
 
   // Initialize notifications first
@@ -35,8 +34,6 @@ void main() async {
   final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? true;
 
   runApp(MyApp(showHome: hasSeenOnboarding));
-  // Quick test: Fire a notification after launch
-  // (gives time for plugin to fully settle)
 }
 
 class MyApp extends StatelessWidget {

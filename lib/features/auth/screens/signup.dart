@@ -4,8 +4,10 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:moneyup/services/auth_service.dart';
+import 'package:moneyup/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/core/constants/notificationtext.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -111,6 +113,7 @@ class _SignUpState extends State<SignUpScreen> {
                                     RequiredValidator(errorText: 'Enter your username'),
                                     MinLengthValidator(3, errorText: 'Minimum 3 characters'),
                                   ]).call,
+                                  
                                   decoration: InputDecoration(
                                     hintText: 'Username',
                                     labelText: 'Username',
@@ -234,8 +237,18 @@ class _SignUpState extends State<SignUpScreen> {
                                             fullName: _nameController.text.trim(),
                                             username: _usernameController.text.trim(),
                                           );
+
+
                                           if (mounted) 
                                           {
+                                            //SIGNUP NOTIFICATION (NON MODULAR)
+                                            await NotificationService().showNotification
+                                            (
+                                              id: AppStrings.signupId,
+                                              title: AppStrings.signupSuccessTitle,
+                                              body: AppStrings.signupSuccessBody,
+                                            );
+
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute
