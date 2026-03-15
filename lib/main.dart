@@ -52,9 +52,8 @@ class MyApp extends StatelessWidget {
         '/start': (context) => const WelcomeScreen(),
 
         // REMOVE THIS LATER
-        '/preview': (context) => const PreviewPage()
       },
-      initialRoute: '/preview',
+      initialRoute: '/',
     );
   }
 }
