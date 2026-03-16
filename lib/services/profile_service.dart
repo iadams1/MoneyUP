@@ -20,7 +20,7 @@ class ProfileService {
   }
 
   Future<int> loadProfileIcon() async {
-    await getProfileIconId();
+     getProfileIconId();
     return iconIdNotifier.value;
   }
 
