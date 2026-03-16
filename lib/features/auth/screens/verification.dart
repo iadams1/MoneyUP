@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/services/plaid_service.dart';
+import 'package:moneyup/features/auth/screens/confirmation.dart';
 import 'package:moneyup/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -53,7 +53,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       if (response.session != null && mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const PlaidService()),
+          MaterialPageRoute(builder: (context) => const ConfirmationScreen()),
         );
       }
     } on AuthException catch (e) {
@@ -195,7 +195,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             border: InputBorder.none,
                             counterText: "",
                             filled: true,
-                            fillColor: Colors.grey[200],
+                            fillColor: Colors.transparent,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 40,
                             ), // adjusted for better look

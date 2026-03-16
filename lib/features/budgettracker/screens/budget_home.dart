@@ -212,7 +212,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 15),
+                  SizedBox(height: 20),
 
                   // ---------- Spending Overview Section ----------- //
                   Padding(
@@ -330,7 +330,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                             "📊 No spending data currently.",
                                             style: TextStyle(
                                               color: Colors.black,
-                                              fontSize: 16,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w700,
                                             ),
                                             textAlign: TextAlign.center,

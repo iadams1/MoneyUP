@@ -11,11 +11,17 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatedDate = DateFormat('yyyy-MM-dd').format(transaction.authorizedDate);
-    final formattedAmount = NumberFormat.currency(symbol: '\$').format(transaction.amount);
+    final formatedDate = DateFormat(
+      'yyyy-MM-dd',
+    ).format(transaction.authorizedDate);
+    final formattedAmount = NumberFormat.currency(
+      symbol: '\$',
+    ).format(transaction.amount);
     final categoryColor = categoryColors[transaction.category] ?? defaultColor;
     final isNegative = transaction.amount < 0;
-    final amountColor = isNegative ? Colors.grey[700] : Colors.black;
+    final amountColor = isNegative
+        ? const Color.fromARGB(255, 150, 41, 41)
+        : const Color.fromARGB(255, 32, 133, 47);
 
     return Material(
       color: Colors.transparent,
@@ -25,13 +31,18 @@ class TransactionCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.black,
-              width: 2.0
-            )
+
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(10, 0, 0, 0),
+                spreadRadius: 0,
+                blurRadius: 9,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
           // TRANSACTION CARD HEIGHT & WIDTH
-          height: 70,
+          height: 75,
           width: 380,
           alignment: Alignment.topCenter,
           child: Padding(
@@ -46,19 +57,22 @@ class TransactionCard extends StatelessWidget {
                   width: 55,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey.shade200,
-                    border: Border.all(
-                      color: Colors.black,
-                      width: 2.0,
-                    ),
+                    color: const Color.fromARGB(255, 219, 219, 219),
+                    boxShadow: [
+                      const BoxShadow(
+                        color: Color.fromARGB(31, 0, 0, 0),
+                        blurRadius: 10,
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.shopping_bag_outlined,
                     color: Colors.grey,
-                  )
+                  ),
                 ),
-                const SizedBox(width: 10,),
-                Expanded( // MERCHANT NAME AND AUTHORIZED DATE
+                const SizedBox(width: 10),
+                Expanded(
+                  // MERCHANT NAME AND AUTHORIZED DATE
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +81,7 @@ class TransactionCard extends StatelessWidget {
                         transaction.title,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                          fontSize: 14,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -75,38 +89,38 @@ class TransactionCard extends StatelessWidget {
                         formatedDate,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ),
                 SizedBox(width: 8),
                 // CATEGORY BOX
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(height: 13,),
+                    SizedBox(height: 13),
                     SizedBox(
-                    width: 90,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: categoryColor.backgroundColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        Formatters.category(transaction.category),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: categoryColor.textColor,
+                      width: 95,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: categoryColor.backgroundColor,
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        child: Text(
+                          Formatters.category(transaction.category),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: categoryColor.textColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      
                     ),
                   ],
                 ),
@@ -114,14 +128,14 @@ class TransactionCard extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(height: 12,),
+                    SizedBox(height: 12),
                     SizedBox(
                       width: 80,
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
                           formattedAmount,
-                          style:TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                             color: amountColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/core/utils/formatters.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/education/screens/education.dart';
@@ -130,7 +131,11 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                           width: 340,
                           child: DropdownMenu<BudgetType>(
                             hintText: "Select a Spending Category.",
+                            menuHeight: 300,
                             width: 340,
+                            menuStyle: MenuStyle(
+                              backgroundColor: WidgetStatePropertyAll(Colors.white),
+                            ),
                             textStyle: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.w600,
@@ -139,7 +144,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             dropdownMenuEntries: BudgetType.values.map((type) {
                               return DropdownMenuEntry(
                                 value: type,
-                                label: type.label, // use the custom string
+                                label: Formatters.formatCategoryTitle(type.label), // use the custom string
                               );
                             }).toList(),
                             onSelected: (value) {
@@ -196,7 +201,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         SizedBox(height: 20),
 
                         Text(
-                          "Amount already saved",
+                          "Amount already spent",
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w600,

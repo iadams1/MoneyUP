@@ -75,7 +75,7 @@ class _FilterDialogState extends State<FilterDialog> {
       child: _isLoading 
       ? const Padding(
           padding: EdgeInsets.all(40),
-          child: Center(child: CircularProgressIndicator()),
+          child: Center(child: CircularProgressIndicator(color: Colors.black)),
         )
       : Padding(
         padding: const EdgeInsets.all(20),

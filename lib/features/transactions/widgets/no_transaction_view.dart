@@ -17,8 +17,8 @@ class NoTransactionView extends StatelessWidget{
           Text(
             'No Transactions Yet',
             style: TextStyle(
-              fontFamily: 'SF Pro',
-              fontSize: 16,
+              fontSize: 20,
+              fontWeight: FontWeight.w600
             ),
           )
         ],

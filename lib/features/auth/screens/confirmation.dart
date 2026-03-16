@@ -19,7 +19,7 @@ class ConfirmationScreen extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: EdgeInsets.only(top: 150.0, left: 55.0, right: 55.0),
+              padding: EdgeInsets.only(top: 190.0, left: 55.0, right: 55.0),
               child: Column(
                 children: <Widget>[
                   Image.asset(

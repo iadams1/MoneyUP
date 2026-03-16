@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/screen/loading_screen.dart';
 
 import '../widgets/filters/active_filter_chips.dart';
 import '/features/transactions/widgets/filter_dialog.dart';
@@ -21,20 +22,25 @@ class TransactionsHome extends StatefulWidget {
 class _TransactionsHomeState extends State<TransactionsHome> {
   bool _isLoading = true;
   final TransactionService _transactionService = TransactionService();
-  FilterState _currentFilters = FilterState();
+  FilterState _currentFilters = FilterState.empty();
 
   double _totalDebit = 0;
   double _totalCredit = 0;
+  double _availableCredit = 0;
+
   TransactionType? _selectedFilter = TransactionType.debit;
   List<Transaction> _filteredTransactions = [];
 
-  Future<void> _loadTransactions({TransactionType? filter}) async {
+  Future<void> _loadTransactions({
+    TransactionType? filter,
+    FilterState? filters,
+  }) async {
     setState(() => _isLoading = true);
 
     try {
       final transactions = await _transactionService.fetchTransactions(
         filter: filter,
-        filters: _currentFilters
+        filters: filters,
       );
 
       final type = filter == TransactionType.credit ? 'credit' : 'depository';
@@ -50,6 +56,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
         _filteredTransactions = transactions;
         _totalDebit = totals['debit'] ?? 0;
         _totalCredit = totals['credit'] ?? 0;
+        _availableCredit = totals['availableCredit'] ?? 0;
         _selectedFilter = filter;
         _isLoading = false;
       });
@@ -57,6 +64,52 @@ class _TransactionsHomeState extends State<TransactionsHome> {
       debugPrint('Error loading transactions: $e');
       setState(() => _isLoading = false);
     }
+  }
+
+  void _removeCategory(String category) async {
+    final updatedCategories = {..._currentFilters.selectedCategories}
+      ..remove(category);
+
+    setState(() {
+      _currentFilters = _currentFilters.copyWith(
+        selectedCategories: updatedCategories
+      );
+    });
+
+    await _loadTransactions(
+      filter: _selectedFilter,
+      filters: _currentFilters,
+    );
+  }
+
+  void _removeBank(String bank) async {
+    final updatedBanks = {..._currentFilters.selectedBanks}
+      ..remove(bank);
+
+    setState(() {
+      _currentFilters = _currentFilters.copyWith(
+        selectedBanks: updatedBanks
+      );
+    });
+
+    await _loadTransactions(
+      filter: _selectedFilter,
+      filters: _currentFilters,
+    );
+  }
+
+  void _removeDate() async {
+    setState(() {
+      _currentFilters = _currentFilters.copyWith(
+        clearStartDate: true,
+        clearEndDate: true,
+      );
+    });
+
+    await _loadTransactions(
+      filter: _selectedFilter,
+      filters: _currentFilters,
+    );
   }
 
   @override
@@ -67,7 +120,17 @@ class _TransactionsHomeState extends State<TransactionsHome> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isLoading
+          ? const LoadingScreen(key: ValueKey('loading'))
+          : _buildContent(context, key: const ValueKey('content')),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, {required Key key}) {
     return Scaffold(
+      key: key,
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -91,6 +154,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                 ),
                 child: Text(
                   'View Debit',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600
+                  ),
                 ),
               ),
               TextButton(
@@ -105,6 +172,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                 ),
                 child: Text(
                   'View Credit',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600
+                  ),
                 ),
               ),
               IconButton( // INFO ICON BUTTON
@@ -141,13 +212,14 @@ class _TransactionsHomeState extends State<TransactionsHome> {
             ),
           ),
           Positioned(
-            top: 165,
+            top: 155,
             left: 25,
             right: 25,
             child: TotalAmountView(
               selectedFilter: _selectedFilter!, 
               totalDebit: _totalDebit, 
               totalCredit: _totalCredit,
+              availableCredit: _availableCredit,
             ),
           ),
           SafeArea( // WHITE BOX CONTAINER
@@ -179,7 +251,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                         ),
                         IconButton(
                           onPressed: () async {
-                            final result = await showDialog(
+                            final result = await showDialog<FilterState>(
                               context: context, 
                               builder: (_) => FilterDialog(
                                 initialState: _currentFilters,
@@ -188,56 +260,30 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                             );
                             if (result != null) {
                               setState(() {_currentFilters = result;});
-                              _loadTransactions(filter: _selectedFilter);
+                              await _loadTransactions(
+                                filter: _selectedFilter,
+                                filters: _currentFilters,
+                              );
                             }
                           },
-                          icon: Icon(Icons.filter_alt_outlined),
+                          icon: Icon(Icons.filter_alt_outlined, size: 30,),
                         )
                       ],
                     ),
                   ),
-                  SizedBox(height: 20,),
                   ActiveFilterChips(
                     filters: _currentFilters,
-                    onRemoveBank: (bank) {
+                    onRemoveCategory: _removeCategory,
+                    onRemoveBank: _removeBank,
+                    onRemoveDate: _removeDate,
+                    onClearAll: () async {
                       setState(() {
-                        _currentFilters.selectedBanks.remove(bank);
+                        _currentFilters = FilterState.empty();
                       });
-                      _loadTransactions(filter: _selectedFilter);
-                    },
-                    onRemoveCategory: (category) {
-                      setState(() {
-                        _currentFilters.selectedBanks.remove(category);
-                      });
-                      _loadTransactions(filter: _selectedFilter);
-                    },
-                    onRemoveStartDate: () {
-                      setState(() {
-                        _currentFilters = FilterState(
-                          selectedBanks: _currentFilters.selectedBanks,
-                          selectedCategories: _currentFilters.selectedCategories,
-                          endDate: _currentFilters.endDate,
-                        );
-                      });
-                      _loadTransactions(filter: _selectedFilter);
-                    },
-                    onRemoveEndDate: () {
-                      setState(() {
-                        _currentFilters = FilterState(
-                          selectedBanks: _currentFilters.selectedBanks,
-                          selectedCategories: _currentFilters.selectedCategories,
-                          startDate: _currentFilters.startDate,
-                        );
-                      });
-                      _loadTransactions(filter: _selectedFilter);
-                    },
-                    onClearAll: () {
-                      setState(() {
-                        _currentFilters = FilterState();
-                      });
-                      _loadTransactions(filter: _selectedFilter);
+                      await _loadTransactions(filter: _selectedFilter);
                     },
                   ),
+                  SizedBox(height: 10),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),

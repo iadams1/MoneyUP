@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+
 import '/features/auth/screens/signup.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/services/auth_service.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/services/auth_service.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -13,7 +14,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginState();
 
-  
 }
 
 class _LoginState extends State<LoginScreen> {
@@ -22,7 +22,7 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   // Add password visibility state
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +109,7 @@ class _LoginState extends State<LoginScreen> {
                           ),
                           Padding(
                             // PASSWORD ENTRY
+                            // PASSWORD ENTRY – with show/hide toggle
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,
@@ -171,8 +172,9 @@ class _LoginState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   if (!(_formkey.currentState?.validate() ??
-                                      false))
+                                      false)) {
                                     return;
+                                  }
 
                                   try {
                                     await AuthService().login(

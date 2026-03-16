@@ -6,7 +6,8 @@ import '/models/filter_state.dart';
 
 class TransactionService {
   final SupabaseClient _client = Supabase.instance.client;
-  final user = supabaseService.currentUserId!;
+
+  String get user => supabaseService.currentUserId!;
 
   Future<List<Transaction>> fetchTransactions({
       TransactionType? filter,
@@ -20,11 +21,12 @@ class TransactionService {
           amount,
           category,
           authorized_date,
-          plaid_accounts!inner(type),
+          plaid_accounts!inner(type, is_active),
           plaid_items!inner(institution_name)
           ''')
         .eq('user_id', user)
-        .eq('plaid_accounts.type', accountType);
+        .eq('plaid_accounts.type', accountType)
+        .eq('plaid_accounts.is_active', true);
 
     if (filters != null) {
       if (filters.selectedCategories.isNotEmpty) {
@@ -125,11 +127,30 @@ class TransactionService {
 
     final response = await _client
         .from('plaid_transactions')
-        .select('plaid_items!inner(institution_name)')
-        .eq('user_id', user);
-    
-    for (final row in response) {
-      institutions.add(row['plaid_items']['institution_name']);
+        .select('''
+          category,
+          plaid_items!inner(institution_name),
+          plaid_accounts!inner(type, is_active)
+        ''')
+        .eq('user_id', user)
+        .eq('plaid_accounts.type', accountType)
+        .eq('plaid_accounts.is_active', true);
+
+    // final categories = <String>{};
+    // final institutions = <String>{};
+
+    final rows = List<Map<String, dynamic>>.from(response);
+
+    for (final row in rows) {
+      final category = row['category'];
+      final instituion = row['plaid_items']?['institution_name'];
+      
+      if (category != null && category.isNotEmpty) {
+        categories.add(category);
+      }
+      if (instituion != null && instituion.isNotEmpty) {
+        institutions.add(instituion);
+      }
     }
 
     fetchTotals(bankName: bankNames, type: accountType);
@@ -137,7 +158,7 @@ class TransactionService {
     return FilterData(
       categories: categories.toList()..sort(), 
       institutions: institutions.toList()..sort(), 
-      dates: dates.toList()..sort(),
+      dates: [],
     );
   }
 }

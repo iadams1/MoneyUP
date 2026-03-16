@@ -17,39 +17,39 @@ const CategoryColor defaultColor = CategoryColor(
 
 final Map<String, CategoryColor> categoryColors = {
   'FOOD_AND_DRINK': CategoryColor(
-    backgroundColor: Colors.pink,
+    backgroundColor: Colors.orange,
     textColor: Colors.white,
   ),
   'GENERAL_MERCHANDISE': CategoryColor(
-    backgroundColor: Colors.orange,
+    backgroundColor: Colors.blue,
     textColor: Colors.white,
   ),
   'GENERAL_SERVICES': CategoryColor(
-    backgroundColor: Colors.lightBlue,
-    textColor: Colors.white,
-  ),
-  'PERSONAL_CARE': CategoryColor(
-    backgroundColor: Colors.yellow,
-    textColor: Colors.white,
-  ),
-  'TRANSPORTATION': CategoryColor(
     backgroundColor: Colors.purple,
     textColor: Colors.white,
   ),
+  'PERSONAL_CARE': CategoryColor(
+    backgroundColor: Colors.green,
+    textColor: Colors.white,
+  ),
+  'TRANSPORTATION': CategoryColor(
+    backgroundColor: Colors.red,
+    textColor: Colors.white,
+  ),
   'ENTERTAINMENT': CategoryColor(
-    backgroundColor: Colors.amber,
+    backgroundColor: Colors.teal,
     textColor: Colors.white,
   ),
   'TRAVEL': CategoryColor(
-    backgroundColor: Colors.orange,
+    backgroundColor: Colors.indigo,
     textColor: Colors.white,
   ),
   'TRANSFER_IN': CategoryColor(
-    backgroundColor: Colors.lightGreen,
+    backgroundColor: Colors.pink,
     textColor: Colors.white,
   ),
   'TRANSFER_OUT': CategoryColor(
-    backgroundColor: Colors.redAccent,
+    backgroundColor: Colors.amber,
     textColor: Colors.white,
   ),
   'BANK_FEES': CategoryColor(
@@ -57,27 +57,27 @@ final Map<String, CategoryColor> categoryColors = {
     textColor: Colors.white,
   ),
   'LOAN_PAYMENTS': CategoryColor(
-    backgroundColor: Colors.orange,
+    backgroundColor: Colors.deepPurple,
     textColor: Colors.white,
   ),
   'LOAN_DISBURSEMENTS': CategoryColor(
-    backgroundColor:Colors.red,
+    backgroundColor:Colors.lightGreen,
     textColor: Colors.white,
   ),
   'MEDICAL': CategoryColor(
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.deepOrange,
     textColor: Colors.white,
   ),
   'INCOME': CategoryColor(
-    backgroundColor: Colors.green,
+    backgroundColor: Colors.brown,
     textColor: Colors.white,
   ),
   'GOVERNMENT_AND_NON_PROFIT': CategoryColor(
-    backgroundColor: const Color.fromRGBO(40, 53, 147, 1),
+    backgroundColor: Colors.lime,
     textColor: Colors.white,
   ),
   'RENT_AND_UTILITIES': CategoryColor(
-    backgroundColor: Colors.deepOrange,
+    backgroundColor: const Color.fromARGB(255, 70, 181, 127),
     textColor: Colors.white,
   ),
 };

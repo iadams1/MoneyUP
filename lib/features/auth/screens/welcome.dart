@@ -23,13 +23,10 @@ class WelcomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          Image.asset(
-            'assets/images/mu_bg.png',
-            fit: BoxFit.fill
-          ),
+          Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           SizedBox(height: 50),
           Image.asset(
-            'assets/images/mu_start.png', 
+            'assets/images/mu_start.png',
             height: 500,
             width: double.infinity,
             fit: BoxFit.none,
@@ -40,15 +37,15 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 550,),
+                SizedBox(height: 550),
                 Text(
                   'YOUR MONEY. YOUR MOVE.',
                   style: TextStyle(
-                    fontSize: 20, 
+                    fontSize: 20,
                     fontWeight: FontWeight.w400,
                     fontFamily: "SF Pro",
-                    color: Colors.white
-                    ),
+                    color: Colors.white,
+                  ),
                   textAlign: TextAlign.left,
                 ),
                 Text(
@@ -57,22 +54,23 @@ class WelcomeScreen extends StatelessWidget {
                     fontSize: 41.0,
                     fontWeight: FontWeight.bold,
                     fontFamily: "SF Pro",
-                    color: Colors.white
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.left,
                 ),
               ],
             ),
           ),
-          Positioned( // NEXT BUTTON
+          Positioned(
+            // NEXT BUTTON
             bottom: 10,
-            right: 0,
+            right: -10,
             child: IconButton(
               icon: Image.asset('assets/icons/doubleArrowRight.png'),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpScreen())
+                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
                 );
               },
             ),

@@ -25,20 +25,35 @@ class BankFilterSection extends StatelessWidget {
           showClear: selectedBanks.isNotEmpty,
           onClear: onClear,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: banks.map((bank) {
-            return FilterChip(
-              label: Text(bank),
-              selected: selectedBanks.contains(bank),
-              onSelected: (_) => onToggle(bank),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
+            return Theme(
+              data: Theme.of(context).copyWith(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
               ),
-              backgroundColor: Colors.white,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              child: FilterChip(
+                label: Text(
+                  bank,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+                selected: selectedBanks.contains(bank),
+                onSelected: (_) => onToggle(bank),
+                selectedColor: const Color.fromARGB(255, 231, 221, 255),
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.white,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
             );
           }).toList(),
         ),

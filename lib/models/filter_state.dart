@@ -11,6 +11,15 @@ class FilterState {
     this.endDate,
   });
 
+  factory FilterState.empty() {
+    return FilterState(
+      selectedBanks: {},
+      selectedCategories: {},
+      startDate: null,
+      endDate: null,
+    );
+  }
+
   bool get hasFilters => 
     selectedBanks.isNotEmpty ||
     selectedCategories.isNotEmpty ||
@@ -22,12 +31,14 @@ class FilterState {
     Set<String>? selectedCategories,
     DateTime? startDate,
     DateTime? endDate,
+    bool clearStartDate = false,
+    bool clearEndDate = false,
   }) {
     return FilterState (
       selectedBanks: selectedBanks ?? this.selectedBanks,
       selectedCategories: selectedCategories ?? this.selectedCategories,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      startDate: clearStartDate ? null : (startDate ?? this.startDate),
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
     );
   }
 }

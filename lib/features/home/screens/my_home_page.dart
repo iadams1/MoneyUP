@@ -4,6 +4,14 @@ import 'package:moneyup/features/home/widgets/greeting_text.dart';
 import 'package:moneyup/services/notification_service.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
+import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
+import 'package:moneyup/features/budgettracker/utils/time_range.dart';
+import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
+import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
+import '/features/home/widgets/greeting_text.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/first_time_plaid_connect.dart';
+// import '/shared/widgets/profile_menu_card.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
@@ -14,6 +22,7 @@ import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
 import 'package:moneyup/core/utils/formatters.dart';
+import 'package:moneyup/shared/widgets/streak_banner.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -30,12 +39,19 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _name;
   List<LinkedCard> _cards = [];
   bool _hasCheckedPlaidDialog = false;
-  bool _hasShownHomeNotification = false;
+  int _currentStreak = 0;
+  int _longestStreak = 0;
+  List<bool> _weekLogins = List.filled(7, false);
+
+
+  Map<int, double> spendingData = {};
+  Map<int, String> categoryTitles = {};
 
   @override
   void initState() {
     super.initState();
     _init();
+    loadMonthlySpendingData();
   }
 
   Future<void> _init() async {
@@ -54,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       profileService.loadProfileIcon();
       await _loadHome();
+      _loadStreakData();
     } catch (e, st) {
       debugPrint('Home init error: $e');
       debugPrintStack(stackTrace: st);
@@ -64,6 +81,35 @@ class _MyHomePageState extends State<MyHomePage> {
       // ScaffoldMessenger.of(
       //   context,
       // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+    }
+  }
+
+  Future<void> _loadStreakData() async {
+    try {
+      final shouldShowBanner = await streakService.recordUserStreak();
+      final streak = await streakService.fetchUserStreak();
+      final weekLogins = await streakService.fetchWeekLogins();
+
+      if (!mounted) return;
+
+      setState(() {
+        _currentStreak = streak.currentStreak;
+        _longestStreak = streak.longestStreak;
+        _weekLogins = weekLogins;
+      });
+
+      if (shouldShowBanner) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          StreakBanner.showStreakBanner(
+            context,
+            currentStreak: _currentStreak,
+            longestStreak: _longestStreak,
+            weekLogins: _weekLogins,
+          );
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading streak data: $e');
     }
   }
 
@@ -83,24 +129,14 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       // ADD TEST NOTIFICATION HERE – after loading completes
-      if (!_hasShownHomeNotification) {
-        _hasShownHomeNotification = true;
+
+      if (!_hasCheckedPlaidDialog) {
+        _hasCheckedPlaidDialog = true;
 
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
-
-          // Small delay for smooth UX (UI fully rendered)
-          await Future.delayed(const Duration(milliseconds: 1200));
+          await _maybeShowPlaidDialog();
         });
-      }
-
-      if (!_hasCheckedPlaidDialog) {
-      _hasCheckedPlaidDialog = true;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        await _maybeShowPlaidDialog();
-      });
       }
     } catch (e) {
       debugPrint('Error loading budgets: $e');
@@ -117,6 +153,33 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted || hasSeen == true) return;
 
     await showFirstTimePlaidConnect(context);
+  }
+
+  Future<void> loadMonthlySpendingData() async {
+    final range = getTimeRange(TimeFilter.thisMonth, DateTime.now());
+
+    final response = await budgetService.getMonthlySpending(
+      start: range.start,
+      end: range.end,
+    );
+
+    final Map<int, double> tempData = {};
+    final Map<int, String> titlesById = {};
+
+    for (final row in response) {
+      final id = row['category_id'] as int;
+      final title = Formatters.formatCategoryTitle(row['category_title']);
+      final total = (row['total_spent'] as num).toDouble();
+
+      tempData[id] = total;
+      titlesById[id] = title;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      spendingData = tempData;
+      categoryTitles = titlesById;
+    });
   }
 
   @override
@@ -156,6 +219,33 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildSpendingOverview(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromARGB(16, 0, 0, 0),
+            offset: Offset(0, 8),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      height: 188,
+      width: 380,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: spendingData.isEmpty
+            ? NoSpendingOverview()
+            : MonthlySpendingOverviewView(
+                spendingData: spendingData,
+                categoryTitles: categoryTitles,
+              ),
+      ),
+    );
+  }
+
   Widget _buildContent(BuildContext context, {required Key key}) {
     final displayName = _name ?? "Guest";
 
@@ -174,9 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 children: [
                   AppAvatar(size: 60),
-
                   const SizedBox(width: 17),
-
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -188,22 +276,24 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontSize: 22,
                         ),
                       ),
-
                       // Text for username
-                      Text(
-                        displayName,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 29,
+                      SizedBox(
+                        width: 240,
+                        child: Text(
+                          displayName,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 29,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
@@ -228,7 +318,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Positioned.fill(
             child: Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -254,7 +343,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -297,7 +385,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       builder: (_) => const MyWallet(),
                                     ),
                                   );
-
                                   await _init();
                                 },
                                 child: Ink(
@@ -339,8 +426,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     // Article Card Widget
 
+                    const SizedBox(height: 10),
+
                     // Budget Card Widget
                     _buildBudgetCard(context),
+
+                    const SizedBox(height: 30),
+
+                    // Monthly Spending Overview Widget
+                    _buildSpendingOverview(context),
                   ],
                 ),
               ),
