@@ -11,10 +11,21 @@ import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/services/plaid_service.dart';
 import 'package:moneyup/services/notification_service.dart'; //custom
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:moneyup/services/realtime_notifications.dart';
 
-void getToken() async {
+void getToken() async 
+{
   String? token = await FirebaseMessaging.instance.getToken();
   // print("FCM TOKEN: $token");
+}
+
+void startRealtime() 
+{
+  final user = Supabase.instance.client.auth.currentUser;
+
+  if (user != null) {
+    RealtimeNotificationService().startListening(user.id);
+  }
 }
 
 void main() async {
@@ -34,6 +45,8 @@ void main() async {
   final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? true;
 
   runApp(MyApp(showHome: hasSeenOnboarding));
+
+  startRealtime();
 }
 
 class MyApp extends StatelessWidget {
