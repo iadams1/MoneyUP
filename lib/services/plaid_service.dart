@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:moneyup/shared/widgets/plaid_connect_dialog.dart';
+
+import '/shared/widgets/plaid_connect_dialog.dart';
 
 class PlaidService extends StatefulWidget {
   const PlaidService({super.key});

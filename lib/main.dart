@@ -3,11 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '/features/auth/screens/user_select.dart';
+import '/features/auth/screens/verification.dart';
+import '/features/auth/screens/welcome.dart';
 import '/features/auth/screens/confirmation.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/auth/screens/login.dart';
-import '/features/auth/screens/plaid_connect_screen.dart';
 import '/features/home/screens/my_home_page.dart';
+import '/services/plaid_service.dart';
 import '/core/config/supabase_config.dart';
 
 void main() async {
@@ -44,9 +47,12 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
-        '/plaid-connect': (context) => PlaidConnectScreen(),
+        '/plaid-connect': (context) => const PlaidService(),
+        '/verify': (context) => const VerificationScreen(email: ''),
+        '/user': (context) => const UserSelectScreen(),
+        '/start': (context) => const WelcomeScreen(),
       },
-      initialRoute: '/',
+      initialRoute: '/home',
     );
   }
 }

@@ -27,9 +27,9 @@ Widget buildLegend(Color statusColor) {
           label,
           style: const TextStyle(
             fontFamily: 'SF Pro',
-            fontSize: 11,
+            fontSize: 13,
             color: ApiColors.textSecondary,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],

@@ -226,7 +226,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 35),
+                  SizedBox(height: 20),
 
                   // ---------- Spending Overview Section ----------- //
                   Padding(

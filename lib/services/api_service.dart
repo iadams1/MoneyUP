@@ -10,9 +10,8 @@ class PredictionService {
   String? get _currentUserId => Supabase.instance.client.auth.currentUser?.id;
 
   Future<PredictionResult> getPrediction({required int budgetId}) async {
-    final userId = _currentUserId;
 
-    if (userId == null) {
+    if (_currentUserId == null) {
       throw Exception('No user logged in');
     }
 
@@ -20,8 +19,8 @@ class PredictionService {
       Uri.parse('$_baseUrl/predict'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'user_id': userId,
         'budget_id': budgetId,
+        'user_id': _currentUserId,
       }),
     );
 

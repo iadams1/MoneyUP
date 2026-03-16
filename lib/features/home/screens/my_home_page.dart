@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/shared/widgets/notification_dialog.dart';
 
 import '/features/budgettracker/ui/time_filter.dart';
 import '/features/budgettracker/utils/time_range.dart';
@@ -11,7 +12,7 @@ import '/shared/widgets/first_time_plaid_connect.dart';
 import '/features/budgettracker/widgets/budget_view.dart';
 import '/features/budgettracker/widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
-import '/features/mywallet/widgets/primary_card_view.dart';
+import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
 import '/models/linked_card.dart';
 import '/services/service_locator.dart';
@@ -258,7 +259,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (_) => NotificationDialog()),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -316,56 +320,58 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   color: Colors.white,
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 5.5),
-                    // MyWallet Card Widget
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
-                            child: SizedBox(
-                              width: 50,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => const MyWallet(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 5.5),
+                      // MyWallet Card Widget
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
+                              child: SizedBox(
+                                width: 50,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
-                                  );
-                                  await _init();
-                                },
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color.fromRGBO(25, 50, 100, 1),
-                                        Color.fromRGBO(47, 52, 126, 1),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const SizedBox(
-                                    width: 70,
-                                    height: 217,
-                                    child: Center(
-                                      child: Text(
-                                        "+",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w400,
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => const MyWallet(),
+                                      ),
+                                    );
+                                    await _init();
+                                  },
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(25, 50, 100, 1),
+                                          Color.fromRGBO(47, 52, 126, 1),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const SizedBox(
+                                      width: 70,
+                                      height: 217,
+                                      child: Center(
+                                        child: Text(
+                                          "+",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -373,28 +379,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 243,
-                            width: 330,
-                            child: PrimaryCardView(cards: _cards),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 243,
+                              width: 330,
+                              child: PrimaryCardView(cards: _cards),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // Article Card Widget
+                      // Article Card Widget
 
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                    // Budget Card Widget
-                    _buildBudgetCard(context),
+                      // Budget Card Widget
+                      _buildBudgetCard(context),
 
-                    const SizedBox(height: 30),
+                      const SizedBox(height: 30),
 
-                    // Monthly Spending Overview Widget
-                    _buildSpendingOverview(context),
-                  ],
+                      // Monthly Spending Overview Widget
+                      _buildSpendingOverview(context),
+                    ],
+                  ),
                 ),
               ),
             ),
