@@ -33,7 +33,11 @@ Widget buildChart(
 
   final spots = buildActualSpots(data);
   final projectedSpots = buildProjectedSpots(spots, data);
-  final maxY = (data.spendingRangeHigh * 1.15).ceilToDouble();
+  final maxY = ([
+    data.spendingRangeHigh * 1.15,
+    data.budgetAmount * 1.15,
+    data.predictedFinalSpending * 1.15,
+  ]).reduce((a, b) => a > b ? a : b).ceilToDouble();
 
   return Container(
     height: 220,
@@ -88,7 +92,7 @@ Widget buildChart(
                   fontFamily: 'SF Pro',
                   fontSize: 10,
                   color: ApiColors.textSecondary,
-                  fontWeight: FontWeight.w500
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

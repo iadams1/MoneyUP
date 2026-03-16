@@ -4,6 +4,7 @@ from models.response import PredictionResponse
 from models.request import PredictionRequest
 from typing import Optional
 from services.ml_services import get_budget_predictor
+from datetime import date
 
 # Import your ML models
 from models.ai.budget_forecast import (
@@ -57,7 +58,7 @@ def get_category_id_from_title(title: str) -> Optional[int]:
             return value
     
     # Default to 1 (Groceries) if not found
-    print(f"⚠️  Warning: Category '{title}' not found, defaulting to Groceries")
+    print(f"Warning: Category '{title}' not found, defaulting to FOOD_AND_DRINK")
     return 1
 
 @router.post("/predict", response_model=PredictionResponse)
@@ -82,17 +83,16 @@ async def predict_budget(request: PredictionRequest):
         # STEP 1: Fetch budget from Supabase
         # =====================================================================
         # ⚠️ UPDATE these column names to match YOUR budgets table exactly
-        budget_response = supabase.table("ml_budgets").select("*").eq(
-            "budget_id", request.budget_id
+        budget_response = supabase.table("budgets").select("*").eq(
+            "budget_ID", request.budget_id
         ).eq(
-            "user_id", request.user_id
+            "user_ID", request.user_id
         ).execute()
         
         if not budget_response.data or len(budget_response.data) == 0:
             return PredictionResponse(
                 success=False,
-                message=f"Budget request not found!",
-                status=status.HTTP_404_NOT_FOUND
+                message=f"Budget request not found!"
             )
         
         budget = budget_response.data[0]
@@ -100,98 +100,46 @@ async def predict_budget(request: PredictionRequest):
         # =====================================================================
         # STEP 2: Get category information
         # =====================================================================
-        # Assuming your budget has a category_ID field that references category_table
-        budget_category_id = budget.get('id')
         
-        if budget_category_id:
-            category_response = supabase.table("ml_categories").select("*").eq(
-                "id", budget_category_id
-            ).execute()
-            
-            if category_response.data and len(category_response.data) > 0:
-                category_title = category_response.data[0].get('title', 'Unknown')
-                ml_category_id = get_category_id_from_title(category_title)
-            else:
-                category_title = 'Groceries'
-                ml_category_id = 1  # Default to Groceries
-        else:
-            category_title = 'Groceries'
-            ml_category_id = 1
+        category_title = budget.get('Category', 'FOOD_AND_DRINK')
+        ml_category_id = get_category_id_from_title(category_title)
         
         # =====================================================================
-        # STEP 3: Fetch transactions from Supabase
+        # STEP 3: Fetch AmountSpent from Supabase
         # =====================================================================
-        transactions_response = supabase.table("ml_transactions").select("*").eq(
-            "budget_id", request.budget_id
-        ).execute()
-        
-        if not transactions_response.data or len(transactions_response.data) == 0:
+        amount_spent = float(budget.get('AmountSpent', 0))
+
+        if amount_spent == 0:
             return PredictionResponse(
                 success=False,
-                message="No transactions found. Need at least one transaction to make a prediction."
+                message="No spending recorded yet for this budget."
             )
         
-        transactions = transactions_response.data
+        transactions_list = [{
+            'transaction_date': str(date.today()),
+            'amount': amount_spent
+        }]
         
         # =====================================================================
         # STEP 4: Format data for ML model
         # =====================================================================
         # Extract budget amount (check different possible column names)
-        budget_amount = (
-            budget.get('amount') or 
-            budget.get('Amount') or 
-            budget.get('budget_amount') or 
-            budget.get('goal_amount')
-        )
         
-        if budget_amount is None:
+        budget_amount = float(budget.get('Goal', 0))
+
+        if budget_amount == 0:
             raise HTTPException(
                 status_code=400,
-                detail="Budget amount not found. Check your budgets table schema."
-            )
-        
-        # Extract timeframe (weekly/monthly)
-        timeframe = (
-            budget.get('timeframe') or 
-            budget.get('Timeframe') or 
-            budget.get('period') or
-            'monthly'  # Default to monthly
-        )
+                detail="Budget goal amount not found."
+            )        
         
         budget_dict = {
             'user_id': request.user_id,
             'category_id': ml_category_id,  # ML model expects 1-5
             'amount': float(budget_amount),
-            'timeframe': timeframe.lower()
+            'timeframe': 'monthly'
         }
         
-        # Format transactions
-        transactions_list = []
-        for tx in transactions:
-            # Extract transaction date (check different possible column names)
-            tx_date = (
-                tx.get('transaction_date') or 
-                tx.get('date') or 
-                tx.get('Date')
-            )
-            
-            # Extract amount
-            tx_amount = (
-                tx.get('amount') or 
-                tx.get('Amount')
-            )
-            
-            if tx_date and tx_amount:
-                transactions_list.append({
-                    'transaction_date': str(tx_date),
-                    'amount': float(tx_amount)
-                })
-        
-        if len(transactions_list) == 0:
-            return PredictionResponse(
-                success=False,
-                message="No valid transactions found with date and amount."
-            )
         
         # =====================================================================
         # STEP 5: Get prediction from ML model
@@ -213,6 +161,7 @@ async def predict_budget(request: PredictionRequest):
         # STEP 6: Return formatted response to Flutter
         # =====================================================================
         print(True)
+        print(result)
         return PredictionResponse(
             success=True,
             model_used=result['model_used'],
