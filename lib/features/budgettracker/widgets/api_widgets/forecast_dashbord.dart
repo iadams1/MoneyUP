@@ -32,6 +32,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
   PredictionResult? _result;
   bool _loading = true;
   String? _error;
+  List<Map<String, double>> _dailySpending = [];
 
   late AnimationController _controller;
   late Animation<double> _fadeIn;
@@ -53,11 +54,14 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
   Future<void> _fetchPrediction() async {
     try {
       final result = await _service.getPrediction(budgetId: widget.budgetId);
+      final daily = await _service.getTransactionSpending(budgetId: widget.budgetId);
+      
       setState(() {
         _result = result;
+        _dailySpending = daily;
         _loading = false;
-      });
-      _controller.forward(); // animate only after data arrives
+    });
+    _controller.forward();
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -98,7 +102,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
     categoryName: _result!.categoryName ?? 'Budget',
     spendingRangeLow: (_result!.predictedSpendingRange?['low'] as num?)?.toDouble() ?? 0,
     spendingRangeHigh: (_result!.predictedSpendingRange?['high'] as num?)?.toDouble() ?? 0,
-    dailySpending: const [],
+    dailySpending: _dailySpending,
   );
 
   return AnimatedBuilder(

@@ -40,36 +40,36 @@ class _BudgetPageState extends State<BudgetPage> {
   ValueNotifier<double> overallGoalAmount = ValueNotifier<double>(
     0,
   ); // Overall budget goal
-  ValueNotifier<double> goalSaved = ValueNotifier<double>(
+  ValueNotifier<double> goalSpent = ValueNotifier<double>(
     0,
   ); // Amount saved towards the goal
-  ValueNotifier<double> goalNeeded = ValueNotifier<double>(0);
+  ValueNotifier<double> goalRemain = ValueNotifier<double>(0);
 
   void initBudget(double saved, double goal, double needed) {
-    goalSaved.value = saved;
+    goalSpent.value = saved;
     overallGoalAmount.value = goal;
-    goalNeeded.value = needed;
+    goalRemain.value = needed;
     previousSaved = saved;
   }
 
   // Calculates the updated amounts based on user input
   void calculateBudget(double userAmount, bool isAddition) {
-    previousSaved = goalSaved.value;
+    previousSaved = goalSpent.value;
 
     if (isAddition) {
-      goalSaved.value += userAmount;
+      goalSpent.value += userAmount;
     } else {
-      if (goalSaved.value == 0) {
+      if (goalSpent.value == 0) {
         userAmount = 0;
       }
-      if (goalSaved.value - userAmount < 0) return;
-      goalSaved.value -= userAmount;
+      if (goalSpent.value - userAmount < 0) return;
+      goalSpent.value -= userAmount;
     }
 
-    goalNeeded.value = overallGoalAmount.value - goalSaved.value;
+    goalRemain.value = overallGoalAmount.value - goalSpent.value;
 
-    if (goalNeeded.value < 0) {
-      goalNeeded.value = 0;
+    if (goalRemain.value < 0) {
+      goalRemain.value = 0;
     }
   }
 
@@ -83,8 +83,8 @@ class _BudgetPageState extends State<BudgetPage> {
     try {
       await budgetService.updateBudget(
         budgetId: widget.budgetId,
-        amountSaved: goalSaved.value,
-        amountNeeded: goalNeeded.value,
+        amountSpent: goalSpent.value,
+        amountRemaining: goalRemain.value,
       );
 
       _didUpdate = true;
@@ -137,7 +137,7 @@ class _BudgetPageState extends State<BudgetPage> {
                         final double amount =
                             double.tryParse(enteredAmount) ?? 0.0;
 
-                        previousSaved = goalSaved.value;
+                        previousSaved = goalSpent.value;
                         calculateBudget(amount, isAddition);
                         await updateBudget();
                       }
@@ -187,7 +187,7 @@ class _BudgetPageState extends State<BudgetPage> {
       });
 
       if (!_initializedArrow) {
-        initBudget(budget.amountSaved, budget.goal, budget.amountNeeded);
+        initBudget(budget.amountSpent, budget.goal, budget.amountRemaining);
         _initializedArrow = true;
       }
     } catch (e) {
@@ -203,8 +203,8 @@ class _BudgetPageState extends State<BudgetPage> {
   @override
   void dispose() {
     overallGoalAmount.dispose();
-    goalSaved.dispose();
-    goalNeeded.dispose();
+    goalSpent.dispose();
+    goalRemain.dispose();
     super.dispose();
   }
 
@@ -384,7 +384,7 @@ class _BudgetPageState extends State<BudgetPage> {
                   SizedBox(height: 10),
 
                   ValueListenableBuilder(
-                    valueListenable: goalSaved,
+                    valueListenable: goalSpent,
                     builder: (context, currentSaved, _) {
                       IconData arrowIcon;
                       Color arrowColor;
@@ -418,7 +418,7 @@ class _BudgetPageState extends State<BudgetPage> {
                               radius: 120,
                               lineWidth: 38,
                               percent:
-                                  (goalSaved.value / overallGoalAmount.value)
+                                  (goalSpent.value / overallGoalAmount.value)
                                       .clamp(0.0, 1.0),
                               center: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -461,7 +461,7 @@ class _BudgetPageState extends State<BudgetPage> {
                   SizedBox(height: 20),
 
                   ValueListenableBuilder<double>(
-                    valueListenable: goalSaved,
+                    valueListenable: goalSpent,
                     builder: (context, spent, _) {
                       return Text(
                         "\$${spent.toStringAsFixed(2)} Spent",
@@ -476,7 +476,7 @@ class _BudgetPageState extends State<BudgetPage> {
                   SizedBox(height: 2),
 
                   ValueListenableBuilder<double>(
-                    valueListenable: goalNeeded,
+                    valueListenable: goalRemain,
                     builder: (context, remain, _) {
                       return Text(
                         "\$${remain.toStringAsFixed(2)} Remaining",

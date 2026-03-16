@@ -12,7 +12,7 @@ class BudgetView extends StatelessWidget{
   Widget build(BuildContext context) {
     final percent = budget.goal <= 0
         ? 0.0
-        : (budget.amountSaved / budget.goal).clamp(0.0, 1.0);
+        : (budget.amountSpent / budget.goal).clamp(0.0, 1.0);
 
     return Row(
       children: [
