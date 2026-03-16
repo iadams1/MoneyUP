@@ -29,7 +29,7 @@ Widget buildConfidenceBar(PredictionData data, Color statusColor) {
             'CONFIDENCE RANGE',
             style: TextStyle(
               fontFamily: 'SF Pro',
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
               color: ApiColors.textSecondary,
               letterSpacing: 1.4,
@@ -102,7 +102,7 @@ Widget buildConfidenceBar(PredictionData data, Color statusColor) {
                 'Low: \$${low.toStringAsFixed(0)}',
                 style: const TextStyle(
                   fontFamily: 'SF Pro',
-                  fontSize: 11,
+                  fontSize: 12,
                   color: ApiColors.textSecondary,
                 ),
               ),
@@ -110,7 +110,7 @@ Widget buildConfidenceBar(PredictionData data, Color statusColor) {
                 'Predicted: \$${predicted.toStringAsFixed(0)}',
                 style: TextStyle(
                   fontFamily: 'SF Pro',
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: statusColor,
                 ),
@@ -119,7 +119,7 @@ Widget buildConfidenceBar(PredictionData data, Color statusColor) {
                 'High: \$${high.toStringAsFixed(0)}',
                 style: const TextStyle(
                   fontFamily: 'SF Pro',
-                  fontSize: 11,
+                  fontSize: 12,
                   color: ApiColors.textSecondary,
                 ),
               ),

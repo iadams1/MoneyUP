@@ -33,7 +33,7 @@ class BudgetService {
   Future<void> insertBudget(
     String title,
     double goal,
-    double saved,
+    double spent,
     BudgetType type,
   ) async {
     try {
@@ -41,8 +41,8 @@ class BudgetService {
         'user_ID': user,
         'Title': title,
         'Goal': goal,
-        'AmountSaved': saved,
-        'AmountNeeded': (goal - saved),
+        'AmountSpent': spent,
+        'AmountRemaining': (goal - spent),
         'Category': type.label,
       });
     } catch (e) {
@@ -130,15 +130,15 @@ class BudgetService {
 
   Future<void> updateBudget({
     required dynamic budgetId, 
-    required double amountSaved, 
-    required double amountNeeded
+    required double amountSpent, 
+    required double amountRemaining
   }) async {
     try {
       await _client
           .from('budgets')
           .update({
-            'AmountSaved': amountSaved,
-            'AmountNeeded': amountNeeded,
+            'AmountSpent': amountSpent,
+            'AmountRemaining': amountRemaining,
           })
           .eq('budget_ID', budgetId)
           .select();

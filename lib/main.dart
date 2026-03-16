@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/budget_preview_forcast.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
 import 'package:moneyup/features/auth/screens/user_select.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
@@ -50,10 +49,8 @@ class MyApp extends StatelessWidget {
         '/verify': (context) => const VerificationScreen(email: ''),
         '/user': (context) => const UserSelectScreen(),
         '/start': (context) => const WelcomeScreen(),
-
-        // REMOVE THIS LATER
       },
-      initialRoute: '/',
+      initialRoute: '/home',
     );
   }
 }

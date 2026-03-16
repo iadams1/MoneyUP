@@ -1,5 +1,6 @@
  // ── Status Banner ────────────────────────────
   import 'package:flutter/material.dart';
+import 'package:moneyup/core/utils/formatters.dart';
 import 'package:moneyup/models/data_model.dart';
 
 Widget buildStatusBanner(PredictionData data, bool isOver, Color statusColor) {
@@ -32,17 +33,17 @@ Widget buildStatusBanner(PredictionData data, bool isOver, Color statusColor) {
               label,
               style: TextStyle(
                 fontFamily: 'SF Pro',
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
                 color: statusColor,
               ),
             ),
           ),
           Text(
-            '\$${data.predictedFinalSpending.toStringAsFixed(2)}',
+            Formatters.currency(data.predictedFinalSpending),
             style: TextStyle(
               fontFamily: 'SF Pro',
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: statusColor,
             ),

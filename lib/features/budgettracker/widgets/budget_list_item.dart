@@ -9,7 +9,6 @@ import '/models/budget.dart';
 import 'package:moneyup/budget_preview_forcast.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class BudgetListItem extends StatelessWidget {
   final Budget budget;
   final void Function(BuildContext context, dynamic budgetId) confirmDelete;
@@ -25,8 +24,8 @@ class BudgetListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String title = budget.title;
-    final double spent = budget.amountSaved;
-    final double remaining = budget.amountNeeded;
+    final double spent = budget.amountSpent;
+    final double remaining = budget.amountRemaining;
     final double percent = budget.percentComplete;
 
     return Padding(
@@ -39,8 +38,7 @@ class BudgetListItem extends StatelessWidget {
           dragDismissible: false,
           children: [
             SlidableAction(
-              onPressed: (_) =>
-                  confirmDelete(context, budget.budgetId),
+              onPressed: (_) => confirmDelete(context, budget.budgetId),
               icon: Icons.delete,
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
@@ -65,10 +63,8 @@ class BudgetListItem extends StatelessWidget {
                     radius: 28,
                     lineWidth: 9,
                     percent: percent,
-                    backgroundColor:
-                        const Color.fromARGB(6, 227, 50, 50),
-                    progressColor:
-                        getCategoryColor(budget.categoryId),
+                    backgroundColor: const Color.fromARGB(6, 227, 50, 50),
+                    progressColor: getCategoryColor(budget.categoryId),
                     circularStrokeCap: CircularStrokeCap.round,
                   ),
                 ),
@@ -80,6 +76,8 @@ class BudgetListItem extends StatelessWidget {
                     children: [
                       Text(
                         title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w600,
@@ -105,21 +103,21 @@ class BudgetListItem extends StatelessWidget {
                 ),
 
                 IconButton(
-                  icon: Image.asset(
-                    'assets/icons/chevronRightArrow.png',
-                  ),
+                  icon: Image.asset('assets/icons/chevronRightArrow.png'),
                   onPressed: () async {
-                    final didUpdate = await Navigator.push<bool>(context, MaterialPageRoute (
-                      builder: (_) => BudgetPage (
-                        budgetId: budget.budgetId,
-                        categoryId: budget.categoryId,
+                    final didUpdate = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BudgetPage(
+                          budgetId: budget.budgetId,
+                          categoryId: budget.categoryId,
+                        ),
                       ),
-                    ),
-                  );
+                    );
 
-                  if (didUpdate == true) {
-                    await onUpdated();
-                  }
+                    if (didUpdate == true) {
+                      await onUpdated();
+                    }
                   },
                 ),
                 const SizedBox(width: 10),

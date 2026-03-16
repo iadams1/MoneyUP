@@ -19,6 +19,7 @@ import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
 import 'package:moneyup/core/utils/formatters.dart';
+import 'package:moneyup/shared/widgets/streak_banner.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -35,6 +36,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _name;
   List<LinkedCard> _cards = [];
   bool _hasCheckedPlaidDialog = false;
+  int _currentStreak = 0;
+  int _longestStreak = 0;
+  List<bool> _weekLogins = List.filled(7, false);
+
 
   Map<int, double> spendingData = {};
   Map<int, String> categoryTitles = {};
@@ -62,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       profileService.loadProfileIcon();
       await _loadHome();
+      _loadStreakData();
     } catch (e, st) {
       debugPrint('Home init error: $e');
       debugPrintStack(stackTrace: st);
@@ -72,6 +78,35 @@ class _MyHomePageState extends State<MyHomePage> {
       // ScaffoldMessenger.of(
       //   context,
       // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+    }
+  }
+
+  Future<void> _loadStreakData() async {
+    try {
+      final shouldShowBanner = await streakService.recordUserStreak();
+      final streak = await streakService.fetchUserStreak();
+      final weekLogins = await streakService.fetchWeekLogins();
+
+      if (!mounted) return;
+
+      setState(() {
+        _currentStreak = streak.currentStreak;
+        _longestStreak = streak.longestStreak;
+        _weekLogins = weekLogins;
+      });
+
+      if (shouldShowBanner) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          StreakBanner.showStreakBanner(
+            context,
+            currentStreak: _currentStreak,
+            longestStreak: _longestStreak,
+            weekLogins: _weekLogins,
+          );
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading streak data: $e');
     }
   }
 

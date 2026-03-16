@@ -4,8 +4,8 @@ class Budget {
 
   final String title;
   final double goal;
-  final double amountSaved;
-  final double amountNeeded;
+  final double amountSpent;
+  final double amountRemaining;
 
   final String category;
   final int categoryId;
@@ -15,8 +15,8 @@ class Budget {
     required this.budgetId,
     required this.title,
     required this.goal,
-    required this.amountNeeded,
-    required this.amountSaved,
+    required this.amountSpent,
+    required this.amountRemaining,
     required this.category,
     required this.categoryId,
   });
@@ -27,13 +27,13 @@ class Budget {
       budgetId: json['budget_ID'],
       title: (json['Title'] ?? '') as String,
       goal: (json['Goal'] as num).toDouble(),
-      amountSaved: (json['AmountSaved'] as num).toDouble(),
-      amountNeeded: (json['AmountNeeded'] as num).toDouble(),
+      amountSpent: (json['AmountSpent'] as num).toDouble(),
+      amountRemaining: (json['AmountRemaining'] as num).toDouble(),
       category: (json['Category'] ?? '') as String,
       categoryId: (json['category_ID'] as int?) ?? 0,
     );
   }
 
   double get percentComplete =>
-      goal <= 0 ? 0.0 : (amountSaved / goal).clamp(0.0, 1.0);
+      goal <= 0 ? 0.0 : (amountSpent / goal).clamp(0.0, 1.0);
 }

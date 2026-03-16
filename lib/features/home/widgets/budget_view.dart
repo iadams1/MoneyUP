@@ -12,7 +12,7 @@ class BudgetView extends StatelessWidget {
   Widget build(BuildContext context) {
     final percent = budget.goal <= 0
         ? 0.0
-        : (budget.amountSaved / budget.goal).clamp(0.0, 1.0);
+        : (budget.amountSpent / budget.goal).clamp(0.0, 1.0);
 
     return Row(
       children: [
@@ -49,6 +49,8 @@ class BudgetView extends StatelessWidget {
               Text(
                 budget.title,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
