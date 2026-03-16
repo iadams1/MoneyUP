@@ -9,8 +9,9 @@ import '/features/home/widgets/no_spending_overview.dart';
 import '/features/home/widgets/greeting_text.dart';
 import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/first_time_plaid_connect.dart';
-import '/features/budgettracker/widgets/budget_view.dart';
-import '/features/budgettracker/widgets/no_budget_view.dart';
+import '/features/home/widgets/budget_view.dart';
+import '/features/home/widgets/no_budget_view.dart';
+import 'package:moneyup/services/notification_service.dart';
 import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
@@ -43,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Map<int, double> spendingData = {};
   Map<int, String> categoryTitles = {};
+  bool _hasShownHomeNotification = false;
 
   @override
   void initState() {
@@ -75,9 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
     }
   }
 
@@ -124,6 +126,18 @@ class _MyHomePageState extends State<MyHomePage> {
         _name = name;
         _isLoading = false;
       });
+
+      // ADD TEST NOTIFICATION HERE – after loading completes
+      if (!_hasShownHomeNotification) {
+        _hasShownHomeNotification = true;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) return;
+
+          // Small delay for smooth UX (UI fully rendered)
+          await Future.delayed(const Duration(milliseconds: 1200));
+        });
+      }
 
       if (!_hasCheckedPlaidDialog) {
         _hasCheckedPlaidDialog = true;
@@ -289,6 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+
               Container(
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),

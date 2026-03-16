@@ -177,6 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 onPressed: () {
                                                   // Proceed with logout...
                                                   _handleLogout();
+                                                  Navigator.pop(context, true);
                                                 },
                                                 child: const Text(
                                                   "Logout",

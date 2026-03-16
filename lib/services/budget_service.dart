@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/models/budget.dart';
-import 'package:moneyup/models/budget_type.dart';
-import 'package:moneyup/services/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '/models/budget.dart';
+import '/models/budget_type.dart';
+import '/services/service_locator.dart';
 
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
@@ -102,13 +103,13 @@ class BudgetService {
   }) async {
     
     final response = await _client
-        .from('budget_transactions')
+        .from('plaid_transactions')
         .select(
-          'category_table!inner(category_ID, Title), spendingAmount, transactionDate',
+          'category_table!inner(category_ID, Title), amount, authorized_date',
         )
-        .eq('user_ID', user)
-        .gte('transactionDate', start.toIso8601String().split("T")[0])
-        .lt('transactionDate', end.toIso8601String().split("T")[0]);
+        .eq('user_id', user)
+        .gte('date', start.toIso8601String().split("T")[0])
+        .lt('date', end.toIso8601String().split("T")[0]);
     
     return List<Map<String, dynamic>>.from(response);
   }

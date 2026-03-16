@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'filter_section_header.dart';
 
 class BankFilterSection extends StatelessWidget {

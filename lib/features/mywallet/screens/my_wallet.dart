@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '/features/home/screens/my_home_page.dart';
 import '/features/education/screens/education.dart';
-import '/features/transactions/screens/transactions_home.dart';
-import '/features/profile/screens/profile.dart';
 import '/features/mywallet/widgets/empty_wallet.dart';
 import '/features/mywallet/widgets/wallet_card.dart';
 import '/features/mywallet/widgets/linked_card_tile.dart';
 import '/features/mywallet/widgets/page_indicator.dart';
-import '/shared/widgets/app_avatar.dart';
+import '/features/profile/screens/profile.dart';
+import '/features/transactions/screens/transactions_home.dart';
+import '/features/home/screens/my_home_page.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/app_avatar.dart';
 import '/models/linked_card.dart';
 import '/services/plaid_service.dart';
 import '/services/service_locator.dart';

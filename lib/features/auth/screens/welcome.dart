@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-import 'package:moneyup/features/auth/screens/signup.dart';
+
+import '/features/auth/screens/signup.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -47,7 +48,6 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   textAlign: TextAlign.left,
                 ),
-                // SizedBox(height:10),
                 Text(
                   'Master your money-without the stress.',
                   style: TextStyle(
