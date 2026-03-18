@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/utils/formatters.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
+import '/core/utils/formatters.dart';
+import '/shared/widgets/app_avatar.dart';
 import '/models/budget_type.dart';
 import '/services/service_locator.dart';
 

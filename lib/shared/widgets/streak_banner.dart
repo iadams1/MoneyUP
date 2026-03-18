@@ -5,12 +5,14 @@ class StreakBanner extends StatelessWidget {
   final int currentStreak;
   final int longestStreak;
   final List<bool> weekLogins;
+  final bool showLongestStreak;
 
   const StreakBanner({
     super.key,
     required this.currentStreak,
     required this.longestStreak,
     required this.weekLogins,
+    this.showLongestStreak = true,
   });
 
   static void showStreakBanner(
@@ -109,19 +111,20 @@ class StreakBanner extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      "Longest streak: $longestStreak days",
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                    if (showLongestStreak) ...[
+                      const Spacer(),
+                      Text(
+                        "Longest streak: $longestStreak days",
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 14),
-
                 SizedBox(
                   width: double.infinity,
                   child: WeeklyLoginProgress(
@@ -132,7 +135,6 @@ class StreakBanner extends StatelessWidget {
               ],
             ),
           ),
-
         ),
       ),
     );

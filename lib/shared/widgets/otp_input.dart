@@ -69,22 +69,29 @@ class _OtpInputState extends State<OtpInput> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Opacity(
-            opacity: 0,
-            child: TextField(
-              controller: _codeController,
-              focusNode: _nodes,
-              keyboardType: TextInputType.number,
-              maxLength: widget.length,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(50),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: Opacity(
+              opacity: 0,
+              child: TextField(
+                controller: _codeController,
+                focusNode: _nodes,
+                keyboardType: TextInputType.number,
+                maxLength: widget.length,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                onChanged: (value) {
+                  setState(() {});
+                },
+                decoration: InputDecoration(
+                  counterText: '',
+                  border: InputBorder.none,
+                ),
               ),
             ),
           ),
@@ -114,9 +121,7 @@ class _OtpInputState extends State<OtpInput> {
                   Container(
                     width: 40,
                     height: 2,
-                    color: _isActive
-                    ? Colors.transparent
-                    : Colors.black,
+                    color: Colors.black,
                   ),
                 ],
               );

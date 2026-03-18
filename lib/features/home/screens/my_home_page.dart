@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
 import 'package:moneyup/features/budgettracker/utils/time_range.dart';
@@ -10,6 +9,8 @@ import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
 // import '/shared/widgets/profile_menu_card.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
+import 'package:moneyup/shared/widgets/notification_dialog.dart';
+import 'package:moneyup/shared/widgets/profile_menu_card.dart';
 import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
@@ -17,8 +18,8 @@ import '/models/linked_card.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
-import 'package:moneyup/core/utils/formatters.dart';
-import 'package:moneyup/shared/widgets/streak_banner.dart';
+import '/core/utils/formatters.dart';
+import '/shared/widgets/streak_banner.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -42,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Map<int, double> spendingData = {};
   Map<int, String> categoryTitles = {};
+  //bool _hasShownHomeNotification = false;
 
   @override
   void initState() {
@@ -259,8 +261,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Row(
                 children: [
-                  AppAvatar(size: 60),
-                  const SizedBox(width: 17),
+                  ProfileMenuCard(),
+                  const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -291,11 +293,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               Container(
-                alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -353,56 +357,58 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   color: Colors.white,
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 5.5),
-                    // MyWallet Card Widget
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
-                            child: SizedBox(
-                              width: 50,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => const MyWallet(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 5.5),
+                      // MyWallet Card Widget
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(8, 8, 4, 25),
+                              child: SizedBox(
+                                width: 50,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
-                                  );
-                                  await _init();
-                                },
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color.fromRGBO(25, 50, 100, 1),
-                                        Color.fromRGBO(47, 52, 126, 1),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const SizedBox(
-                                    width: 70,
-                                    height: 217,
-                                    child: Center(
-                                      child: Text(
-                                        "+",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w400,
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => const MyWallet(),
+                                      ),
+                                    );
+                                    await _init();
+                                  },
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(25, 50, 100, 1),
+                                          Color.fromRGBO(47, 52, 126, 1),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const SizedBox(
+                                      width: 70,
+                                      height: 217,
+                                      child: Center(
+                                        child: Text(
+                                          "+",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -410,28 +416,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 243,
-                            width: 330,
-                            child: PrimaryCardView(cards: _cards),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 243,
+                              width: 330,
+                              child: PrimaryCardView(cards: _cards),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // Article Card Widget
+                      // Article Card Widget
 
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                    // Budget Card Widget
-                    _buildBudgetCard(context),
+                      // Budget Card Widget
+                      _buildBudgetCard(context),
 
-                    const SizedBox(height: 30),
+                      const SizedBox(height: 30),
 
-                    // Monthly Spending Overview Widget
-                    _buildSpendingOverview(context),
-                  ],
+                      // Monthly Spending Overview Widget
+                      _buildSpendingOverview(context),
+                    ],
+                  ),
                 ),
               ),
             ),

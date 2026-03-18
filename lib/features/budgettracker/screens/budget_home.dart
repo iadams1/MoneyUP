@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:moneyup/core/utils/formatters.dart';
 
-import 'package:moneyup/shared/widgets/app_avatar.dart';
-import 'package:moneyup/shared/widgets/bottom_nav.dart';
 import '/features/budgettracker/ui/time_filter.dart';
 import '/features/budgettracker/utils/category_colors.dart';
 import '/features/budgettracker/utils/time_range.dart';
 import '/features/budgettracker/widgets/budget_listing_view.dart';
+import 'budget_creation.dart';
 import '/models/budget.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/core/utils/formatters.dart';
 import '/services/service_locator.dart';
-import 'budget_creation.dart';
+
 
 class BudgetGoalPage extends StatefulWidget {
   const BudgetGoalPage({super.key});
@@ -359,8 +360,8 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                             }).toList(),
                                           ),
                                         ),
-                                ),
-                              ),
+                                      ),
+                                    ),
                             ),
                           ],
                         ),

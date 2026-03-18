@@ -1,9 +1,10 @@
-import 'package:moneyup/models/streak_data.dart';
-import 'package:moneyup/services/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '/models/streak_data.dart';
+import '/services/service_locator.dart';
+
 class StreakService {
-  final SupabaseClient _client = Supabase.instance.client;
+  static final SupabaseClient _client = Supabase.instance.client;
 
   String get user => supabaseService.currentUserId!;
   
@@ -26,14 +27,16 @@ class StreakService {
         .from('user_streaks')
         .select('current_streak, longest_streak')
         .eq('user_ID', user)
-        .single();
+        .maybeSingle();
+
+    final weekLogins = await fetchWeekLogins();
 
     return StreakData(
-      currentStreak: response['current_streak'] ?? 0,
-      longestStreak: response['longest_streak'] ?? 0,
+      currentStreak: response?['current_streak'] ?? 0,
+      longestStreak: response?['longest_streak'] ?? 0,
+      weekLogins: weekLogins,
     );
   }
-
 
   String toDateOnly(DateTime date) {
     return date.toIso8601String().split('T').first;

@@ -1,6 +1,17 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+<<<<<<< HEAD
+=======
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+>>>>>>> origin/tran-Dan
+
+import '/models/notification_item.dart';
+import '/services/service_locator.dart';
 
 class NotificationService {
+  static final SupabaseClient _client = Supabase.instance.client;
+  String get user => supabaseService.currentUserId!;
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
 
@@ -74,4 +85,76 @@ class NotificationService {
       notificationDetails: details,
     );
   }
+<<<<<<< HEAD
 }
+=======
+
+  /// Schedule a notification for a future date/time
+  Future<void> scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledDate,
+    String? payload,
+  }) async {
+    await _notificationsPlugin?.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'moneyup_channel',
+          'MoneyUP Notifications',
+          channelDescription: 'Important alerts and updates',
+          importance: Importance.max, // HIGH importance ensures it shows
+          priority: Priority.high,
+          playSound: true,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
+    );
+  }
+
+  /// Cancel a specific notification – use NAMED 'id'
+  Future<void> cancel(int id) async {
+    await _notificationsPlugin?.cancel(id: id);
+  }
+
+  /// Cancel all notifications
+  Future<void> cancelAll() async {
+    await _notificationsPlugin?.cancelAll();
+  }
+
+  Future<List<NotificationItem>> fetchNotifications({int? limit}) async {
+    var query = _client
+      .from('notifications')
+      .select('id, title, body, created_at, is_read')
+      .eq('user_id', user)
+      .order('created_at', ascending: false);
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    final response = await query;
+    return (response as List).map((data) => NotificationItem(
+      id: data['id'],
+      title: data['title'],
+      message: data['body'],
+      time: DateTime.parse(data['created_at']),
+      isUnread: !(data['is_read'] ?? false),
+    )).toList();
+  }
+
+  Future<void> markAsRead(int notificationId) async {
+    await _client
+      .from('notifications')
+      .update({'is_read': true})
+      .eq('id', notificationId)
+      .eq('user_id', user);
+  }
+}
+>>>>>>> origin/tran-Dan

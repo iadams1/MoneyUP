@@ -1,13 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/features/auth/screens/verification.dart';
-import 'package:moneyup/services/auth_service.dart';
-import 'package:moneyup/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/core/constants/notificationtext.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+
+import '/features/auth/screens/login.dart';
+import '/features/auth/screens/verification.dart';
+import '/core/constants/notificationtext.dart';
+import '/services/auth_service.dart';
+import '/services/notification_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -256,7 +257,6 @@ class _SignUpState extends State<SignUpScreen> {
                                                 builder: (context) => VerificationScreen(email: _emailController.text.trim()),
                                                 // builder: (context) => PlaidConnectScreen(),
                                               ),
-                                              
                                             );
                                           }
                                         } on AuthException catch (error) {

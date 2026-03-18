@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/auth/screens/confirmation.dart';
-import 'package:moneyup/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '/features/auth/screens/confirmation.dart';
+import '/services/auth_service.dart';
+import '/shared/widgets/otp_input.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -35,7 +37,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please enter the full 6-digit code"),
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.red,
         ),
       );
       return;
@@ -181,26 +183,27 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: _codeController,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          maxLength: _codeLength,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            letterSpacing: 10,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '_ _ _ _ _ _',
-                            border: InputBorder.none,
-                            counterText: "",
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 40,
-                            ), // adjusted for better look
-                          ),
-                        ),
+                        OtpInput(),
+                        // TextFormField(
+                        //   controller: _codeController,
+                        //   keyboardType: TextInputType.number,
+                        //   textAlign: TextAlign.center,
+                        //   maxLength: _codeLength,
+                        //   style: const TextStyle(
+                        //     fontSize: 24,
+                        //     letterSpacing: 10,
+                        //   ),
+                        //   decoration: InputDecoration(
+                        //     hintText: '_ _ _ _ _ _',
+                        //     border: InputBorder.none,
+                        //     counterText: "",
+                        //     filled: true,
+                        //     fillColor: Colors.transparent,
+                        //     contentPadding: const EdgeInsets.symmetric(
+                        //       vertical: 40,
+                        //     ), // adjusted for better look
+                        //   ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 20.0,

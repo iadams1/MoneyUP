@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '/features/home/screens/my_home_page.dart';
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/notification_dialog.dart';
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;
@@ -106,7 +107,10 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

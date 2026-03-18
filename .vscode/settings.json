@@ -19,9 +19,14 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
+<<<<<<< HEAD
   // "cmake.sourceDirectory": "C:/Users/Dan/Documents/MoneyUP/windows",
   // "java.configuration.updateBuildConfiguration": "interactive",
   // "cmake.sourceDirectory": "C:/Users/IJAda/Downloads/MoneyUP/windows",
   // "cSpell.words": ["supabase"],
   // "python-envs.defaultEnvManager": "ms-python.python:system"
+=======
+  "cmake.sourceDirectory": "C:/Users/Dan/Documents/MoneyUP/windows",
+  "java.configuration.updateBuildConfiguration": "interactive"
+>>>>>>> origin/tran-Dan
 }

@@ -8,6 +8,7 @@ import '/features/education/screens/viewallarticles.dart';
 import '/models/article.dart';
 import '/models/daily_tip.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/notification_dialog.dart';
 import '/shared/widgets/profile_menu_card.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/features/education/widgets/article_card.dart';
@@ -127,7 +128,10 @@ class _EducationScreenState extends State<EducationScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
