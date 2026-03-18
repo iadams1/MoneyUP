@@ -7,7 +7,6 @@ import '/features/budgettracker/utils/category_colors.dart';
 import '/models/budget.dart';
 import '/core/utils/formatters.dart';
 
-
 class BudgetListItem extends StatelessWidget {
   final Budget budget;
   final void Function(BuildContext context, dynamic budgetId) confirmDelete;

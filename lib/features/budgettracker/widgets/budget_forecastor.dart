@@ -6,6 +6,7 @@ import 'package:moneyup/shared/screen/loading_screen.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 
 import 'package:moneyup/features/home/screens/my_home_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
@@ -14,7 +15,7 @@ import '/features/transactions/screens/transactions_home.dart';
 class PredictiveBudgetForecastor extends StatefulWidget {
   final String budgetName;
   final double goalAmount;
-  final int budgetId;
+  final String budgetId;
 
   const PredictiveBudgetForecastor({
     super.key,
@@ -128,14 +129,14 @@ class _PredictiveBudgetForecastorState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 270,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 25),
-                                    child: Text(
+                            Flexible(
+                              // 👈 Replace the SizedBox with Flexible
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 25),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
                                       widget.budgetName,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -145,21 +146,22 @@ class _PredictiveBudgetForecastorState
                                         height: 1,
                                       ),
                                     ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    "Predictive Forecastor",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 21,
-                                      color: const Color.fromARGB(51, 0, 0, 0),
+                                    Text(
+                                      "Predictive Forecastor",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 21,
+                                        color: const Color.fromARGB(
+                                          51,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
 
                             Padding(
@@ -216,8 +218,8 @@ class _PredictiveBudgetForecastorState
                       padding: EdgeInsets.only(left: 16, right: 16, top: 4),
                       child: SingleChildScrollView(
                         child: BudgetPredictionChart(
-                          userId: 'preview-user',
-                          budgetId: 1 //widget.budgetId,
+                          userId: Supabase.instance.client.auth.currentUser!.id,
+                          budgetId: widget.budgetId, //widget.budgetId,
                         ),
                       ),
                     ),

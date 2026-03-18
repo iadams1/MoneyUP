@@ -11,6 +11,7 @@ import '/models/budget.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class BudgetPage extends StatefulWidget {
@@ -139,8 +140,67 @@ class _BudgetPageState extends State<BudgetPage> {
                         previousSaved = goalSpent.value;
                         calculateBudget(amount, isAddition);
                         await updateBudget();
+                        if (isAddition) {
+                          try {
+                            final userId =
+                                Supabase.instance.client.auth.currentUser?.id;
+                            print(
+                              'Logging spend - userId: $userId, budgetId: ${widget.budgetId}, amount: $amount',
+                            );
+
+                            if (userId != null) {
+                              final payload = {
+                                'budget_id': widget.budgetId,
+                                'user_id': userId,
+                                'amount': amount,
+                                'log_date': DateTime.now()
+                                    .toIso8601String()
+                                    .split('T')[0],
+                              };
+                              print('Payload being sent: $payload');
+                              print('budgetId value: ${widget.budgetId}');
+                              print(
+                                'budgetId type: ${widget.budgetId.runtimeType}',
+                              );
+                              final response = await Supabase.instance.client
+                                  .from('budget_logs')
+                                  .insert({
+                                    'budget_id': widget.budgetId,
+                                    'user_id': userId,
+                                    'amount': amount,
+                                    'log_date': DateTime.now()
+                                        .toIso8601String()
+                                        .split('T')[0],
+                                  });
+                              print('Budget log insert response: $response');
+                            } else {
+                              print('No user logged in');
+                            }
+                          } catch (e) {
+                            print('Error logging spend to ML: $e');
+                            debugPrint('Error logging spend to ML: $e');
+                          }
+                        }
+                        // Log to budget_logs for ML model (only when adding spending)
+                        // if (isAddition) {
+                        //   try {
+                        //     final userId = Supabase.instance.client.auth.currentUser?.id;
+                        //     if (userId != null) {
+                        //       await Supabase.instance.client
+                        //           .from('budget_logs')
+                        //           .insert({
+                        //             'budget_id': widget.budgetId,
+                        //             'user_id': userId,
+                        //             'amount': amount,
+                        //             'log_date': DateTime.now().toIso8601String().split('T')[0],
+                        //           });
+                        //     }
+                        //   } catch (e) {
+                        //     debugPrint('Error logging spend to ML: $e');
+                        //   }
+                        // }
                       }
-                      Navigator.pop(context, _didUpdate);
+                      if (context.mounted) Navigator.pop(context, _didUpdate);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -296,7 +356,7 @@ class _BudgetPageState extends State<BudgetPage> {
                                     MaterialPageRoute(
                                       builder: (_) =>
                                           PredictiveBudgetForecastor(
-                                            budgetId: 1,
+                                            budgetId: widget.budgetId.toString(),
                                             budgetName: budget!.title,
                                             goalAmount: budget.goal,
                                           ),

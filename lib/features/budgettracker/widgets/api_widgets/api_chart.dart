@@ -33,7 +33,11 @@ Widget buildChart(
 
   final spots = buildActualSpots(data);
   final projectedSpots = buildProjectedSpots(spots, data);
-  final maxY = (data.spendingRangeHigh * 1.15).ceilToDouble();
+  final maxY = ([
+    data.spendingRangeHigh * 1.15,
+    data.budgetAmount * 1.15,
+    data.predictedFinalSpending * 1.15,
+  ]).reduce((a, b) => a > b ? a : b).ceilToDouble();
 
   return Container(
     height: 220,
@@ -50,6 +54,28 @@ Widget buildChart(
         minY: 0,
         maxY: maxY,
         clipData: const FlClipData.all(),
+        lineTouchData: LineTouchData(
+          enabled: true,
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipItems: (touchedSpots) {
+              return touchedSpots.map((spot) {
+                if (spot.x == 0) return null;
+                final now = DateTime.now();
+                final date = DateTime(now.year, now.month, spot.x.toInt());
+                final dateStr = '${_monthName(date.month)} ${date.day}';
+                return LineTooltipItem(
+                  '$dateStr\n\$${spot.y.toStringAsFixed(2)}',
+                  const TextStyle(
+                    fontFamily: 'SF Pro',
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -82,15 +108,23 @@ Widget buildChart(
             sideTitles: SideTitles(
               showTitles: true,
               interval: 10,
-              getTitlesWidget: (val, _) => Text(
-                'Day ${val.toInt()}',
-                style: const TextStyle(
-                  fontFamily: 'SF Pro',
-                  fontSize: 10,
-                  color: ApiColors.textSecondary,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
+              getTitlesWidget: (val, _) {
+                if (val == 0) return const SizedBox.shrink();
+                final now = DateTime.now();
+                final date = DateTime(now.year, now.month, val.toInt());
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    '${_monthName(date.month)} ${date.day}',
+                    style: const TextStyle(
+                      fontFamily: 'SF Pro',
+                      fontSize: 10,
+                      color: ApiColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           topTitles: const AxisTitles(
@@ -188,4 +222,22 @@ Widget buildChart(
       ),
     ),
   );
+}
+
+String _monthName(int month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month - 1];
 }
