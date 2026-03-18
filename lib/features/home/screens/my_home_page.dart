@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/shared/widgets/notification_dialog.dart';
+import 'package:moneyup/shared/widgets/profile_menu_card.dart';
 
 import '/features/budgettracker/ui/time_filter.dart';
 import '/features/budgettracker/utils/time_range.dart';
 import '/features/home/widgets/monthly_spending_overview_view.dart';
 import '/features/home/widgets/no_spending_overview.dart';
 import '/features/home/widgets/greeting_text.dart';
-import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/first_time_plaid_connect.dart';
 import '/features/home/widgets/budget_view.dart';
 import '/features/home/widgets/no_budget_view.dart';
-import 'package:moneyup/services/notification_service.dart';
 import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
@@ -19,6 +17,7 @@ import '/models/linked_card.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/first_time_plaid_connect.dart';
 import '/core/utils/formatters.dart';
 import '/shared/widgets/streak_banner.dart';
 
@@ -272,8 +271,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Row(
                 children: [
-                  AppAvatar(size: 60),
-                  const SizedBox(width: 17),
+                  ProfileMenuCard(),
+                  const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -303,15 +302,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-
               Container(
-                alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (_) => NotificationDialog()),
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
                     );
                   },
                   icon: Icon(

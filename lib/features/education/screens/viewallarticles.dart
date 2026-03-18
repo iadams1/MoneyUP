@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/features/education/widgets/article_card.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/notification_dialog.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
@@ -78,7 +79,10 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

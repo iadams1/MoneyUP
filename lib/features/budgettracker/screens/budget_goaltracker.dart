@@ -4,7 +4,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/features/budgettracker/widgets/budget_forecastor.dart';
 import '/features/budgettracker/utils/category_colors.dart';
-import '/features/budgettracker/utils/category_colors.dart';
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';

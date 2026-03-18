@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/features/profile/widgets/profile_menu.dart';
-import 'package:moneyup/services/auth_service.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
-import 'package:moneyup/shared/widgets/bottom_nav.dart';
+
+import '/features/auth/screens/login.dart';
+import '/features/profile/widgets/profile_menu.dart';
+import '/services/auth_service.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/notification_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -58,7 +60,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // TODO: Implement notifications
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: const Icon(
                     Icons.notifications_outlined,
@@ -112,95 +117,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         onPressed: () async {
-                                final confirmed = await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text(
-                                      'Log Out',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 27,
-                                      ),
-                                    ),
-                                    content: Padding(
-                                      padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
-                                      child: Text(
-                                        'Are you sure you want to log out?',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 17,
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                'Log Out',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 27,
+                                ),
+                              ),
+                              content: Padding(
+                                padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
+                                child: Text(
+                                  'Are you sure you want to log out?',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                              ),
+                              backgroundColor: Colors.white,
+                              actions: [
+                                Center(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () => Navigator.pop(
+                                            context,
+                                            false,
+                                          ),
+                                          child: const Text(
+                                            "Cancel",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    backgroundColor: Colors.white,
-                                    actions: [
-                                      Center(
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                  context,
-                                                  false,
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                  255,
+                                                  184,
+                                                  27,
+                                                  27,
                                                 ),
-                                                child: const Text(
-                                                  "Cancel",
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.black,
+                                            padding: EdgeInsets.zero,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    20,
                                                   ),
-                                                ),
-                                              ),
                                             ),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color.fromARGB(
-                                                        255,
-                                                        184,
-                                                        27,
-                                                        27,
-                                                      ),
-                                                  padding: EdgeInsets.zero,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  // Proceed with logout...
-                                                  _handleLogout();
-                                                  Navigator.pop(context, true);
-                                                },
-                                                child: const Text(
-                                                  "Logout",
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
+                                          ),
+                                          onPressed: () {
+                                            // Proceed with logout...
+                                            _handleLogout();
+                                            Navigator.pop(context, true);
+                                          },
+                                          child: const Text(
+                                            "Logout",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
+                                ),
+                              ],
+                            ),
+                          );
 
-                                if (confirmed != true) return;
+                          if (confirmed != true) return;
 
-                                // Proceed with logout...
-                                _handleLogout();
-                              },
+                          // Proceed with logout...
+                          _handleLogout();
+                        },
                         child: Ink(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(

@@ -22,7 +22,7 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   // Add password visibility state
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -171,8 +171,9 @@ class _LoginState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   if (!(_formkey.currentState?.validate() ??
-                                      false))
+                                      false)) {
                                     return;
+                                  }
 
                                   try {
                                     await AuthService().login(

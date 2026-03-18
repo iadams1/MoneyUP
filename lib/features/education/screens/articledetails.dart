@@ -9,6 +9,7 @@ import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/notification_dialog.dart';
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;
@@ -106,7 +107,10 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showDialog(
+                      context: context,
+                      builder: (_) => const NotificationDialog(),
+                    );
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

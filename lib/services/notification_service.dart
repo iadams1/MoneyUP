@@ -1,8 +1,14 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '/models/notification_item.dart';
+import '/services/service_locator.dart';
+
 class NotificationService {
+  static final SupabaseClient _client = Supabase.instance.client;
+  String get user => supabaseService.currentUserId!;
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
@@ -124,5 +130,34 @@ Future<void> initialize() async {
   /// Cancel all notifications
   Future<void> cancelAll() async {
     await _notificationsPlugin?.cancelAll();
+  }
+
+  Future<List<NotificationItem>> fetchNotifications({int? limit}) async {
+    var query = _client
+      .from('notifications')
+      .select('id, title, body, created_at, is_read')
+      .eq('user_id', user)
+      .order('created_at', ascending: false);
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    final response = await query;
+    return (response as List).map((data) => NotificationItem(
+      id: data['id'],
+      title: data['title'],
+      message: data['body'],
+      time: DateTime.parse(data['created_at']),
+      isUnread: !(data['is_read'] ?? false),
+    )).toList();
+  }
+
+  Future<void> markAsRead(int notificationId) async {
+    await _client
+      .from('notifications')
+      .update({'is_read': true})
+      .eq('id', notificationId)
+      .eq('user_id', user);
   }
 }
