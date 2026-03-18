@@ -14,7 +14,7 @@ import 'package:moneyup/services/service_locator.dart';
 // ─────────────────────────────────────────────
 class BudgetPredictionChart extends StatefulWidget {
   final String userId;
-  final int budgetId;
+  final String budgetId;
 
   const BudgetPredictionChart({
     super.key, 
@@ -32,7 +32,6 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
   PredictionResult? _result;
   bool _loading = true;
   String? _error;
-  List<Map<String, double>> _dailySpending = [];
 
   late AnimationController _controller;
   late Animation<double> _fadeIn;
@@ -47,18 +46,15 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
     );
     _fadeIn = CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.4, curve: Curves.easeOut));
     _lineGrow = CurvedAnimation(parent: _controller, curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic));
-    _controller.forward();
     _fetchPrediction();
   }
 
   Future<void> _fetchPrediction() async {
     try {
       final result = await _service.getPrediction(budgetId: widget.budgetId);
-      final daily = await _service.getTransactionSpending(budgetId: widget.budgetId);
       
       setState(() {
         _result = result;
-        _dailySpending = daily;
         _loading = false;
     });
     _controller.forward();
@@ -91,7 +87,19 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
     return Center(child: Text(_result?.message ?? 'No data', style: const TextStyle(color: Colors.white)));
   }
 
-  // convert _result to PredictionData for the chart methods
+    // Build simple chart points from current data
+  final today = DateTime.now().day.toDouble();
+  final currentSpent = _result!.currentSpent ?? 0;
+  final dailyRate = _result!.currentSpent! / today;
+
+  final List<Map<String, double>> chartPoints = [];
+  for (int day = 1; day <= today.toInt(); day++) {
+    chartPoints.add({
+      'day': day.toDouble(),
+      'cumulative': dailyRate * day,
+    });
+  }
+
   final data = PredictionData(
     budgetAmount: _result!.budgetAmount ?? 0,
     currentSpent: _result!.currentSpent ?? 0,
@@ -102,7 +110,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
     categoryName: _result!.categoryName ?? 'Budget',
     spendingRangeLow: (_result!.predictedSpendingRange?['low'] as num?)?.toDouble() ?? 0,
     spendingRangeHigh: (_result!.predictedSpendingRange?['high'] as num?)?.toDouble() ?? 0,
-    dailySpending: _dailySpending,
+    dailySpending: chartPoints, // ✅ synthetic daily points
   );
 
   return AnimatedBuilder(
