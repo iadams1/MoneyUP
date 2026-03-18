@@ -26,8 +26,10 @@ class RealtimeNotificationService {
 
             final data = payload.newRecord;
 
-            NotificationService().showNotification(
-              id: DateTime.now().millisecondsSinceEpoch,
+            NotificationService().showNotification
+            (
+              id: DateTime.now().millisecondsSinceEpoch % 2147483647,
+
               title: data['title'] ?? 'No Title',
               body: data['body'] ?? 'No Body',
             );
