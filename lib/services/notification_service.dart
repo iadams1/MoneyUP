@@ -6,7 +6,7 @@ import '/models/notification_item.dart';
 import '/services/service_locator.dart';
 
 class NotificationService {
-  static final SupabaseClient _client = Supabase.instance.client;
+  final SupabaseClient _client = Supabase.instance.client;
 
   String get user => supabaseService.currentUserId!;
 
@@ -127,7 +127,7 @@ class NotificationService {
   Future<List<NotificationItem>> fetchNotifications({int? limit}) async {
     var query = _client
       .from('notifications')
-      .select('id, title, body, created_at, is_read')
+      .select('*')
       .eq('user_id', user)
       .order('created_at', ascending: false);
 

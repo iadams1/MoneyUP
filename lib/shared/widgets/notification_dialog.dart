@@ -151,7 +151,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
                     return Center(child: CircularProgressIndicator());
                   }
                   final notifications = notifSnapshot.data!;
-                  print(notifications);
+                  //print(notifications);
                   if (notifSnapshot.data!.isEmpty) {
                     return Center(
                       child: Text('No notifications'),
@@ -173,7 +173,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
                               notifItem: notif,
                               onTap: () async {
                                 if (notif.isUnread) {
-                                  await NotificationService().markAsRead(notif.id!);
+                                  await NotificationService().markAsRead(notif.id);
 
                                   setState(() {
                                     notif.isUnread = false;

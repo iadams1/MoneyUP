@@ -114,11 +114,19 @@ async def predict_budget(request: PredictionRequest):
                 success=False,
                 message="No spending recorded yet for this budget."
             )
-        
-        transactions_list = [{
-            'transaction_date': str(date.today()),
-            'amount': amount_spent
-        }]
+
+        # Spread AmountSpent evenly across days of month so far
+        today = date.today()
+        day_of_month = today.day
+        amount_per_day = amount_spent / day_of_month
+
+        transactions_list = []
+        for day in range(1, day_of_month + 1):
+            point_date = date(today.year, today.month, day)
+            transactions_list.append({
+                'transaction_date': str(point_date),
+                'amount': amount_per_day
+            })
         
         # =====================================================================
         # STEP 4: Format data for ML model

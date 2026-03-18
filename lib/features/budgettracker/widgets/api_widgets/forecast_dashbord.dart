@@ -73,7 +73,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart> with Sing
   }
 
   bool get _isOver => _result?.status == 'over';
-  Color get _statusColor => _isOver ? ApiColors.danger :ApiColors. accent;
+  Color get _statusColor => _isOver ? const Color.fromARGB(255, 170, 49, 70) :ApiColors. accent;
 
   @override
   Widget build(BuildContext context) {
