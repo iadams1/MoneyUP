@@ -2,13 +2,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_service.dart';
 
 class RealtimeNotificationService {
-
   final _supabase = Supabase.instance.client;
 
   void startListening(String userId) {
+    print("📡 Starting realtime listener for user: $userId");
 
-    _supabase
-        .channel('notifications_channel')
+    final channel = _supabase.channel('notifications_channel');
+
+    channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
           schema: 'public',
@@ -18,18 +19,30 @@ class RealtimeNotificationService {
             column: 'user_id',
             value: userId,
           ),
-          callback: (payload) {
+          callback: (payload) 
+          {
+            print("📩 REALTIME EVENT RECEIVED");
+            print("📦 Payload: ${payload.newRecord}");
 
             final data = payload.newRecord;
 
             NotificationService().showNotification(
               id: DateTime.now().millisecondsSinceEpoch,
-              title: data['title'],
-              body: data['body'],
+              title: data['title'] ?? 'No Title',
+              body: data['body'] ?? 'No Body',
             );
-
           },
         )
-        .subscribe();
+        .subscribe((status, [error]) {
+          print("📡 SUB STATUS: $status");
+
+          if (error != null) {
+            print("❌ REALTIME ERROR: $error");
+          }
+
+          if (status == RealtimeSubscribeStatus.subscribed) {
+            print("✅ REALTIME CONNECTED");
+          }
+        });
   }
 }

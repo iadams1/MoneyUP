@@ -6,6 +6,8 @@ import 'package:form_field_validator/form_field_validator.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/services/realtime_notifications.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -176,12 +178,26 @@ class _LoginState extends State<LoginScreen> {
                                     return;
                                   }
 
-                                  try {
+                                  try 
+                                  {
                                     await AuthService().login(
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
                                     );
 
+                                    //REALTIME NOTIFICATION START AFTER LOGIN
+                                    Supabase.instance.client.auth.onAuthStateChange.listen((data) 
+                                    {
+                                      final session = data.session;
+
+                                      if (session != null) {
+                                        print("🔥 Auth state changed → starting realtime");
+
+                                        RealtimeNotificationService()
+                                            .startListening(session.user.id);
+                                      }
+                                    });
+                                    
                                     if (!mounted) return;
 
                                     Navigator.pushReplacement(

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
 import 'package:moneyup/features/auth/screens/user_select.dart';
@@ -10,31 +11,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/services/plaid_service.dart';
-import 'package:moneyup/services/notification_service.dart'; //custom
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:moneyup/services/realtime_notifications.dart';
+import 'package:moneyup/services/notification_service.dart';
 
-void getToken() async 
-{
+void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
-  // print("FCM TOKEN: $token");
-}
-
-void startRealtime() 
-{
-  final user = Supabase.instance.client.auth.currentUser;
-
-  if (user != null) {
-    RealtimeNotificationService().startListening(user.id);
-  }
+  print("FCM TOKEN: $token"); //Debug
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await dotenv.load(fileName: ".env");
 
-  // Initialize notifications first
+  //Initialize notifications FIRST
   await NotificationService().initialize();
 
   await Supabase.initialize(
@@ -43,14 +32,14 @@ void main() async {
   );
 
   final prefs = await SharedPreferences.getInstance();
-  final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? true;
+  final hasSeenOnboarding =
+      prefs.getBool('hasSeenOnboarding') ?? true;
 
   runApp(MyApp(showHome: hasSeenOnboarding));
-
-  startRealtime();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget 
+{
   final bool showHome;
   const MyApp({super.key, required this.showHome});
 
