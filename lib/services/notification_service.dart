@@ -6,7 +6,7 @@ import '/models/notification_item.dart';
 import '/services/service_locator.dart';
 
 class NotificationService {
-  final SupabaseClient _client = Supabase.instance.client;
+  static final SupabaseClient _client = Supabase.instance.client;
 
   String get user => supabaseService.currentUserId!;
 

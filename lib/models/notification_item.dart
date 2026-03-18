@@ -1,5 +1,5 @@
 class NotificationItem {
-  final int id;
+  final dynamic id;
   final String title;
   final String message;
   final DateTime time;

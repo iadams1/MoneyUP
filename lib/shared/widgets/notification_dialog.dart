@@ -147,11 +147,16 @@ class _NotificationDialogState extends State<NotificationDialog> {
                       ),
                     );
                   }
+                  if (notifSnapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${notifSnapshot.error}'),
+                    );
+                  }
                   if (!notifSnapshot.hasData) {
                     return Center(child: CircularProgressIndicator());
                   }
                   final notifications = notifSnapshot.data!;
-                  //print(notifications);
+                  print(notifications);
                   if (notifSnapshot.data!.isEmpty) {
                     return Center(
                       child: Text('No notifications'),
