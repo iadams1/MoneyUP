@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
-import 'package:moneyup/services/notification_service.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
 import 'package:moneyup/features/budgettracker/utils/time_range.dart';
 import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
 import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
-import '/features/home/widgets/greeting_text.dart';
-import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/first_time_plaid_connect.dart';
 // import '/shared/widgets/profile_menu_card.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';

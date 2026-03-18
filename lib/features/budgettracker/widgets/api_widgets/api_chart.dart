@@ -165,7 +165,7 @@ Widget buildChart(
             dotData: FlDotData(
               show: true,
               checkToShowDot: (spot, _) => spot == spots.last,
-              getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
+              getDotPainter: (_, _, _, _) => FlDotCirclePainter(
                 radius: 5,
                 color: statusColor,
                 strokeWidth: 2,
