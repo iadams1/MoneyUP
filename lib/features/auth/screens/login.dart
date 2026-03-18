@@ -110,10 +110,6 @@ class _LoginState extends State<LoginScreen> {
                           ),
                           Padding(
                             // PASSWORD ENTRY
-<<<<<<< HEAD
-                            // PASSWORD ENTRY – with show/hide toggle
-=======
->>>>>>> origin/tran-Dan
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,

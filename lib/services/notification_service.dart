@@ -1,18 +1,17 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-<<<<<<< HEAD
-=======
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
->>>>>>> origin/tran-Dan
 
 import '/models/notification_item.dart';
 import '/services/service_locator.dart';
 
 class NotificationService {
   static final SupabaseClient _client = Supabase.instance.client;
+
   String get user => supabaseService.currentUserId!;
+
   static final NotificationService _instance = NotificationService._internal();
+
   factory NotificationService() => _instance;
 
   NotificationService._internal();
@@ -85,11 +84,8 @@ class NotificationService {
       notificationDetails: details,
     );
   }
-<<<<<<< HEAD
-}
-=======
 
-  /// Schedule a notification for a future date/time
+    /// Schedule a notification for a future date/time
   Future<void> scheduleNotification({
     required int id,
     required String title,
@@ -157,4 +153,3 @@ class NotificationService {
       .eq('user_id', user);
   }
 }
->>>>>>> origin/tran-Dan
