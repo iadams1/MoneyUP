@@ -125,13 +125,17 @@ class _NotificationDialogState extends State<NotificationDialog> {
                             child: NotificationCard(
                               notifItem: notif,
                               onTap: () async {
-                                if (notif.isUnread && notif.id != null) {
-                                  await NotificationService().markAsRead(notif.id!);
+                                if (notif.id == null) return;
+                                final wasUnread = notif.isUnread;
 
-                                  setState(() {
-                                    notif.isUnread = false;
-                                  });
-                                }
+                                await NotificationService().markAsRead(
+                                  notificationId: notif.id!,
+                                  isCurrentlyUnread: wasUnread
+                                );
+
+                                setState(() {
+                                  notif.isUnread = !wasUnread;
+                                });
                               },
                             ),
                           ),
