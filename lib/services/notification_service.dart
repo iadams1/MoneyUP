@@ -50,6 +50,46 @@ class NotificationService {
     //REQUEST PERMISSION (Android 13+)
     final granted = await androidPlugin?.requestNotificationsPermission();
     print("🔔 Notification permission granted: $granted"); //FORCE
+  Future<void> initialize() async {
+    _notificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    // Initialize timezone
+    tz.initializeTimeZones();
+
+    // Android init settings
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    // iOS settings
+    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    // Initialize plugin
+    await _notificationsPlugin!.initialize(
+      settings: initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+    );
+
+    // Create Android notification channel
+    await _notificationsPlugin!
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+  }
+
+  // Handle notification tap (when app opens from notification)
+  static void _onNotificationTap(NotificationResponse response) {
+    final payload = response.payload;
+    print('Notification tapped with payload: $payload');
+    // Add navigation logic later if needed (e.g., deep link handling)
   }
 
   Future<void> showNotification({
@@ -136,6 +176,7 @@ class NotificationService {
     }
 
     final response = await query;
+
     return (response as List).map((data) => NotificationItem(
       id: data['id'],
       title: data['title'],
@@ -145,7 +186,7 @@ class NotificationService {
     )).toList();
   }
 
-  Future<void> markAsRead(int notificationId) async {
+  Future<void> markAsRead(String notificationId) async {
     await _client
       .from('notifications')
       .update({'is_read': true})
