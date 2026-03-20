@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/models/streak_data.dart';
-import 'package:moneyup/services/streak_service.dart';
+import 'package:hexcolor/hexcolor.dart';
 
+import '/models/streak_data.dart';
 import '/models/notification_item.dart';
 import '/services/notification_service.dart';
+import '/services/streak_service.dart';
 import '/shared/widgets/notification_card.dart';
 import '/shared/widgets/streak_banner.dart';
 
@@ -15,67 +16,17 @@ class NotificationDialog extends StatefulWidget{
 }
 
 class _NotificationDialogState extends State<NotificationDialog> {
-  late Future<List<NotificationItem>> _notifications;
   late Future<StreakData> _streak;
+  late Future<List<NotificationItem>> _allNotifications;
+  bool _showSeeAll = false;
 
   @override
   void initState() {
     super.initState();
-    _notifications = NotificationService().fetchNotifications(limit: 2);
+    _allNotifications = NotificationService().fetchNotifications();
     _streak = StreakService().fetchUserStreak();
   }
 
-  void _showAllNotifications(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return FutureBuilder<List<NotificationItem>>(
-          future: NotificationService().fetchNotifications(), 
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                ),
-              );
-            }
-            final all = snapshot.data!;
-
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20)
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Text(
-                      'All Notifications',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'SF Pro',
-                        fontWeight: FontWeight.w600
-                      ),
-                    ),
-                    SizedBox(height:10),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: all.length,
-                        itemBuilder: (_, i) => Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          child: NotificationCard(notifItem: all[i]),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        );
-      }
-    );
-  }
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -138,7 +89,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
             ),
             Expanded(
               child: FutureBuilder<List<NotificationItem>>(
-                future: _notifications,
+                future: _allNotifications,
                 builder: (context, notifSnapshot) {
                   if (notifSnapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -151,18 +102,20 @@ class _NotificationDialogState extends State<NotificationDialog> {
                     return Center(child: CircularProgressIndicator());
                   }
                   final notifications = notifSnapshot.data!;
-                  print(notifications);
+
                   if (notifSnapshot.data!.isEmpty) {
                     return Center(
-                      child: Text('No notifications'),
+                      child: Text('No recent notifications'),
                     );
                   }
-
-                  final hasMore = notifications.length == 2;
+                  final preview = notifications.take(2).toList();
+                  final hasMore = notifications.length > 2;
+                  final allNotifications = notifSnapshot.data!;
+                  final visible = _showSeeAll ? allNotifications : preview;
 
                   return ListView(
                     children: [
-                      ...notifications.map((notif) {
+                      ...visible.map((notif) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           child: Container(
@@ -185,28 +138,36 @@ class _NotificationDialogState extends State<NotificationDialog> {
                         );
                       }),
                       if (hasMore)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        child: GestureDetector(
-                          onTap: () => _showAllNotifications(context),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white
-                            ),
-                            child: Center(
-                              child: Text(
-                                'See All',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showSeeAll = !_showSeeAll;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  colors: [HexColor('#124074'), HexColor('#332677')],
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  _showSeeAll ? 'Show Less' : 'See All',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      ),
+                          )
+                        ),
+                        
                     ],
                   );
                 },

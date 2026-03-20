@@ -286,7 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       // Text for username
                       SizedBox(
-                        width: 240,
+                        width: 230,
                         child: Text(
                           displayName,
                           textAlign: TextAlign.left,

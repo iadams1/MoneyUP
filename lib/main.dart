@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
         '/plaid-connect': (context) => const PlaidService(),
         '/verify': (context) => const VerificationScreen(email: ''),
       },
-      initialRoute: '/home',
+      initialRoute: '/login',
     );
   }
 }

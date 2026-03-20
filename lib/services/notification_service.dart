@@ -24,40 +24,40 @@ class NotificationService {
     playSound: true,
   );
 
-Future<void> initialize() async {
-  _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  Future<void> initialize() async {
+    _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  // Initialize timezone
-  tz.initializeTimeZones();
+    // Initialize timezone
+    tz.initializeTimeZones();
 
-  // Android init settings
-  const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+    // Android init settings
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  // iOS settings
-  const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
+    // iOS settings
+    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
-  const InitializationSettings initSettings = InitializationSettings(
-    android: androidSettings,
-    iOS: iosSettings,
-  );
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
 
-  // Initialize plugin
-  await _notificationsPlugin!.initialize(
-    settings: initSettings,
-    onDidReceiveNotificationResponse: _onNotificationTap,
-  );
+    // Initialize plugin
+    await _notificationsPlugin!.initialize(
+      settings: initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+    );
 
-  // Create Android notification channel
-  await _notificationsPlugin!
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(_channel);
-}
+    // Create Android notification channel
+    await _notificationsPlugin!
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+  }
 
   // Handle notification tap (when app opens from notification)
   static void _onNotificationTap(NotificationResponse response) {
@@ -144,6 +144,7 @@ Future<void> initialize() async {
     }
 
     final response = await query;
+
     return (response as List).map((data) => NotificationItem(
       id: data['id'],
       title: data['title'],
@@ -153,7 +154,7 @@ Future<void> initialize() async {
     )).toList();
   }
 
-  Future<void> markAsRead(int notificationId) async {
+  Future<void> markAsRead(String notificationId) async {
     await _client
       .from('notifications')
       .update({'is_read': true})
