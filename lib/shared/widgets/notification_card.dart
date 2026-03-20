@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:moneyup/core/utils/date_helper.dart';
 // import 'package:moneyup/services/notification_service.dart';
 
 import '/models/notification_item.dart';
 
-class NotificationCard extends StatelessWidget{
+class NotificationCard extends StatelessWidget {
   final NotificationItem notifItem;
   final VoidCallback? onTap;
   const NotificationCard({super.key, required this.notifItem, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final formatedDate = DateFormat(
-      'yyyy-MM-dd',
-    ).format(notifItem.time);
+    final formatedDate = DateFormat('yyyy-MM-dd').format(notifItem.time);
 
     return Material(
       color: Colors.transparent,
@@ -22,59 +21,68 @@ class NotificationCard extends StatelessWidget{
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: notifItem.isUnread
-              ? Colors.grey.withValues(alpha: .5)
-              : Colors.white,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color.fromRGBO(69, 90, 100, 1),
-              width: 2.0,
-            ),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Color.fromARGB(10, 0, 0, 0),
-            //     spreadRadius: 0,
-            //     blurRadius: 9,
-            //     offset: Offset(0, 8),
-            //   ),
-            // ],
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 12,
+                offset: Offset(0, 6),
+                color: const Color.fromARGB(40, 0, 0, 0),
+              ),
+            ],
           ),
           // NOTIFICATION CARD HEIGHT & WIDTH
-          height: 75,
           width: 380,
           child: Padding(
             padding: EdgeInsetsGeometry.all(8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
+                  child: notifItem.isUnread
+                ? Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  )
+                : null,
+                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: Text(
-                          notifItem.title,
-                          style: TextStyle(
-                            fontWeight: notifItem.isUnread
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                            fontSize: 16,
+                      Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Expanded(
+                          child: Text(
+                            notifItem.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 17,
+                            ),
                           ),
                         ),
                       ),
                       Text(
                         notifItem.message,
                         overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.black,
+                          height: 1,
                         ),
-                      ), 
-                      Text(
-                        formatedDate,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[700],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                        child: Text(
+                          DateHelper.formatReadable(formatedDate),
+                          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                         ),
                       ),
                     ],

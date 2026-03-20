@@ -84,7 +84,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
           final today = DateTime.now().day.toDouble();
           final currentSpent = result.currentSpent ?? 0;
           chartPoints = [];
-          double cumulative = 0;
+          //double cumulative = 0;
           for (int day = 1; day <= today.toInt(); day++) {
             final progress = day / today;
             final naturalSpend =
@@ -150,7 +150,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
 
     // Build simple chart points from current data
     final today = DateTime.now().day.toDouble();
-    final currentSpent = _result!.currentSpent ?? 0;
+    //final currentSpent = _result!.currentSpent ?? 0;
     final dailyRate = _result!.currentSpent! / today;
 
     final List<Map<String, double>> chartPoints = [];
