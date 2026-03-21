@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moneyup/core/utils/date_helper.dart';
 // import 'package:moneyup/services/notification_service.dart';
-
 import '/models/notification_item.dart';
 
 class NotificationCard extends StatelessWidget {
@@ -41,15 +40,15 @@ class NotificationCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
                   child: notifItem.isUnread
-                      ? Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        )
-                      : null,
+                ? Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  )
+                : null,
                 ),
                 Expanded(
                   child: Column(
