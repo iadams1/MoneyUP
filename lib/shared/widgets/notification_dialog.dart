@@ -184,7 +184,8 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                                     onTap: () async {
                                       if (notif.isUnread) {
                                         await NotificationService().markAsRead(
-                                          notificationId: notif.id, currentIsRead: null,
+                                          notificationId: notif.id, 
+                                          currentIsRead: true,
                                         );
       
                                         setState(() {

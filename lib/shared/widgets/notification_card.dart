@@ -38,7 +38,7 @@ class NotificationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
+                  padding: const EdgeInsets.fromLTRB(3, 5, 7, 0),
                   child: notifItem.isUnread
                 ? Container(
                     width: 10,
