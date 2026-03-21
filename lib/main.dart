@@ -13,7 +13,7 @@ import 'package:moneyup/services/notification_service.dart';
 
 void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
-  print("FCM TOKEN: $token"); //Debug
+  debugPrint("FCM TOKEN: $token"); //Debug
 }
 
 void main() async {

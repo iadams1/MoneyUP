@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/auth/screens/login.dart';
 import '/features/profile/widgets/profile_menu.dart';
 import '/services/auth_service.dart';
 import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/notification_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -60,10 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: const Icon(
                     Icons.notifications_outlined,

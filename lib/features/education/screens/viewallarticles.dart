@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/widgets/article_card.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/notification_dialog.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
@@ -79,10 +79,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

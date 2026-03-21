@@ -189,7 +189,7 @@ class _LoginState extends State<LoginScreen> {
                                       final session = data.session;
 
                                       if (session != null) {
-                                        print("🔥 Auth state changed → starting realtime");
+                                        debugPrint("🔥 Auth state changed → starting realtime");
 
                                         RealtimeNotificationService()
                                             .startListening(session.user.id);

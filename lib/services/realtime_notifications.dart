@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_service.dart';
 
@@ -5,7 +6,7 @@ class RealtimeNotificationService {
   final _supabase = Supabase.instance.client;
 
   void startListening(String userId) {
-    print("📡 Starting realtime listener for user: $userId");
+    debugPrint("📡 Starting realtime listener for user: $userId");
 
     final channel = _supabase.channel('notifications_channel');
 
@@ -21,8 +22,8 @@ class RealtimeNotificationService {
           ),
           callback: (payload) 
           {
-            print("📩 REALTIME EVENT RECEIVED");
-            print("📦 Payload: ${payload.newRecord}");
+            debugPrint("📩 REALTIME EVENT RECEIVED");
+            debugPrint("📦 Payload: ${payload.newRecord}");
 
             final data = payload.newRecord;
 
@@ -36,14 +37,14 @@ class RealtimeNotificationService {
           },
         )
         .subscribe((status, [error]) {
-          print("📡 SUB STATUS: $status");
+          debugPrint("📡 SUB STATUS: $status");
 
           if (error != null) {
-            print("❌ REALTIME ERROR: $error");
+            debugPrint("❌ REALTIME ERROR: $error");
           }
 
           if (status == RealtimeSubscribeStatus.subscribed) {
-            print("✅ REALTIME CONNECTED");
+            debugPrint("✅ REALTIME CONNECTED");
           }
         });
   }

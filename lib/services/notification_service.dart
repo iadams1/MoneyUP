@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -49,7 +50,7 @@ class NotificationService {
 
     //REQUEST PERMISSION (Android 13+)
     final granted = await androidPlugin?.requestNotificationsPermission();
-    print("🔔 Notification permission granted: $granted"); //FORCE
+    debugPrint("🔔 Notification permission granted: $granted"); //FORCE
   }
 
   Future<void> showNotification({
@@ -57,7 +58,7 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
-    print("📢 SHOWING NOTIFICATION: $title");
+    debugPrint("📢 SHOWING NOTIFICATION: $title");
 
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails
   (

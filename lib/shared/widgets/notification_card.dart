@@ -41,15 +41,15 @@ class NotificationCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
                   child: notifItem.isUnread
-                ? Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  )
-                : null,
+                      ? Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        )
+                      : null,
                 ),
                 Expanded(
                   child: Column(
@@ -73,16 +73,20 @@ class NotificationCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 15.5,
                           color: Colors.black,
                           height: 1,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                        padding: const EdgeInsets.fromLTRB(0, 7, 0, 0),
                         child: Text(
                           DateHelper.formatReadable(formatedDate),
-                          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromARGB(117, 0, 0, 0),
+                          ),
                         ),
                       ),
                     ],

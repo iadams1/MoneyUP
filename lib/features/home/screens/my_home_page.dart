@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
 import 'package:moneyup/features/budgettracker/utils/time_range.dart';
@@ -9,7 +10,6 @@ import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
 // import '/shared/widgets/profile_menu_card.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
-import 'package:moneyup/shared/widgets/notification_dialog.dart';
 import 'package:moneyup/shared/widgets/profile_menu_card.dart';
 import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
@@ -296,10 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

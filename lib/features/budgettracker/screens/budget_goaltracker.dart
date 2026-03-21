@@ -144,7 +144,7 @@ class _BudgetPageState extends State<BudgetPage> {
                           try {
                             final userId =
                                 Supabase.instance.client.auth.currentUser?.id;
-                            print(
+                            debugPrint(
                               'Logging spend - userId: $userId, budgetId: ${widget.budgetId}, amount: $amount',
                             );
 
@@ -157,9 +157,9 @@ class _BudgetPageState extends State<BudgetPage> {
                                     .toIso8601String()
                                     .split('T')[0],
                               };
-                              print('Payload being sent: $payload');
-                              print('budgetId value: ${widget.budgetId}');
-                              print(
+                              debugPrint('Payload being sent: $payload');
+                              debugPrint('budgetId value: ${widget.budgetId}');
+                              debugPrint(
                                 'budgetId type: ${widget.budgetId.runtimeType}',
                               );
                               final response = await Supabase.instance.client
@@ -172,12 +172,12 @@ class _BudgetPageState extends State<BudgetPage> {
                                         .toIso8601String()
                                         .split('T')[0],
                                   });
-                              print('Budget log insert response: $response');
+                              debugPrint('Budget log insert response: $response');
                             } else {
-                              print('No user logged in');
+                              debugPrint('No user logged in');
                             }
                           } catch (e) {
-                            print('Error logging spend to ML: $e');
+                            debugPrint('Error logging spend to ML: $e');
                             debugPrint('Error logging spend to ML: $e');
                           }
                         }

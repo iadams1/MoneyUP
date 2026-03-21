@@ -11,11 +11,16 @@ Widget buildChart(
 ) {
   List<FlSpot> buildActualSpots(PredictionData data) {
     if (data.dailySpending.isEmpty) {
-      return [FlSpot(0, 0)];
+      return [];
     }
-    return data.dailySpending
-        .map((d) => FlSpot(d['day']!, d['cumulative']!))
-        .toList();
+
+    final spots =
+        data.dailySpending
+            .map((d) => FlSpot(d['day']!, d['cumulative']!))
+            .toList()
+          ..sort((a, b) => a.x.compareTo(b.x));
+
+    return spots;
   }
 
   List<FlSpot> buildProjectedSpots(List<FlSpot> actual, PredictionData data) {

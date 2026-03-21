@@ -76,7 +76,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
         final daily = await _service.getTransactionSpending(
           budgetId: widget.budgetId,
         );
-        print('Daily spending points from budget_logs: $daily');
+        debugPrint('Daily spending points from budget_logs: $daily');
 
         // Fall back to synthetic if no logs yet
         List<Map<String, double>> chartPoints = daily;
