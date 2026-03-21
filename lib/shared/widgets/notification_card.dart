@@ -56,8 +56,7 @@ class NotificationCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: Expanded(
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
                             notifItem.title,
                             style: TextStyle(
@@ -65,7 +64,6 @@ class NotificationCard extends StatelessWidget {
                               fontSize: 17,
                             ),
                           ),
-                        ),
                       ),
                       Text(
                         notifItem.message,

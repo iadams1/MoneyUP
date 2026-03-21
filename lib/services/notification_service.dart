@@ -58,6 +58,11 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
+    if (_notificationsPlugin == null) {
+      debugPrint('❌ Notifications plugin not initialized');
+      return;
+    }
+    
     debugPrint("📢 SHOWING NOTIFICATION: $title");
 
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails

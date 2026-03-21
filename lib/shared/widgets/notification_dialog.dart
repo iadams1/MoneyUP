@@ -119,7 +119,7 @@ class _NotificationDropdownState extends State<NotificationDropdown> {
                       },
                     ),
       
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                       child: Center(
                         child: Text(
