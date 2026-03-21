@@ -33,37 +33,41 @@ class NotificationCard extends StatelessWidget {
           // NOTIFICATION CARD HEIGHT & WIDTH
           width: 380,
           child: Padding(
-            padding: EdgeInsetsGeometry.all(8),
+            padding: EdgeInsetsGeometry.all(10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(3, 5, 7, 0),
-                  child: notifItem.isUnread
-                ? Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  )
-                : null,
-                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            notifItem.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 17,
+                      Row(
+                        children: [
+                          if (notifItem.isUnread)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(3, 0 , 7, 0),
+                              child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                            ),
+                          
+                          Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: Text(
+                              notifItem.title,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                              ),
                             ),
                           ),
+                        ],
                       ),
                       Text(
                         notifItem.message,
