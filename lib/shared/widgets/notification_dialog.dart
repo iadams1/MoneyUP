@@ -8,7 +8,7 @@ import '/services/streak_service.dart';
 import '/shared/widgets/notification_card.dart';
 import '/shared/widgets/streak_banner.dart';
 
-class NotificationDialog extends StatefulWidget{
+class NotificationDialog extends StatefulWidget {
   const NotificationDialog({super.key});
 
   @override
@@ -42,15 +42,13 @@ class _NotificationDialogState extends State<NotificationDialog> {
               builder: (context, streakSnapshot) {
                 if (streakSnapshot.connectionState == ConnectionState.waiting) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.black,
-                    ),
+                    child: CircularProgressIndicator(color: Colors.black),
                   );
                 }
                 if (!streakSnapshot.hasData) {
                   return SizedBox();
                 }
-                
+
                 final streaks = streakSnapshot.data!;
 
                 return Column(
@@ -72,18 +70,21 @@ class _NotificationDialogState extends State<NotificationDialog> {
                       weekLogins: streaks.weekLogins,
                       showLongestStreak: false,
                     ),
-                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10),
                   ],
                 );
               },
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+              child: Center(
+                child: Text(
+                  'Recent Notifications',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    color: const Color.fromARGB(123, 0, 0, 0),
+                  ),
                 ),
               ),
             ),
@@ -91,12 +92,14 @@ class _NotificationDialogState extends State<NotificationDialog> {
               child: FutureBuilder<List<NotificationItem>>(
                 future: _allNotifications,
                 builder: (context, notifSnapshot) {
-                  if (notifSnapshot.connectionState == ConnectionState.waiting) {
+                  if (notifSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.black
-                      ),
+                      child: CircularProgressIndicator(color: Colors.black),
                     );
+                  }
+                  if (notifSnapshot.hasError) {
+                    return Center(child: Text('Error: ${notifSnapshot.error}'));
                   }
                   if (!notifSnapshot.hasData) {
                     return Center(child: CircularProgressIndicator());
@@ -104,9 +107,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
                   final notifications = notifSnapshot.data!;
 
                   if (notifSnapshot.data!.isEmpty) {
-                    return Center(
-                      child: Text('No recent notifications'),
-                    );
+                    return Center(child: Text('No recent notifications'));
                   }
                   final preview = notifications.take(2).toList();
                   final hasMore = notifications.length > 2;
@@ -117,25 +118,28 @@ class _NotificationDialogState extends State<NotificationDialog> {
                     children: [
                       ...visible.map((notif) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 10,
+                          ),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: NotificationCard(
                               notifItem: notif,
-                              onTap: () async {
-                                if (notif.id == null) return;
-                                final wasUnread = notif.isUnread;
+                              onTap: () async { 
+                                final currentIsRead = !notif.isUnread;
 
                                 await NotificationService().markAsRead(
-                                  notificationId: notif.id!,
-                                  isCurrentlyUnread: wasUnread
-                                );
-
+                                  notificationId: notif.id,
+                                  currentIsRead: currentIsRead,
+                                ); 
+                                
                                 setState(() {
-                                  notif.isUnread = !wasUnread;
-                                });
+                                  notif.isUnread = !notif.isUnread;
+                                  
+                                }); 
                               },
                             ),
                           ),
@@ -143,7 +147,10 @@ class _NotificationDialogState extends State<NotificationDialog> {
                       }),
                       if (hasMore)
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 10,
+                          ),
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -155,7 +162,10 @@ class _NotificationDialogState extends State<NotificationDialog> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 gradient: LinearGradient(
-                                  colors: [HexColor('#124074'), HexColor('#332677')],
+                                  colors: [
+                                    HexColor('#124074'),
+                                    HexColor('#332677'),
+                                  ],
                                 ),
                               ),
                               child: Center(
@@ -164,14 +174,13 @@ class _NotificationDialogState extends State<NotificationDialog> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.white
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
                             ),
-                          )
+                          ),
                         ),
-                        
                     ],
                   );
                 },
