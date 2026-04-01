@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
-import 'package:moneyup/services/notification_service.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
