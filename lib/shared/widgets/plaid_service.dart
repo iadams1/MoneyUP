@@ -54,7 +54,7 @@ class PlaidConnectionWidget extends StatelessWidget {
                     children: [
                       const Text(
                         'Use fake sandbox credentials:\n'
-                        'Username: user_transactions_dynamic\n'
+                        'Username: user_dynamic_transactions\n'
                         'Password: Anything',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16),
