@@ -6,9 +6,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 
 import '/features/auth/screens/login.dart';
 import '/features/auth/screens/verification.dart';
-import '/core/constants/notificationtext.dart';
 import '/services/auth_service.dart';
-import '/services/notification_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
