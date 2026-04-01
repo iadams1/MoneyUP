@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/home/widgets/greeting_text.dart';
 import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
+import 'package:moneyup/shared/widgets/app_avatar.dart';
 import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
 import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
 import 'package:moneyup/features/budgettracker/utils/time_range.dart';
