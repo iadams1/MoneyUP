@@ -1,5 +1,5 @@
 class UserImages {
-  // 12 = fallback
+  // Keep index 12 as your default/fallback icon
   static const List<String> all = [
     'assets/images/userIcon_2.png',
     'assets/images/userIcon_3.png',

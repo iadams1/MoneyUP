@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/utils/formatters.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/features/profile/screens/profile.dart';
 import '/features/transactions/screens/transactions_home.dart';
+import '/core/utils/formatters.dart';
+import '/shared/widgets/app_avatar.dart';
 import '/models/budget_type.dart';
 import '/services/service_locator.dart';
 
@@ -37,14 +38,24 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 10, left: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          padding: EdgeInsets.only(top: 50, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppAvatar(
-                size: 60,
+              AppAvatar(size: 60),
+              Container(
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    showNotificationDropdown(context);
+                  },
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
               ),
-              SizedBox(height: 40),
             ],
           ),
         ),

@@ -61,8 +61,7 @@ class WelcomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          Positioned(
-            // NEXT BUTTON
+          Positioned( // NEXT BUTTON
             bottom: 10,
             right: -10,
             child: IconButton(
@@ -73,6 +72,15 @@ class WelcomeScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const SignUpScreen()),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(10.0),
+                shape: const StadiumBorder()
+              ),
+              // child: const Text(
+              //   '>>',
+              //   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)
+              // ),
             ),
           ),
         ],

@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
+import '/features/education/widgets/article_card.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/features/education/widgets/article_card.dart';
 import '/shared/widgets/category_info.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
@@ -94,7 +95,7 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

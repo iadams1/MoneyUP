@@ -9,7 +9,6 @@ import '/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/realtime_notifications.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -94,8 +93,8 @@ class _LoginState extends State<LoginScreen> {
                                   fontFamily: 'SF Pro',
                                 ),
                                 prefixIcon: Icon(
-                                  Icons.email_outlined,
-                                  color: Colors.black,
+                                  Icons.email_outlined, 
+                                  color: Colors.black
                                 ),
                                 errorStyle: TextStyle(fontSize: 16.0),
                                 filled: true,
@@ -111,7 +110,6 @@ class _LoginState extends State<LoginScreen> {
                           ),
                           Padding(
                             // PASSWORD ENTRY
-                            // PASSWORD ENTRY – with show/hide toggle
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,
@@ -134,8 +132,8 @@ class _LoginState extends State<LoginScreen> {
                                   fontFamily: 'SF Pro',
                                 ),
                                 prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                  color: Colors.black,
+                                  Icons.lock_outline, 
+                                  color: Colors.black
                                 ),
                                 errorStyle: TextStyle(fontSize: 16.0),
                                 filled: true,
@@ -191,7 +189,7 @@ class _LoginState extends State<LoginScreen> {
                                       final session = data.session;
 
                                       if (session != null) {
-                                        print("🔥 Auth state changed → starting realtime");
+                                        debugPrint("🔥 Auth state changed → starting realtime");
 
                                         RealtimeNotificationService()
                                             .startListening(session.user.id);
@@ -199,15 +197,12 @@ class _LoginState extends State<LoginScreen> {
                                     });
                                     
                                     if (!mounted) return;
-
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            const MyHomePage(title: ''),
+                                        builder: (context) => const MyHomePage(title: ''),
                                       ),
                                     );
-                                    
                                   } catch (e) {
                                     debugPrint('LOGIN ERROR: $e');
 
@@ -233,7 +228,7 @@ class _LoginState extends State<LoginScreen> {
                                   'Login',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16,
+                                    fontSize: 16
                                   ),
                                 ),
                               ),

@@ -5,12 +5,14 @@ class StreakBanner extends StatelessWidget {
   final int currentStreak;
   final int longestStreak;
   final List<bool> weekLogins;
+  final bool showLongestStreak;
 
   const StreakBanner({
     super.key,
     required this.currentStreak,
     required this.longestStreak,
     required this.weekLogins,
+    this.showLongestStreak = true,
   });
 
   static void showStreakBanner(
@@ -18,7 +20,7 @@ class StreakBanner extends StatelessWidget {
     required int currentStreak,
     required int longestStreak,
     required List<bool> weekLogins,
-    Duration duration = const Duration(seconds: 5),// MAKE 5 SECONDS 
+    Duration duration = const Duration(seconds: 5),
   }) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
@@ -74,9 +76,8 @@ class StreakBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: SafeArea(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -109,19 +110,20 @@ class StreakBanner extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      "Longest streak: $longestStreak days",
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                    if (showLongestStreak) ...[
+                      const Spacer(),
+                      Text(
+                        "Longest streak: $longestStreak days",
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 14),
-
                 SizedBox(
                   width: double.infinity,
                   child: WeeklyLoginProgress(
@@ -132,9 +134,7 @@ class StreakBanner extends StatelessWidget {
               ],
             ),
           ),
-
         ),
-      ),
     );
   }
 }

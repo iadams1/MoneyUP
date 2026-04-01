@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/screens/categorydetails.dart';
 import '/features/education/screens/viewallarticles.dart';
@@ -127,7 +128,7 @@ class _EducationScreenState extends State<EducationScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,

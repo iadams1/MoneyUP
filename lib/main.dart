@@ -1,9 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:moneyup/core/config/supabase_config.dart';
-import 'package:moneyup/features/auth/screens/user_select.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
-import 'package:moneyup/features/auth/screens/welcome.dart';
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,7 +13,7 @@ import 'package:moneyup/services/notification_service.dart';
 
 void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
-  print("FCM TOKEN: $token"); //Debug
+  debugPrint("FCM TOKEN: $token"); //Debug
 }
 
 void main() async {
@@ -53,16 +51,13 @@ class MyApp extends StatelessWidget
         fontFamily: "SF Pro",
       ),
       routes: {
-        '/verification': (context) => const VerificationScreen(email: ''),
         '/': (context) => const SignUpScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const MyHomePage(title: 'MoneyUP'),
         '/plaid-connect': (context) => const PlaidService(),
         '/verify': (context) => const VerificationScreen(email: ''),
-        '/user': (context) => const UserSelectScreen(),
-        '/start': (context) => const WelcomeScreen(),
       },
-      initialRoute: '/login',
+      initialRoute: '/home',
     );
   }
 }

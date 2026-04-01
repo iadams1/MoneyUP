@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/screen/loading_screen.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '../widgets/filters/active_filter_chips.dart';
 import '/features/transactions/widgets/filter_dialog.dart';
@@ -7,6 +7,7 @@ import '/features/transactions/widgets/total_amount.dart';
 import '/features/transactions/widgets/no_transaction_view.dart';
 import '/features/transactions/widgets/transaction_card.dart';
 import '/services/transaction_service.dart';
+import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/shared/widgets/profile_menu_card.dart';
 import '/models/transaction.dart';
@@ -190,7 +191,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ),
               IconButton(
                 onPressed: () {
-                  // print('Notification icon pressed');
+                  showNotificationDropdown(context);
                 }, 
                 icon: Icon(
                   Icons.notifications_outlined, 

@@ -11,11 +11,16 @@ Widget buildChart(
 ) {
   List<FlSpot> buildActualSpots(PredictionData data) {
     if (data.dailySpending.isEmpty) {
-      return [FlSpot(0, 0)];
+      return [];
     }
-    return data.dailySpending
-        .map((d) => FlSpot(d['day']!, d['cumulative']!))
-        .toList();
+
+    final spots =
+        data.dailySpending
+            .map((d) => FlSpot(d['day']!, d['cumulative']!))
+            .toList()
+          ..sort((a, b) => a.x.compareTo(b.x));
+
+    return spots;
   }
 
   List<FlSpot> buildProjectedSpots(List<FlSpot> actual, PredictionData data) {
@@ -57,6 +62,8 @@ Widget buildChart(
         lineTouchData: LineTouchData(
           enabled: true,
           touchTooltipData: LineTouchTooltipData(
+            fitInsideHorizontally: true,
+            fitInsideVertically: true,
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 if (spot.x == 0) return null;
@@ -134,14 +141,8 @@ Widget buildChart(
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
+
         // Confidence band
-        betweenBarsData: [
-          BetweenBarsData(
-            fromIndex: 1,
-            toIndex: 2,
-            color: statusColor.withOpacity(0.06),
-          ),
-        ],
         lineBarsData: [
           // Budget limit line
           LineChartBarData(
@@ -149,8 +150,8 @@ Widget buildChart(
               FlSpot(0, data.budgetAmount),
               FlSpot(30, data.budgetAmount),
             ],
-            isCurved: false,
-            color: ApiColors.danger.withOpacity(0.6),
+            isCurved: true,
+            color: const Color.fromARGB(255, 35, 35, 141).withOpacity(0.6),
             barWidth: 1.5,
             dashArray: [6, 4],
             dotData: const FlDotData(show: false),
@@ -199,7 +200,7 @@ Widget buildChart(
             dotData: FlDotData(
               show: true,
               checkToShowDot: (spot, _) => spot == spots.last,
-              getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
+              getDotPainter: (_, _, _, _) => FlDotCirclePainter(
                 radius: 5,
                 color: statusColor,
                 strokeWidth: 2,

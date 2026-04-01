@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/budgettracker/widgets/budget_forecastor.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-import 'package:moneyup/features/home/screens/my_home_page.dart';
+import '/features/home/screens/my_home_page.dart';
+import '/features/budgettracker/widgets/budget_forecastor.dart';
 import '/features/budgettracker/utils/category_colors.dart';
 import '/features/education/screens/education.dart';
 import '/features/profile/screens/profile.dart';
@@ -11,6 +11,7 @@ import '/features/transactions/screens/transactions_home.dart';
 import '/models/budget.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/app_avatar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
@@ -144,7 +145,7 @@ class _BudgetPageState extends State<BudgetPage> {
                           try {
                             final userId =
                                 Supabase.instance.client.auth.currentUser?.id;
-                            print(
+                            debugPrint(
                               'Logging spend - userId: $userId, budgetId: ${widget.budgetId}, amount: $amount',
                             );
 
@@ -157,9 +158,9 @@ class _BudgetPageState extends State<BudgetPage> {
                                     .toIso8601String()
                                     .split('T')[0],
                               };
-                              print('Payload being sent: $payload');
-                              print('budgetId value: ${widget.budgetId}');
-                              print(
+                              debugPrint('Payload being sent: $payload');
+                              debugPrint('budgetId value: ${widget.budgetId}');
+                              debugPrint(
                                 'budgetId type: ${widget.budgetId.runtimeType}',
                               );
                               final response = await Supabase.instance.client
@@ -172,12 +173,14 @@ class _BudgetPageState extends State<BudgetPage> {
                                         .toIso8601String()
                                         .split('T')[0],
                                   });
-                              print('Budget log insert response: $response');
+                              debugPrint(
+                                'Budget log insert response: $response',
+                              );
                             } else {
-                              print('No user logged in');
+                              debugPrint('No user logged in');
                             }
                           } catch (e) {
-                            print('Error logging spend to ML: $e');
+                            debugPrint('Error logging spend to ML: $e');
                             debugPrint('Error logging spend to ML: $e');
                           }
                         }
@@ -290,10 +293,25 @@ class _BudgetPageState extends State<BudgetPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 10, left: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [AppAvatar(size: 60), SizedBox(height: 20)],
+          padding: EdgeInsets.only(top: 50, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppAvatar(size: 60),
+              Container(
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    showNotificationDropdown(context);
+                  },
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         toolbarHeight: 120,
@@ -356,7 +374,8 @@ class _BudgetPageState extends State<BudgetPage> {
                                     MaterialPageRoute(
                                       builder: (_) =>
                                           PredictiveBudgetForecastor(
-                                            budgetId: widget.budgetId.toString(),
+                                            budgetId: widget.budgetId
+                                                .toString(),
                                             budgetName: budget!.title,
                                             goalAmount: budget.goal,
                                           ),

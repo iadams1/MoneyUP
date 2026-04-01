@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
-import '/features/education/screens/education.dart';
-import '/features/profile/screens/profile.dart';
-import '/features/transactions/screens/transactions_home.dart';
-import '/features/home/screens/my_home_page.dart';
+import '/features/education/widgets/article_card.dart';
+import '/shared/screen/loading_screen.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/bottom_nav.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
-import '/shared/screen/loading_screen.dart';
-import '/features/education/widgets/article_card.dart';
 
 class ViewAllArticlesScreen extends StatefulWidget {
   const ViewAllArticlesScreen({super.key});
@@ -81,7 +79,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    // print('Notification icon pressed');
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -159,53 +157,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/educationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 2),
     );
   }
 }

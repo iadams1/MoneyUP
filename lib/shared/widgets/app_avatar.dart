@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/contrants/user_icons.dart';
-import 'package:moneyup/shared/widgets/gradient_ring_avatar.dart';
+
+import '/services/service_locator.dart';
+import '/shared/contrants/user_icons.dart';
+import '/shared/widgets/gradient_ring_avatar.dart';
 
 class AppAvatar extends StatelessWidget {
   final double size;
