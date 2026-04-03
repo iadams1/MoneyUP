@@ -102,7 +102,7 @@ class _UserSelectScreen extends State<UserSelectScreen> {
                     const SizedBox(height: 5),
             
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.45,
+                      height: MediaQuery.of(context).size.height * 0.30,
                       child: GridView.builder(
                         itemCount: UserImages.all.length - 1,
                         gridDelegate:
