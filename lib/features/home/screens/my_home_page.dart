@@ -308,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -357,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: 5.5),
+                      SizedBox(height: 10),
                       // MyWallet Card Widget
                       IntrinsicHeight(
                         child: Row(
@@ -424,12 +424,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       // Article Card Widget
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 0),
 
                       // Budget Card Widget
                       _buildBudgetCard(context),
 
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
 
                       // Monthly Spending Overview Widget
                       _buildSpendingOverview(context),

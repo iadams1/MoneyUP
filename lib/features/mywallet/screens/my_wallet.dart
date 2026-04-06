@@ -330,7 +330,7 @@ class _MyWallet extends State<MyWallet> {
                             cardId: index,
                             bankName: card.bankName ?? "Unknown Bank",
                             mask: card.mask,
-                            currentAmount: card.currentBalance ?? 0.0,
+                            currentAmount: card.availableBalance ?? 0.0,
                             cardholderName: card.cardholderName ?? "",
                           );
                         },

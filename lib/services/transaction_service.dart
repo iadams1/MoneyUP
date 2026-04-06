@@ -66,7 +66,7 @@ class TransactionService {
       .from('plaid_accounts')
       .select('''
             type, 
-            current_balance,
+            available_balance,
             plaid_items!inner(institution_name), 
             is_active''')
       .eq('user_id', user)
@@ -86,7 +86,7 @@ class TransactionService {
     double totalDebit = 0;
 
     for (final row in response as List) {
-      final amount = (row['current_balance'] as num).toDouble();
+      final amount = (row['available_balance'] as num).toDouble();
       final accountType = row['type'];
 
       if (accountType == 'depository') {

@@ -314,7 +314,7 @@ class _BudgetPageState extends State<BudgetPage> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
