@@ -85,7 +85,7 @@ class _PrimaryWalletCardState extends State<PrimaryCardView> {
       cardId: 0,
       bankName: c.bankName ?? "Unknown Bank",
       mask: c.mask,
-      currentAmount: c.currentBalance ?? 0,
+      currentAmount: c.availableBalance ?? 0,
       cardholderName: c.cardholderName ?? "",
     );
   }

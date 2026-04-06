@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/budget_response.dart';
 
 class PredictionService {
-  // static const String _baseUrl = 'http://10.0.2.2:8000';
+  //static const String _baseUrl = 'http://10.0.2.2:8000';
   static const String _baseUrl = 'http://127.0.0.1:8000';
 
   // Get current logged in user's ID automatically
