@@ -29,7 +29,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
   double _totalCredit = 0;
   double _availableCredit = 0;
 
-  TransactionType? _selectedFilter = TransactionType.debit;
+  TransactionType _selectedFilter = TransactionType.debit;
   List<Transaction> _filteredTransactions = [];
 
   Future<void> _loadTransactions({
@@ -39,18 +39,19 @@ class _TransactionsHomeState extends State<TransactionsHome> {
     setState(() => _isLoading = true);
 
     try {
+      final activeFilter = filter ?? _selectedFilter;
       final transactions = await _transactionService.fetchTransactions(
-        filter: filter,
+        filter: activeFilter,
         filters: filters,
       );
 
-      final type = filter == TransactionType.credit ? 'credit' : 'depository';
+      // final type = filter == TransactionType.credit ? 'credit' : 'depository';
 
       final totals = await _transactionService.fetchTotals(
-        bankName: _currentFilters.selectedBanks.isEmpty
-            ? null
-            : _currentFilters.selectedBanks.toList(),
-        type: type,
+        selectedBanks: _currentFilters.selectedBanks.isEmpty
+          ? null
+          : _currentFilters.selectedBanks.toList(),
+        filter: activeFilter,
       );
 
       setState(() {
@@ -58,7 +59,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
         _totalDebit = totals['debit'] ?? 0;
         _totalCredit = totals['credit'] ?? 0;
         _availableCredit = totals['availableCredit'] ?? 0;
-        _selectedFilter = filter;
+        _selectedFilter = activeFilter;
         _isLoading = false;
       });
     } catch (e) {
@@ -145,7 +146,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ProfileMenuCard(),
               TextButton(
                 onPressed: () {
-                  _loadTransactions(filter: TransactionType.debit);
+                  _loadTransactions(
+                    filter: TransactionType.debit,
+                    filters: _currentFilters,
+                  );
                 }, 
                 style: TextButton.styleFrom(
                   backgroundColor: _selectedFilter == TransactionType.debit
@@ -163,7 +167,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ),
               TextButton(
                 onPressed: () {
-                   _loadTransactions(filter: TransactionType.credit);
+                   _loadTransactions(
+                    filter: TransactionType.credit,
+                    filters: _currentFilters,
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: _selectedFilter == TransactionType.credit
@@ -220,7 +227,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
             left: 25,
             right: 25,
             child: TotalAmountView(
-              selectedFilter: _selectedFilter!, 
+              selectedFilter: _selectedFilter, 
               totalDebit: _totalDebit, 
               totalCredit: _totalCredit,
               availableCredit: _availableCredit,
@@ -259,7 +266,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                               context: context, 
                               builder: (_) => FilterDialog(
                                 initialState: _currentFilters,
-                                selectedType: _selectedFilter!,
+                                selectedType: _selectedFilter,
                                 ),
                             );
                             if (result != null) {
@@ -284,7 +291,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                       setState(() {
                         _currentFilters = FilterState.empty();
                       });
-                      await _loadTransactions(filter: _selectedFilter);
+                      await _loadTransactions(
+                        filter: _selectedFilter,
+                        filters: _currentFilters
+                      );
                     },
                   ),
                   SizedBox(height: 10),

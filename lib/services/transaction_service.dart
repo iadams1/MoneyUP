@@ -30,7 +30,9 @@ class TransactionService {
 
     if (filters != null) {
       if (filters.selectedCategories.isNotEmpty) {
-        query = query.inFilter('category', filters.selectedCategories.toList());
+        query = query.inFilter(
+          'category',
+          filters.selectedCategories.toList());
       }
       if (filters.selectedBanks.isNotEmpty) {
         query = query.inFilter(
@@ -45,23 +47,29 @@ class TransactionService {
         );
       }
       if (filters.endDate != null) {
+        final end = filters.endDate!;
+        final endOfDay = DateTime(
+          end.year,
+          end.month,
+          end.day,
+          23, 59, 59, 999,
+        );
         query = query.lte(
           'authorized_date',
-          filters.endDate!.toIso8601String(),
+          endOfDay.toIso8601String(),
         );
       }
     }
     
     final response = await query.order('authorized_date', ascending: false);
     final rows = List<Map<String, dynamic>>.from(response);
-    return rows.map(Transaction.fromJson).toList();
+    return rows.map((row) => Transaction.fromJson(row)).toList();
   }
 
   Future<Map<String, double>> fetchTotals({
-    List<String>? bankName,
-    String? type,
+    List<String>? selectedBanks,
+    TransactionType? filter,
   }) async {
-    
     var query = _client
       .from('plaid_accounts')
       .select('''
@@ -72,22 +80,29 @@ class TransactionService {
       .eq('user_id', user)
       .eq('is_active', true);
 
-    if (type != null && type.isNotEmpty) {
-      query = query.eq('type', type);
+    if (filter != null) {
+      final typeString = filter == TransactionType.credit ? 'credit' : 'depository';
+      query = query.eq('type', typeString);
     }
 
-    if (bankName != null && bankName.isNotEmpty) {
-      query = query.inFilter('plaid_items.institution_name', bankName);
+    if (selectedBanks != null && selectedBanks.isNotEmpty) {
+      query = query.inFilter(
+        'plaid_items.institution_name',
+        selectedBanks,
+      );
     }
 
     final response = await query;
 
     double totalCredit = 0;
     double totalDebit = 0;
+    double totalBalance = 0;
 
     for (final row in response as List) {
-      final amount = (row['current_balance'] as num).toDouble();
+      final amount = (row['current_balance'] as num?)?.toDouble() ?? 0.0;
       final accountType = row['type'];
+
+      totalBalance += amount;
 
       if (accountType == 'depository') {
         totalDebit += amount;
@@ -97,6 +112,7 @@ class TransactionService {
     }
 
     return {
+      'total': totalBalance,
       'credit': totalCredit,
       'debit': totalDebit
     };
@@ -108,9 +124,7 @@ class TransactionService {
     List<String>? bankNames,
     String? category,
   }) async {
-    
     final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
-    
     final transactions = await fetchTransactions(
       filter: filter,
       filters: filters,
@@ -136,9 +150,6 @@ class TransactionService {
         .eq('plaid_accounts.type', accountType)
         .eq('plaid_accounts.is_active', true);
 
-    // final categories = <String>{};
-    // final institutions = <String>{};
-
     final rows = List<Map<String, dynamic>>.from(response);
 
     for (final row in rows) {
@@ -153,7 +164,7 @@ class TransactionService {
       }
     }
 
-    fetchTotals(bankName: bankNames, type: accountType);
+    fetchTotals(selectedBanks: bankNames, filter: filter);
 
     return FilterData(
       categories: categories.toList()..sort(), 
