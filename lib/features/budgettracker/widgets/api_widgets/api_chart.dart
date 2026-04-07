@@ -68,6 +68,7 @@ Widget buildChart(
     data.spendingRangeHigh * 1.15,
     data.budgetAmount * 1.15,
     data.predictedFinalSpending * 1.15,
+    data.currentSpent * 1.2,
   ]).reduce((a, b) => a > b ? a : b).ceilToDouble();
 
   return Container(

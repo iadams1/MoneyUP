@@ -60,9 +60,35 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
   Future<void> _fetchPrediction() async {
     try {
       final result = await _service.getPrediction(budgetId: widget.budgetId);
+      final daily = await _service.getTransactionSpending(budgetId: widget.budgetId);
+      
+      debugPrint('Daily points: $daily'); 
+      debugPrint('Current spent: ${result.currentSpent}'); 
+      debugPrint('Predicted final: ${result.predictedFinalSpending}');
+      debugPrint('Budget amount: ${result.budgetAmount}'); 
+
+      // Fall back to synthetic only if no history yet
+      List<Map<String, double>> chartPoints = daily;
+      if (daily.isEmpty) {
+        final today = DateTime.now().day.toDouble();
+        final currentSpent = result.currentSpent ?? 0;
+        for (int day = 1; day <= today.toInt(); day++) {
+          final progress = day / today;
+          final naturalSpend = currentSpent * 
+              (progress + 0.15 * math.sin(progress * math.pi));
+          chartPoints.add({
+            'day': day.toDouble(),
+            'cumulative': naturalSpend.clamp(0, currentSpent),
+          });
+        }
+        if (chartPoints.isNotEmpty) {
+          chartPoints.last['cumulative'] = currentSpent;
+        }
+      }
 
       setState(() {
         _result = result;
+        _dailySpending = chartPoints;
         _loading = false;
       });
       _controller.forward();
@@ -71,46 +97,6 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
         _error = e.toString();
         _loading = false;
       });
-      try {
-        final result = await _service.getPrediction(budgetId: widget.budgetId);
-        final daily = await _service.getTransactionSpending(
-          budgetId: widget.budgetId,
-        );
-        debugPrint('Daily spending points from budget_logs: $daily');
-
-        // Fall back to synthetic if no logs yet
-        List<Map<String, double>> chartPoints = daily;
-        if (daily.isEmpty) {
-          final today = DateTime.now().day.toDouble();
-          final currentSpent = result.currentSpent ?? 0;
-          chartPoints = [];
-          //double cumulative = 0;
-          for (int day = 1; day <= today.toInt(); day++) {
-            final progress = day / today;
-            final naturalSpend =
-                currentSpent * (progress + 0.15 * math.sin(progress * math.pi));
-            chartPoints.add({
-              'day': day.toDouble(),
-              'cumulative': naturalSpend.clamp(0, currentSpent),
-            });
-          }
-          if (chartPoints.isNotEmpty) {
-            chartPoints.last['cumulative'] = currentSpent;
-          }
-        }
-
-        setState(() {
-          _result = result;
-          _dailySpending = _dailySpending;
-          _loading = false;
-        });
-        _controller.forward();
-      } catch (e) {
-        setState(() {
-          _error = e.toString();
-          _loading = false;
-        });
-      }
     }
   }
 
@@ -170,7 +156,7 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
           (_result!.predictedSpendingRange?['low'] as num?)?.toDouble() ?? 0,
       spendingRangeHigh:
           (_result!.predictedSpendingRange?['high'] as num?)?.toDouble() ?? 0,
-      dailySpending: chartPoints, // ✅ synthetic daily points
+      dailySpending: _dailySpending,
     );
 
     return AnimatedBuilder(
