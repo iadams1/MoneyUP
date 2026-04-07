@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:moneyup/services/supabase_service.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -101,7 +102,8 @@ class _PlaidServiceState extends State<PlaidService> {
       if (data['success'] != true) {
         throw Exception(data['error'] ?? 'Exchange did not succeed');
       }
-
+      
+      await SupabaseService().syncAll();
       debugPrint('Plaid connection saved successfully');
 
       // ────────────────────────────────────────────────
