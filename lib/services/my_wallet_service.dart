@@ -21,7 +21,8 @@ class MyWalletService {
           credit_limit, 
           plaid_items!left(institution_name), 
           profiles!left(full_name),
-          is_active
+          is_active, 
+          card_color
         ''')
         .eq('user_id', user);
 

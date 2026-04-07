@@ -86,7 +86,12 @@ class TransactionService {
     double totalDebit = 0;
 
     for (final row in response as List) {
-      final amount = (row['available_balance'] as num).toDouble();
+      double parseBalance(dynamic value) {
+        if (value == null) return 0.0;
+        if (value is num) return value.toDouble();
+        return double.tryParse(value.toString()) ?? 0.0;
+      }
+      final amount = parseBalance(row['current_balance']);
       final accountType = row['type'];
 
       if (accountType == 'depository') {

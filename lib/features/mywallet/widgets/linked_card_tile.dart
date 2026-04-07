@@ -29,7 +29,7 @@ class LinkedCardTile extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              gradient: CardGradients.gradientForCardId(cardId),
+              gradient: CardGradients.fromName(card.cardColor),
             ),
           ),
 

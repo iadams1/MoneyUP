@@ -175,7 +175,6 @@ class _LoginState extends State<LoginScreen> {
                                       false)) {
                                     return;
                                   }
-
                                   try 
                                   {
                                     await AuthService().login(
@@ -183,18 +182,15 @@ class _LoginState extends State<LoginScreen> {
                                       password: _passwordController.text,
                                     );
 
-                                    //REALTIME NOTIFICATION START AFTER LOGIN
-                                    Supabase.instance.client.auth.onAuthStateChange.listen((data) 
-                                    {
-                                      final session = data.session;
+                                    // ✅ Ensure session exists
+                                    final session = Supabase.instance.client.auth.currentSession;
 
-                                      if (session != null) {
-                                        debugPrint("🔥 Auth state changed → starting realtime");
+                                    if (session == null) {
+                                      throw Exception("Session not established after login");
+                                    }
 
-                                        RealtimeNotificationService()
-                                            .startListening(session.user.id);
-                                      }
-                                    });
+                                    // ✅ Start realtime manually with correct user
+                                    RealtimeNotificationService().startListening(session.user.id);
                                     
                                     if (!mounted) return;
                                     Navigator.pushReplacement(

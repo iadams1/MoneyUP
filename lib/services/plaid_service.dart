@@ -17,24 +17,38 @@ class _PlaidServiceState extends State<PlaidService> {
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
+  bool _linkCompleted = false;
 
   StreamSubscription<LinkSuccess>? _onSuccessSubscription;
+  StreamSubscription<LinkExit>? _onExitSubscription;
 
   @override
   void initState() {
     super.initState();
     _fetchLinkToken();
 
-    _onSuccessSubscription = PlaidLink.onSuccess.listen(_handlePlaidSuccess);
-    PlaidLink.onExit.listen((exit) {
-      if (exit.error != null) {
-        debugPrint('Plaid exit with error: ${exit.error}');
-        if (mounted) {
-          setState(() {
-            _hasError = true;
-            _errorMessage = exit.error?.message ?? 'Connection cancelled';
-          });
-        }
+    _onSuccessSubscription = PlaidLink.onSuccess.listen((success) async {
+      debugPrint('PLAID SUCCESS FIRED');
+      _linkCompleted = true;
+      await _handlePlaidSuccess(success);
+    });
+
+    _onExitSubscription = PlaidLink.onExit.listen((exit) {
+      debugPrint('PLAID EXIT FIRED');
+      debugPrint('Plaid exit error: ${exit.error}');
+      debugPrint('Plaid exit metadata: ${exit.metadata}');
+
+      if (_linkCompleted) {
+        debugPrint('Ignoring exit because success already completed');
+        return;
+      }
+
+      if (exit.error != null && mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = exit.error?.message ?? 'Connection cancelled';
+          _isLoading = false;
+        });
       }
     });
   }
@@ -42,20 +56,27 @@ class _PlaidServiceState extends State<PlaidService> {
   @override
   void dispose() {
     _onSuccessSubscription?.cancel();
+    _onExitSubscription?.cancel();
     super.dispose();
   }
 
   Future<void> _fetchLinkToken() async {
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-      _errorMessage = '';
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+        _errorMessage = '';
+      });
+    }
 
     try {
-      final response = await Supabase.instance.client.functions.invoke(
-        'create-plaid-link-token',
-      );
+      debugPrint('Fetching link token...');
+      final response = await Supabase.instance.client.functions
+          .invoke('create-plaid-link-token')
+          .timeout(const Duration(seconds: 15));
+
+      debugPrint('Link token response status: ${response.status}');
+      debugPrint('Link token response data: ${response.data}');
 
       if (response.status != 200) {
         throw Exception('Failed to get link token: ${response.status}');
@@ -68,30 +89,41 @@ class _PlaidServiceState extends State<PlaidService> {
         throw Exception('No link_token in response');
       }
 
-      if (mounted) {
-        setState(() {
-          _linkToken = token;
-          _isLoading = false;
-        });
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _linkToken = token;
+        _isLoading = false;
+      });
     } catch (e, stack) {
       debugPrint('Link token error: $e\n$stack');
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = e.toString();
-          _isLoading = false;
-        });
-      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _hasError = true;
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
   Future<void> _handlePlaidSuccess(LinkSuccess success) async {
+    debugPrint('Plaid success received');
+
     try {
-      final exchangeResponse = await Supabase.instance.client.functions.invoke(
-        'exchange-public-token',
-        body: {'public_token': success.publicToken},
-      );
+      final supabase = Supabase.instance.client;
+
+      debugPrint('Calling exchange-public-token...');
+      final exchangeResponse = await supabase.functions
+          .invoke(
+            'exchange-public-token',
+            body: {'public_token': success.publicToken},
+          )
+          .timeout(const Duration(seconds: 15));
+
+      debugPrint('Exchange status: ${exchangeResponse.status}');
+      debugPrint('Exchange data: ${exchangeResponse.data}');
 
       if (exchangeResponse.status != 200) {
         throw Exception('Token exchange failed: ${exchangeResponse.status}');
@@ -102,65 +134,75 @@ class _PlaidServiceState extends State<PlaidService> {
         throw Exception(data['error'] ?? 'Exchange did not succeed');
       }
 
-      debugPrint('Plaid connection saved successfully');
-
-      // ────────────────────────────────────────────────
-      // NEW: Mark that the user has completed Plaid onboarding
-      final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
-
       if (userId != null) {
-        final updateResult = await supabase
+        debugPrint('Updating has_plaid_connected for $userId');
+
+        await supabase
             .from('profiles')
             .update({'has_plaid_connected': true})
-            .eq('id', userId)
-            .maybeSingle();
+            .eq('id', userId);
 
-        if (updateResult == null) {
-          debugPrint(
-            'Warning: No profile row found to update for user $userId',
-          );
-        } else {
-          debugPrint('has_plaid_connected set to true for user $userId');
-        }
+        debugPrint('Profile updated successfully');
       } else {
-        debugPrint('Warning: No current user when trying to update profile');
+        debugPrint('No current user found');
       }
-      // ────────────────────────────────────────────────
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Bank account connected!')));
+      setState(() {
+        _linkToken = null;
+        _isLoading = false;
+      });
 
-      Navigator.pushReplacementNamed(context, '/home');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bank account connected!')),
+      );
+
+      debugPrint('Navigating to /home');
+      Navigator.of(context).pushReplacementNamed('/home');
     } catch (e, stack) {
       debugPrint('Exchange error: $e\n$stack');
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to connect: $e')));
-      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to connect: $e')),
+      );
     }
   }
 
-  void _openPlaidLink() async {
-    if (_linkToken == null) return;
-
+  Future<void> _openPlaidLink() async {
     try {
+      _linkCompleted = false;
+
+      await _fetchLinkToken();
+
+      if (_linkToken == null) {
+        throw Exception('No link token available');
+      }
+
+      debugPrint('Opening Plaid with fresh token: $_linkToken');
+
       await PlaidLink.create(
         configuration: LinkTokenConfiguration(token: _linkToken!),
       );
-      PlaidLink.open();
-    } catch (e) {
-      debugPrint('Error launching Plaid Link: $e');
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = e.toString();
-        });
-      }
+
+      await PlaidLink.open();
+    } catch (e, stack) {
+      debugPrint('Error launching Plaid Link: $e\n$stack');
+
+      if (!mounted) return;
+
+      setState(() {
+        _hasError = true;
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
