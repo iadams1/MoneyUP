@@ -4,8 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/budget_response.dart';
 
 class PredictionService {
-  // static const String _baseUrl = 'http://10.0.2.2:8000';
-  static const String _baseUrl = 'http://127.0.0.1:8000';
+  //static const String _baseUrl = 'http://10.0.2.2:8000'; //Android Emulator
+  //static const String _baseUrl = 'http://127.0.0.1:8000';  //Localhost
+  //static const String _baseUrl = 'http://10.200.230.23:8000';  //university wifi
+  static const String _baseUrl = 'http://172.20.10.2:8000';  //Phone hotspot network
 
   // Get current logged in user's ID automatically
   String? get _currentUserId => Supabase.instance.client.auth.currentUser?.id;

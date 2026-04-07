@@ -107,27 +107,29 @@ async def predict_budget(request: PredictionRequest):
         # =====================================================================
         # STEP 3: Fetch AmountSpent from Supabase
         # =====================================================================
-        amount_spent = float(budget.get('AmountSpent', 0))
+        history_response = supabase.table("budget_history").select("*").eq(
+            "budget_ID", request.budget_id
+        ).eq(
+            "user_ID", request.user_id
+        ).order("recorded_at").execute()
 
-        if amount_spent == 0:
+        if not history_response.data or len(history_response.data) == 0:
             return PredictionResponse(
                 success=False,
-                message="No spending recorded yet for this budget."
+                message="No spending history yet for this budget."
             )
 
-        # Spread AmountSpent evenly across days of month so far
-        today = date.today()
-        day_of_month = today.day
-        amount_per_day = amount_spent / day_of_month
+        amount_spent = float(budget.get('AmountSpent', 0))
 
         transactions_list = []
-        for day in range(1, day_of_month + 1):
-            point_date = date(today.year, today.month, day)
+        for record in history_response.data:
+            recorded_at = record['recorded_at']
+            # Parse the date from the timestamp
+            point_date = date.fromisoformat(recorded_at[:10])
             transactions_list.append({
                 'transaction_date': str(point_date),
-                'amount': amount_per_day
+                'amount': float(record['AmountSpent'])
             })
-        
         # =====================================================================
         # STEP 4: Format data for ML model
         # =====================================================================
