@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '/models/notification_item.dart';
@@ -8,92 +8,90 @@ import '/services/service_locator.dart';
 
 class NotificationService {
   static final SupabaseClient _client = Supabase.instance.client;
+
   String get user => supabaseService.currentUserId!;
+
   static final NotificationService _instance = NotificationService._internal();
+
   factory NotificationService() => _instance;
+
   NotificationService._internal();
 
-  static FlutterLocalNotificationsPlugin? _notificationsPlugin;
+  FlutterLocalNotificationsPlugin? _notificationsPlugin;
 
-  // Android notification channel
-  static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-    'moneyup_channel',
-    'MoneyUP Notifications',
-    description: 'Important alerts and updates from MoneyUP',
-    importance: Importance.high,
-    playSound: true,
-  );
-
-  Future<void> initialize() async {
+  Future<void> initialize() async 
+  {
     _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // Initialize timezone
-    tz.initializeTimeZones();
-
-    // Android init settings
-    const AndroidInitializationSettings androidSettings =
+    const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // iOS settings
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    const InitializationSettings initSettings =
+        InitializationSettings(android: androidInitSettings);
 
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
-
-    // Initialize plugin
+    //FIXED (named parameter)
     await _notificationsPlugin!.initialize(
       settings: initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
-    // Create Android notification channel
-    await _notificationsPlugin!
+    //CREATE NOTIFICATION CHANNEL
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'moneyup_channel',
+      'MoneyUP Notifications',
+      description: 'Important alerts and updates',
+      importance: Importance.max,
+    );
+
+    final androidPlugin = _notificationsPlugin!
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidPlugin?.createNotificationChannel(channel);
+
+    //REQUEST PERMISSION (Android 13+)
+    final granted = await androidPlugin?.requestNotificationsPermission();
+    debugPrint("🔔 Notification permission granted: $granted"); //FORCE
   }
 
-  // Handle notification tap (when app opens from notification)
-  static void _onNotificationTap(NotificationResponse response) {
-    final payload = response.payload;
-    print('Notification tapped with payload: $payload');
-    // Add navigation logic later if needed (e.g., deep link handling)
-  }
-
-  /// Show an instant notification
   Future<void> showNotification({
     required int id,
     required String title,
     required String body,
-    String? payload,
   }) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'moneyup_channel',
-      'MoneyUP Notifications',
-      channelDescription: 'Important alerts and updates',
-      importance: Importance.max, // HIGH importance ensures it shows in foreground
-      priority: Priority.high,
-      playSound: true,
-    );
+    if (_notificationsPlugin == null) {
+      debugPrint('❌ Notifications plugin not initialized');
+      return;
+    }
+    
+    debugPrint("📢 SHOWING NOTIFICATION: $title");
 
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails
+  (
+  'moneyup_channel',
+  'MoneyUP Notifications',
+  channelDescription: 'Important alerts and updates',
+  importance: Importance.max,
+  priority: Priority.high,
+  playSound: true,
+  enableVibration: true,
+  ticker: 'ticker',
+  fullScreenIntent: true,
+  );
 
+
+    const NotificationDetails details =
+        NotificationDetails(android: androidDetails);
+
+    // ✅ FIXED (named parameters)
     await _notificationsPlugin?.show(
       id: id,
       title: title,
       body: body,
       notificationDetails: details,
-      payload: payload,
     );
   }
 
-  /// Schedule a notification for a future date/time
+    /// Schedule a notification for a future date/time
   Future<void> scheduleNotification({
     required int id,
     required String title,
@@ -135,7 +133,7 @@ class NotificationService {
   Future<List<NotificationItem>> fetchNotifications({int? limit}) async {
     var query = _client
       .from('notifications')
-      .select('id, title, body, created_at, is_read')
+      .select('*')
       .eq('user_id', user)
       .order('created_at', ascending: false);
 
@@ -160,7 +158,7 @@ class NotificationService {
     }) async {
     await _client
       .from('notifications')
-      .update({'is_read': !currentIsRead})
+      .update({'is_read': currentIsRead})
       .eq('id', notificationId)
       .eq('user_id', user);
   }

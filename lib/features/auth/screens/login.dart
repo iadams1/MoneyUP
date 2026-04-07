@@ -6,6 +6,8 @@ import 'package:form_field_validator/form_field_validator.dart';
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/services/realtime_notifications.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,7 +15,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginState();
 
-  
 }
 
 class _LoginState extends State<LoginScreen> {
@@ -174,13 +175,23 @@ class _LoginState extends State<LoginScreen> {
                                       false)) {
                                     return;
                                   }
-
-                                  try {
+                                  try 
+                                  {
                                     await AuthService().login(
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
                                     );
 
+                                    // ✅ Ensure session exists
+                                    final session = Supabase.instance.client.auth.currentSession;
+
+                                    if (session == null) {
+                                      throw Exception("Session not established after login");
+                                    }
+
+                                    // ✅ Start realtime manually with correct user
+                                    RealtimeNotificationService().startListening(session.user.id);
+                                    
                                     if (!mounted) return;
                                     Navigator.pushReplacement(
                                       context,

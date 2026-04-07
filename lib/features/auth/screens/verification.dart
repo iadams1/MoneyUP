@@ -183,7 +183,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                     child: Column(
                       children: [
-                        OtpInput(),
+                        OtpInput(
+                          controller: _codeController,
+                          length: _codeLength,
+                        ),
                         // TextFormField(
                         //   controller: _codeController,
                         //   keyboardType: TextInputType.number,

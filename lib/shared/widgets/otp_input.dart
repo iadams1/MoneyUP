@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 
 class OtpInput extends StatefulWidget {
   final int length;
-  
+  final TextEditingController controller;
+
   const OtpInput({
     super.key,
+    required this.controller,
     this.length = 6,
   });
 
@@ -14,20 +16,17 @@ class OtpInput extends StatefulWidget {
 }
 
 class _OtpInputState extends State<OtpInput> {
-  late TextEditingController _codeController;
   late FocusNode _nodes;
   bool _isActive = false;
 
   @override
   void initState() {
     super.initState();
-    _codeController =  TextEditingController();
     _nodes = FocusNode();
   }
 
   @override
   void dispose() {
-    _codeController.dispose();
     _nodes.dispose();
     super.dispose();
   }
@@ -39,27 +38,6 @@ class _OtpInputState extends State<OtpInput> {
 
     _nodes.requestFocus();
   }
-
-  // void _handleChange(String value, int index) {
-  //   setState(() {
-  //     _isActive = true;
-  //   });
-
-    // if (value.isNotEmpty) {
-    //   if (index < widget.length - 1) {
-    //     _nodes[index + 1].requestFocus();
-    //   }
-    // }
-    // else {
-    //   if (index > 0) {
-    //     _nodes[index - 1].requestFocus();
-    //   }
-    // }
-    // final code = _codeController.map((c) => c.text).join();
-    // if (code.length == widget.length) {
-    //   //
-    // }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +52,11 @@ class _OtpInputState extends State<OtpInput> {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(50),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
             child: Opacity(
               opacity: 0,
               child: TextField(
-                controller: _codeController,
+                controller: widget.controller,
                 focusNode: _nodes,
                 keyboardType: TextInputType.number,
                 maxLength: widget.length,
@@ -88,7 +66,7 @@ class _OtpInputState extends State<OtpInput> {
                 onChanged: (value) {
                   setState(() {});
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   counterText: '',
                   border: InputBorder.none,
                 ),
@@ -99,9 +77,10 @@ class _OtpInputState extends State<OtpInput> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(widget.length, (index) {
               String digit = '';
-              if (index < _codeController.text.length) {
-                digit = _codeController.text[index];
+              if (index < widget.controller.text.length) {
+                digit = widget.controller.text[index];
               }
+
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -113,11 +92,11 @@ class _OtpInputState extends State<OtpInput> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                        )
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8,),
+                  const SizedBox(height: 8),
                   Container(
                     width: 40,
                     height: 2,
@@ -125,35 +104,6 @@ class _OtpInputState extends State<OtpInput> {
                   ),
                 ],
               );
-              // return SizedBox(
-              //   width: 40,
-              //   child: TextFormField(
-              //     controller: _codeController[index],
-              //     focusNode: _nodes[index],
-              //     keyboardType: TextInputType.number,
-              //     textAlign: TextAlign.center,
-              //     maxLength: 1,
-              //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              //     style: TextStyle(
-              //       fontSize: 24,
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //     decoration: InputDecoration(
-              //       counterText: "",
-              //       enabledBorder: UnderlineInputBorder(
-              //         borderSide: BorderSide(color: _isActive ? Colors.transparent : Colors.black),
-              //         ),
-              //       focusedBorder: UnderlineInputBorder(
-              //         borderSide: BorderSide(color: Colors.transparent),
-              //       ),
-              //     ),
-              //     onChanged: (value) {
-              //       if (value.length == _nodes) {
-              //         //
-              //       }
-              //     },
-              //   ),
-              // );
             }),
           ),
         ],

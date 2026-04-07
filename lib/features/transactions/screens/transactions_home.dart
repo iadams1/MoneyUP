@@ -7,9 +7,9 @@ import '/features/transactions/widgets/no_transaction_view.dart';
 import '/features/transactions/widgets/transaction_card.dart';
 import '/services/transaction_service.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/utils/show_notification_dashboard.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/shared/widgets/profile_menu_card.dart';
-import '/shared/widgets/notification_dialog.dart';
 import '/models/transaction.dart';
 import '/models/filter_state.dart';
 
@@ -19,7 +19,7 @@ class TransactionsHome extends StatefulWidget {
   @override
   State<TransactionsHome> createState() => _TransactionsHomeState();
 }
-  
+
 class _TransactionsHomeState extends State<TransactionsHome> {
   bool _isLoading = true;
   final TransactionService _transactionService = TransactionService();
@@ -29,7 +29,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
   double _totalCredit = 0;
   double _availableCredit = 0;
 
-  TransactionType _selectedFilter = TransactionType.debit;
+  TransactionType? _selectedFilter = TransactionType.debit;
   List<Transaction> _filteredTransactions = [];
 
   Future<void> _loadTransactions({
@@ -39,19 +39,16 @@ class _TransactionsHomeState extends State<TransactionsHome> {
     setState(() => _isLoading = true);
 
     try {
-      final activeFilter = filter ?? _selectedFilter;
       final transactions = await _transactionService.fetchTransactions(
-        filter: activeFilter,
+        filter: filter,
         filters: filters,
       );
 
-      // final type = filter == TransactionType.credit ? 'credit' : 'depository';
-
       final totals = await _transactionService.fetchTotals(
         selectedBanks: _currentFilters.selectedBanks.isEmpty
-          ? null
-          : _currentFilters.selectedBanks.toList(),
-        filter: activeFilter,
+            ? null
+            : _currentFilters.selectedBanks.toList(),
+        filter: filter,
       );
 
       setState(() {
@@ -59,7 +56,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
         _totalDebit = totals['debit'] ?? 0;
         _totalCredit = totals['credit'] ?? 0;
         _availableCredit = totals['availableCredit'] ?? 0;
-        _selectedFilter = activeFilter;
+        _selectedFilter = filter;
         _isLoading = false;
       });
     } catch (e) {
@@ -74,30 +71,21 @@ class _TransactionsHomeState extends State<TransactionsHome> {
 
     setState(() {
       _currentFilters = _currentFilters.copyWith(
-        selectedCategories: updatedCategories
+        selectedCategories: updatedCategories,
       );
     });
 
-    await _loadTransactions(
-      filter: _selectedFilter,
-      filters: _currentFilters,
-    );
+    await _loadTransactions(filter: _selectedFilter, filters: _currentFilters);
   }
 
   void _removeBank(String bank) async {
-    final updatedBanks = {..._currentFilters.selectedBanks}
-      ..remove(bank);
+    final updatedBanks = {..._currentFilters.selectedBanks}..remove(bank);
 
     setState(() {
-      _currentFilters = _currentFilters.copyWith(
-        selectedBanks: updatedBanks
-      );
+      _currentFilters = _currentFilters.copyWith(selectedBanks: updatedBanks);
     });
 
-    await _loadTransactions(
-      filter: _selectedFilter,
-      filters: _currentFilters,
-    );
+    await _loadTransactions(filter: _selectedFilter, filters: _currentFilters);
   }
 
   void _removeDate() async {
@@ -108,10 +96,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
       );
     });
 
-    await _loadTransactions(
-      filter: _selectedFilter,
-      filters: _currentFilters,
-    );
+    await _loadTransactions(filter: _selectedFilter, filters: _currentFilters);
   }
 
   @override
@@ -146,47 +131,40 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ProfileMenuCard(),
               TextButton(
                 onPressed: () {
-                  _loadTransactions(
-                    filter: TransactionType.debit,
-                    filters: _currentFilters,
-                  );
-                }, 
+                  _loadTransactions(filter: TransactionType.debit);
+                },
                 style: TextButton.styleFrom(
                   backgroundColor: _selectedFilter == TransactionType.debit
-                    ? Colors.white : Colors.transparent,
+                      ? Colors.white
+                      : Colors.transparent,
                   foregroundColor: _selectedFilter == TransactionType.debit
-                    ? Colors.black : Colors.white,
+                      ? Colors.black
+                      : Colors.white,
                 ),
                 child: Text(
                   'View Debit',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ),
               TextButton(
                 onPressed: () {
-                   _loadTransactions(
-                    filter: TransactionType.credit,
-                    filters: _currentFilters,
-                  );
+                  _loadTransactions(filter: TransactionType.credit);
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: _selectedFilter == TransactionType.credit
-                    ? Colors.white : Colors.transparent,
+                      ? Colors.white
+                      : Colors.transparent,
                   foregroundColor: _selectedFilter == TransactionType.credit
-                    ? Colors.black : Colors.white,
+                      ? Colors.black
+                      : Colors.white,
                 ),
                 child: Text(
                   'View Credit',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ),
-              IconButton( // INFO ICON BUTTON
+              IconButton(
+                // INFO ICON BUTTON
                 onPressed: () {
                   //
                 },
@@ -198,13 +176,10 @@ class _TransactionsHomeState extends State<TransactionsHome> {
               ),
               IconButton(
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => NotificationDialog()
-                  );
-                }, 
+                  showNotificationDropdown(context);
+                },
                 icon: Icon(
-                  Icons.notifications_outlined, 
+                  Icons.notifications_outlined,
                   color: Colors.white,
                   size: 25,
                 ),
@@ -212,14 +187,15 @@ class _TransactionsHomeState extends State<TransactionsHome> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset( // BACKGROUND
+            child: Image.asset(
+              // BACKGROUND
               'assets/images/mu_bg.png',
-              fit: BoxFit.fill
+              fit: BoxFit.fill,
             ),
           ),
           Positioned(
@@ -227,20 +203,19 @@ class _TransactionsHomeState extends State<TransactionsHome> {
             left: 25,
             right: 25,
             child: TotalAmountView(
-              selectedFilter: _selectedFilter, 
-              totalDebit: _totalDebit, 
+              selectedFilter: _selectedFilter!,
+              totalDebit: _totalDebit,
               totalCredit: _totalCredit,
               availableCredit: _availableCredit,
             ),
           ),
-          SafeArea( // WHITE BOX CONTAINER
+          SafeArea(
+            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               margin: EdgeInsets.only(top: 120),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(50.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(50.0)),
                 color: Colors.white,
               ),
               child: Column(
@@ -257,28 +232,30 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                           style: TextStyle(
                             fontFamily: 'SF Pro',
                             fontWeight: FontWeight.w600,
-                            fontSize: 28
+                            fontSize: 28,
                           ),
                         ),
                         IconButton(
                           onPressed: () async {
                             final result = await showDialog<FilterState>(
-                              context: context, 
+                              context: context,
                               builder: (_) => FilterDialog(
                                 initialState: _currentFilters,
-                                selectedType: _selectedFilter,
-                                ),
+                                selectedType: _selectedFilter!,
+                              ),
                             );
                             if (result != null) {
-                              setState(() {_currentFilters = result;});
+                              setState(() {
+                                _currentFilters = result;
+                              });
                               await _loadTransactions(
                                 filter: _selectedFilter,
                                 filters: _currentFilters,
                               );
                             }
                           },
-                          icon: Icon(Icons.filter_alt_outlined, size: 30,),
-                        )
+                          icon: Icon(Icons.filter_alt_outlined, size: 30),
+                        ),
                       ],
                     ),
                   ),
@@ -291,10 +268,7 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                       setState(() {
                         _currentFilters = FilterState.empty();
                       });
-                      await _loadTransactions(
-                        filter: _selectedFilter,
-                        filters: _currentFilters
-                      );
+                      await _loadTransactions(filter: _selectedFilter);
                     },
                   ),
                   SizedBox(height: 10),
@@ -302,18 +276,18 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: _filteredTransactions.isEmpty
-                      ? NoTransactionView()
-                      : ListView.builder(
-                        itemCount: _filteredTransactions.length,
-                        itemBuilder: (context, index) {
-                          final t = _filteredTransactions[index];
-                        
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom:15),
-                            child: TransactionCard(transaction: t,),
-                          );
-                        },
-                      ),
+                          ? NoTransactionView()
+                          : ListView.builder(
+                              itemCount: _filteredTransactions.length,
+                              itemBuilder: (context, index) {
+                                final t = _filteredTransactions[index];
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 15),
+                                  child: TransactionCard(transaction: t),
+                                );
+                              },
+                            ),
                     ),
                   ),
                 ],

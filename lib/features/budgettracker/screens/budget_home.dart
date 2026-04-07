@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/budgettracker/ui/time_filter.dart';
 import '/features/budgettracker/utils/category_colors.dart';
@@ -12,7 +13,6 @@ import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/core/utils/formatters.dart';
 import '/services/service_locator.dart';
-
 
 class BudgetGoalPage extends StatefulWidget {
   const BudgetGoalPage({super.key});
@@ -186,10 +186,25 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 50, left: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [AppAvatar(size: 60), SizedBox(height: 40)],
+          padding: EdgeInsets.only(top: 50, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppAvatar(size: 60),
+              Container(
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    showNotificationDropdown(context);
+                  },
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         toolbarHeight: 110,
@@ -261,18 +276,23 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                         setState(() => selectedFilter = value);
                                         await loadSpendingData();
                                       },
-                                      itemBuilder: (context) => TimeFilter.values.map((filter) {
-                                        return PopupMenuItem<TimeFilter>(
-                                          value: filter,
-                                          child: Text(filterLabels[filter]!),
-                                        );
-                                      }).toList(),
+                                      itemBuilder: (context) =>
+                                          TimeFilter.values.map((filter) {
+                                            return PopupMenuItem<TimeFilter>(
+                                              value: filter,
+                                              child: Text(
+                                                filterLabels[filter]!,
+                                              ),
+                                            );
+                                          }).toList(),
                                       offset: const Offset(0, 45),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -360,8 +380,8 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
                                             }).toList(),
                                           ),
                                         ),
-                                      ),
-                                    ),
+                                ),
+                              ),
                             ),
                           ],
                         ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/auth/screens/login.dart';
 import '/features/profile/widgets/profile_menu.dart';
 import '/services/auth_service.dart';
 import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/notification_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,15 +19,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _handleLogout() async {
     try {
+      // stop any listeners first if you have them
+      // _subscription?.cancel();
+      // RealtimeNotificationService().stopListening();
+
+      // clear local state here if this widget owns any
+      if (mounted) {
+        setState(() {
+          // _linkToken = null;
+          // _accounts = [];
+          // _isLoading = false;
+          // _hasPlaidConnected = false;
+        });
+      }
+
       await _authService.signOut();
 
       if (!mounted) return;
 
-      // Clear navigation stack and go to login
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false, // removes all previous routes
+        (route) => false,
       );
     } catch (e) {
       if (!mounted) return;
@@ -60,10 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: const Icon(
                     Icons.notifications_outlined,
@@ -75,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -94,7 +104,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.white,
               ),
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 5,
+                ),
                 children: [
                   const SizedBox(height: 20),
                   ProfileMenu(text: 'Edit Account', press: () => {}),
@@ -129,7 +142,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               content: Padding(
-                                padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
+                                padding: const EdgeInsets.fromLTRB(
+                                  20.0,
+                                  0,
+                                  20.0,
+                                  0,
+                                ),
                                 child: Text(
                                   'Are you sure you want to log out?',
                                   textAlign: TextAlign.center,
@@ -146,10 +164,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       Expanded(
                                         child: TextButton(
-                                          onPressed: () => Navigator.pop(
-                                            context,
-                                            false,
-                                          ),
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
                                           child: const Text(
                                             "Cancel",
                                             style: TextStyle(
@@ -174,9 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             padding: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                    20,
-                                                  ),
+                                                  BorderRadius.circular(20),
                                             ),
                                           ),
                                           onPressed: () {
@@ -229,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ),
-                        ), 
+                        ),
                       ),
                     ),
                   ),

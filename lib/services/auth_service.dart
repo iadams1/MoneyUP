@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -40,7 +41,7 @@ Future<AuthResponse> verifyOtp({
   required OtpType type,
 }) async {
   final cleanEmail = email.trim().toLowerCase();           // lowercase helps consistency
-  print("Verifying OTP for cleaned email: '$cleanEmail' (length: ${cleanEmail.length})");
+  debugPrint("Verifying OTP for cleaned email: '$cleanEmail' (length: ${cleanEmail.length})");
   
   // Optional: add very basic sanity check (helps debugging)
   if (!cleanEmail.contains('@') || !cleanEmail.contains('.')) {

@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/widgets/article_card.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/notification_dialog.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/shared/widgets/category_info.dart';
 
@@ -36,7 +36,9 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
 
   Future<void> _loadArticles() async {
     try {
-      final article = await articleService.getArticleByCategory(widget.category);
+      final article = await articleService.getArticleByCategory(
+        widget.category,
+      );
       if (!mounted) return;
 
       setState(() {
@@ -63,7 +65,6 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
     );
   }
 
-  
   Widget _buildContent(BuildContext context, {required Key key}) {
     final categoryInfo = categoryInfoMap[widget.category]!;
     final randomArticles = getTwoDifferentArticles(_articles);
@@ -86,19 +87,14 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppAvatar(
-                size: 60,
-              ),
+              AppAvatar(size: 60),
               Container(
                 // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -110,7 +106,7 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -121,7 +117,8 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
               fit: BoxFit.fill,
             ),
           ),
-          SafeArea(// WHITE BOX CONTAINER
+          SafeArea(
+            // WHITE BOX CONTAINER
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -147,66 +144,72 @@ class _CategoryDetailsScreen extends State<CategoryDetailsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.category,
-                                  style: TextStyle(
-                                    fontFamily: 'SF Pro',
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.w600
-                                  ),
-                                ),
-                                const SizedBox(height:6),
-                                Text(
-                                  categoryInfo.text,
-                                  style: TextStyle(
-                                    fontFamily: 'SF Pro',
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 30),
-                                  child: Text(
-                                    'Why it Matters',
-                                    style: TextStyle(
-                                      fontFamily: 'SF Pro',
-                                      fontSize: 26,
-                                      fontStyle: FontStyle.italic,
-                                      fontWeight: FontWeight.w600
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 30),
-                                  child: Text(
-                                    categoryInfo.whyItMatters,
-                                    style: TextStyle(
-                                      fontFamily: 'SF Pro',
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  'Best Practices',
-                                  style: TextStyle(
-                                    fontFamily: 'SF Pro',
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w600
-                                  ),
-                                ),
-                                Column(
-                                  children: categoryInfo.bestPractices.map((text)=>bulletItem(text)).toList(),
-                                ),
-                                const SizedBox(height: 15),
-                                Column(
-                                  spacing: 15,
-                                  children: randomArticles.map((article)=>ArticleCard(article: article)).toList()
-                                ),
-                              ],
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.category,
+                              style: TextStyle(
+                                fontFamily: 'SF Pro',
+                                fontSize: 36,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+                            const SizedBox(height: 6),
+                            Text(
+                              categoryInfo.text,
+                              style: TextStyle(
+                                fontFamily: 'SF Pro',
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding: EdgeInsets.only(left: 30),
+                              child: Text(
+                                'Why it Matters',
+                                style: TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 26,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 30),
+                              child: Text(
+                                categoryInfo.whyItMatters,
+                                style: TextStyle(
+                                  fontFamily: 'SF Pro',
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Best Practices',
+                              style: TextStyle(
+                                fontFamily: 'SF Pro',
+                                fontSize: 26,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Column(
+                              children: categoryInfo.bestPractices
+                                  .map((text) => bulletItem(text))
+                                  .toList(),
+                            ),
+                            const SizedBox(height: 15),
+                            Column(
+                              spacing: 15,
+                              children: randomArticles
+                                  .map(
+                                    (article) => ArticleCard(article: article),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

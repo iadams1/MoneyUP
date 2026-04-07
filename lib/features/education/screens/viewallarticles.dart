@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/widgets/article_card.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
-import '/shared/widgets/notification_dialog.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
@@ -54,7 +54,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
           : _buildContent(context, key: const ValueKey('content')),
     );
   }
-  
+
   Widget _buildContent(BuildContext context, {required Key key}) {
     final articles = _articles;
 
@@ -70,19 +70,14 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppAvatar(
-                size: 60,
-              ),
+              AppAvatar(size: 60),
               Container(
                 // NOTIFICATION ICON
                 alignment: Alignment.topRight,
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -94,7 +89,7 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -140,20 +135,22 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
                           ),
                         ),
 
-                        SizedBox(height: 5)
+                        SizedBox(height: 5),
                       ],
                     ),
                   ),
                   Expanded(
                     child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 18),
+                      padding: EdgeInsets.symmetric(horizontal: 18),
                       child: ListView.separated(
                         itemCount: articles.length,
-                        itemBuilder: (context, index) => ArticleCard(article: articles[index]),
-                        separatorBuilder: (context, index) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) =>
+                            ArticleCard(article: articles[index]),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
                       ),
-                    )
-                  )
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -164,5 +161,3 @@ class _ViewAllArticlesScreenState extends State<ViewAllArticlesScreen> {
     );
   }
 }
-
-  

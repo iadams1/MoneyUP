@@ -20,7 +20,7 @@ class StreakBanner extends StatelessWidget {
     required int currentStreak,
     required int longestStreak,
     required List<bool> weekLogins,
-    Duration duration = const Duration(seconds: 5),// MAKE 5 SECONDS 
+    Duration duration = const Duration(seconds: 5),
   }) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
@@ -76,9 +76,8 @@ class StreakBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: SafeArea(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -136,7 +135,6 @@ class StreakBanner extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

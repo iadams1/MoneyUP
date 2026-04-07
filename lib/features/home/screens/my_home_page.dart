@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/shared/widgets/notification_dialog.dart';
+import 'package:moneyup/features/home/widgets/greeting_text.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
+import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
+import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
+import 'package:moneyup/features/budgettracker/utils/time_range.dart';
+import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
+import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
+// import '/shared/widgets/profile_menu_card.dart';
+import '../widgets/budget_view.dart';
+import '../widgets/no_budget_view.dart';
 import 'package:moneyup/shared/widgets/profile_menu_card.dart';
-
-import '/features/budgettracker/ui/time_filter.dart';
-import '/features/budgettracker/utils/time_range.dart';
-import '/features/home/widgets/monthly_spending_overview_view.dart';
-import '/features/home/widgets/no_spending_overview.dart';
-import '/features/home/widgets/greeting_text.dart';
-import '/features/home/widgets/budget_view.dart';
-import '/features/home/widgets/no_budget_view.dart';
 import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
@@ -17,7 +18,6 @@ import '/models/linked_card.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/first_time_plaid_connect.dart';
 import '/core/utils/formatters.dart';
 import '/shared/widgets/streak_banner.dart';
 
@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Map<int, double> spendingData = {};
   Map<int, String> categoryTitles = {};
-  bool _hasShownHomeNotification = false;
+  //bool _hasShownHomeNotification = false;
 
   @override
   void initState() {
@@ -127,16 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       // ADD TEST NOTIFICATION HERE – after loading completes
-      if (!_hasShownHomeNotification) {
-        _hasShownHomeNotification = true;
-
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          if (!mounted) return;
-
-          // Small delay for smooth UX (UI fully rendered)
-          await Future.delayed(const Duration(milliseconds: 1200));
-        });
-      }
 
       if (!_hasCheckedPlaidDialog) {
         _hasCheckedPlaidDialog = true;
@@ -306,10 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(5),
                 child: IconButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const NotificationDialog(),
-                    );
+                    showNotificationDropdown(context);
                   },
                   icon: Icon(
                     Icons.notifications_outlined,
@@ -321,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -370,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: 5.5),
+                      SizedBox(height: 10),
                       // MyWallet Card Widget
                       IntrinsicHeight(
                         child: Row(
@@ -437,12 +424,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       // Article Card Widget
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 0),
 
                       // Budget Card Widget
                       _buildBudgetCard(context),
 
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
 
                       // Monthly Spending Overview Widget
                       _buildSpendingOverview(context),

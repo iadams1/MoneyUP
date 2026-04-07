@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -37,18 +38,28 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Padding(
-          padding: EdgeInsets.only(top: 10, left: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          padding: EdgeInsets.only(top: 50, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppAvatar(
-                size: 60,
+              AppAvatar(size: 60),
+              Container(
+                padding: EdgeInsets.all(5),
+                child: IconButton(
+                  onPressed: () {
+                    showNotificationDropdown(context);
+                  },
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                ),
               ),
-              SizedBox(height: 40),
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
 
       // Background Gradient
@@ -134,7 +145,9 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             menuHeight: 300,
                             width: 340,
                             menuStyle: MenuStyle(
-                              backgroundColor: WidgetStatePropertyAll(Colors.white),
+                              backgroundColor: WidgetStatePropertyAll(
+                                Colors.white,
+                              ),
                             ),
                             textStyle: TextStyle(
                               fontSize: 19,
@@ -144,7 +157,9 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             dropdownMenuEntries: BudgetType.values.map((type) {
                               return DropdownMenuEntry(
                                 value: type,
-                                label: Formatters.formatCategoryTitle(type.label), // use the custom string
+                                label: Formatters.formatCategoryTitle(
+                                  type.label,
+                                ), // use the custom string
                               );
                             }).toList(),
                             onSelected: (value) {
@@ -328,7 +343,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -338,9 +353,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -349,20 +362,16 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),
