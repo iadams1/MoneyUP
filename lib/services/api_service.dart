@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/budget_response.dart';
+import 'package:flutter/foundation.dart';
 
 class PredictionService {
   //static const String _baseUrl = 'http://10.0.2.2:8000';
@@ -33,24 +34,54 @@ class PredictionService {
     required String budgetId,
   }) async {
     final userId = Supabase.instance.client.auth.currentUser?.id;
-    if (userId == null) return [];
+    if (userId == null) {
+      debugPrint('No user ID');
+      return [];
+    }
+
+    debugPrint('🔍 Querying budget_history for budgetId: $budgetId, userId: $userId');
 
     final response = await Supabase.instance.client
-        .from('budget_logs')
-        .select('log_date, amount')
-        .eq('budget_id', budgetId)
-        .eq('user_id', userId)
-        .order('log_date');
+        .from('budget_history')
+        .select('recorded_at, AmountSpent')
+        .eq('budget_ID', budgetId)
+        .eq('user_ID', userId)
+        .order('recorded_at', ascending: true);
 
-    double cumulative = 0;
+    debugPrint('Raw response: $response');
+    debugPrint('Response length: ${response.length}');
+
     final List<Map<String, double>> daily = [];
 
     for (final log in response) {
-      cumulative += (log['amount'] as num).toDouble();
-      final date = DateTime.parse(log['log_date']);
-      daily.add({'day': date.day.toDouble(), 'cumulative': cumulative});
+      final date = DateTime.parse(log['recorded_at']);
+      final amount = (log['AmountSpent'] as num).toDouble();
+      daily.add({'day': date.day.toDouble(), 'cumulative': amount});
     }
 
     return daily;
   }
+  // Future<List<Map<String, double>>> getTransactionSpending({
+  //   required String budgetId,
+  // }) async {
+  //   final userId = Supabase.instance.client.auth.currentUser?.id;
+  //   if (userId == null) return [];
+
+  //   final response = await Supabase.instance.client
+  //       .from('budget_history')
+  //       .select('recorded_at, AmountSpent')
+  //       .eq('budget_ID', budgetId)
+  //       .eq('user_ID', userId)
+  //       .order('recorded_at');
+
+  //   final List<Map<String, double>> daily = [];
+
+  //   for (final log in response) {
+  //   final date = DateTime.parse(log['recorded_at']);
+  //   final amount = (log['AmountSpent'] as num).toDouble();
+  //   daily.add({'day': date.day.toDouble(), 'cumulative': amount});
+  // }
+
+  // return daily;
+  // }
 }

@@ -26,7 +26,33 @@ Widget buildChart(
   List<FlSpot> buildProjectedSpots(List<FlSpot> actual, PredictionData data) {
     if (actual.isEmpty) return [];
     final last = actual.last;
-    return [last, FlSpot(30, data.predictedFinalSpending)];
+    final startDay = last.x;
+    final endDay = 30.0;
+    final startSpend = last.y;
+    final endSpend = data.predictedFinalSpending;
+    final range = data.spendingRangeHigh - data.spendingRangeLow;
+
+    final spots = <FlSpot>[last];
+    final steps = 8;
+
+    for (int i = 1; i <= steps; i++) {
+      final t = i / steps;
+      final day = startDay + (endDay - startDay) * t;
+
+      // Ease-in-out curve instead of straight line
+      final eased = t < 0.5
+          ? 2 * t * t
+          : 1 - (-2 * t + 2) * (-2 * t + 2) / 2;
+
+      // Add slight natural variance using the confidence range
+      final variance = (range * 0.08) * (i % 3 == 0 ? 1 : i % 2 == 0 ? -0.5 : 0.3);
+      final spend = startSpend + (endSpend - startSpend) * eased + variance;
+
+      spots.add(FlSpot(day, spend.clamp(0, data.spendingRangeHigh * 1.1)));
+    }
+
+    spots.add(FlSpot(endDay, endSpend));
+    return spots;
   }
 
   List<FlSpot> animatedSpots(List<FlSpot> spots) {
@@ -42,6 +68,7 @@ Widget buildChart(
     data.spendingRangeHigh * 1.15,
     data.budgetAmount * 1.15,
     data.predictedFinalSpending * 1.15,
+    data.currentSpent * 1.2,
   ]).reduce((a, b) => a > b ? a : b).ceilToDouble();
 
   return Container(
