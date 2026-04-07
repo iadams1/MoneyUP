@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:moneyup/services/supabase_service.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -134,6 +135,12 @@ class _PlaidServiceState extends State<PlaidService> {
         throw Exception(data['error'] ?? 'Exchange did not succeed');
       }
 
+      
+      await SupabaseService().syncAll();
+      debugPrint('Plaid connection saved successfully');
+
+      // ────────────────────────────────────────────────
+      // NEW: Mark that the user has completed Plaid onboarding
       final userId = supabase.auth.currentUser?.id;
       if (userId != null) {
         debugPrint('Updating has_plaid_connected for $userId');
