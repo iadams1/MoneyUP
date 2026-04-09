@@ -6,27 +6,38 @@ import '/services/service_locator.dart';
 class StreakService {
   static final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
-  
+  String? get user => supabaseService.currentUserId;
+
+  /// Record the user's streak for today.
   Future<bool> recordUserStreak() async {
+    final currentUser = user;
+    if (currentUser == null) return false;
+
     final today = DateTime.now().toIso8601String().split('T').first;
 
     final result = await _client.rpc(
       'record_user_streak',
       params: {
-        'p_user_id': user,
+        'p_user_id': currentUser,
         'p_check_in_date': today,
       },
     );
 
-    return result as bool;
+    // RPC might return null, so safely cast to bool
+    return result == true;
   }
 
+  /// Fetch the user's streak data
   Future<StreakData> fetchUserStreak() async {
+    final currentUser = user;
+    if (currentUser == null) {
+      return StreakData(currentStreak: 0, longestStreak: 0, weekLogins: List.filled(7, false));
+    }
+
     final response = await _client
         .from('user_streaks')
         .select('current_streak, longest_streak')
-        .eq('user_ID', user)
+        .eq('user_ID', currentUser)
         .maybeSingle();
 
     final weekLogins = await fetchWeekLogins();
@@ -38,16 +49,22 @@ class StreakService {
     );
   }
 
+  /// Format DateTime to YYYY-MM-DD
   String toDateOnly(DateTime date) {
     return date.toIso8601String().split('T').first;
   }
 
+  /// Start of the week (Monday)
   DateTime getStartOfWeek(DateTime date) {
     return DateTime(date.year, date.month, date.day)
         .subtract(Duration(days: date.weekday - 1));
   }
 
+  /// Returns a list of booleans for the current week's login (Mon-Sun)
   Future<List<bool>> fetchWeekLogins() async {
+    final currentUser = user;
+    if (currentUser == null) return List.filled(7, false);
+
     final now = DateTime.now();
     final startOfWeek = getStartOfWeek(now);
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
@@ -58,11 +75,11 @@ class StreakService {
     final rows = await _client
         .from('daily_user_logins')
         .select('login_date')
-        .eq('user_ID', user)
+        .eq('user_ID', currentUser)
         .gte('login_date', startOfWeekString)
         .lte('login_date', endOfWeekString);
 
-    final loginDates = rows
+    final loginDates = (rows as List)
         .map((row) => row['login_date'] as String)
         .toSet();
 

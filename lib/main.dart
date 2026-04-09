@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget
         '/verify': (context) => const VerificationScreen(email: ''),
         '/welcome': (context) => const WelcomeScreen(),
       },
-      initialRoute: '/home',
+      initialRoute: '/welcome',
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_legend.da
 import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_stats.dart';
 import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_status_banner.dart';
 import 'package:moneyup/models/data_model.dart';
-import 'package:moneyup/services/budget_response.dart';
+import 'package:moneyup/models/budget_response.dart';
 import 'package:moneyup/services/service_locator.dart';
 import 'dart:math' as math;
 

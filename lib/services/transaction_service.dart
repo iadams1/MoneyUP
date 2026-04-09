@@ -7,12 +7,17 @@ import '/models/filter_state.dart';
 class TransactionService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
+  /// Current user ID, nullable for null safety
+  String? get user => supabaseService.currentUserId;
 
+  /// Fetch transactions with optional filters
   Future<List<Transaction>> fetchTransactions({
-      TransactionType? filter,
-      FilterState? filters,
-    }) async {
+    TransactionType? filter,
+    FilterState? filters,
+  }) async {
+    final currentUser = user;
+    if (currentUser == null) return [];
+
     final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
     var query = _client
         .from('plaid_transactions')
@@ -23,8 +28,8 @@ class TransactionService {
           authorized_date,
           plaid_accounts!inner(type, is_active),
           plaid_items!inner(institution_name)
-          ''')
-        .eq('user_id', user)
+        ''')
+        .eq('user_id', currentUser)
         .eq('plaid_accounts.type', accountType)
         .eq('plaid_accounts.is_active', true);
 
@@ -39,38 +44,39 @@ class TransactionService {
         );
       }
       if (filters.startDate != null) {
-        query = query.gte(
-          'authorized_date',
-          filters.startDate!.toIso8601String(),
-        );
+        query = query.gte('authorized_date', filters.startDate!.toIso8601String());
       }
       if (filters.endDate != null) {
-        query = query.lte(
-          'authorized_date',
-          filters.endDate!.toIso8601String(),
-        );
+        query = query.lte('authorized_date', filters.endDate!.toIso8601String());
       }
     }
-    
+
     final response = await query.order('authorized_date', ascending: false);
     final rows = List<Map<String, dynamic>>.from(response);
     return rows.map(Transaction.fromJson).toList();
   }
 
+  /// Fetch total balances per account type
   Future<Map<String, double>> fetchTotals({
     List<String>? bankName,
     String? type,
   }) async {
-    
+    final currentUser = user;
+    if (currentUser == null) {
+      return {'credit': 0.0, 'debit': 0.0};
+    }
+
     var query = _client
-      .from('plaid_accounts')
-      .select('''
-            type, 
-            available_balance,
-            plaid_items!inner(institution_name), 
-            is_active''')
-      .eq('user_id', user)
-      .eq('is_active', true);
+        .from('plaid_accounts')
+        .select('''
+          type,
+          available_balance,
+          current_balance,
+          plaid_items!inner(institution_name),
+          is_active
+        ''')
+        .eq('user_id', currentUser)
+        .eq('is_active', true);
 
     if (type != null && type.isNotEmpty) {
       query = query.eq('type', type);
@@ -91,7 +97,8 @@ class TransactionService {
         if (value is num) return value.toDouble();
         return double.tryParse(value.toString()) ?? 0.0;
       }
-      final amount = parseBalance(row['current_balance']);
+
+      final amount = parseBalance(row['available_balance']);
       final accountType = row['type'];
 
       if (accountType == 'depository') {
@@ -101,21 +108,27 @@ class TransactionService {
       }
     }
 
-    return {
-      'credit': totalCredit,
-      'debit': totalDebit
-    };
+    return {'credit': totalCredit, 'debit': totalDebit};
   }
 
+  /// Fetch available filters for transactions
   Future<FilterData> fetchFilters(
-    TransactionType? filter, 
+    TransactionType? filter,
     FilterState? filters, {
     List<String>? bankNames,
     String? category,
   }) async {
-    
+    final currentUser = user;
+    if (currentUser == null) {
+      return FilterData(
+        categories: [],
+        institutions: [],
+        dates: [],
+      );
+    }
+
     final accountType = filter == TransactionType.credit ? 'credit' : 'depository';
-    
+
     final transactions = await fetchTransactions(
       filter: filter,
       filters: filters,
@@ -137,33 +150,30 @@ class TransactionService {
           plaid_items!inner(institution_name),
           plaid_accounts!inner(type, is_active)
         ''')
-        .eq('user_id', user)
+        .eq('user_id', currentUser)
         .eq('plaid_accounts.type', accountType)
         .eq('plaid_accounts.is_active', true);
-
-    // final categories = <String>{};
-    // final institutions = <String>{};
 
     final rows = List<Map<String, dynamic>>.from(response);
 
     for (final row in rows) {
       final category = row['category'];
-      final instituion = row['plaid_items']?['institution_name'];
-      
+      final institution = row['plaid_items']?['institution_name'];
+
       if (category != null && category.isNotEmpty) {
         categories.add(category);
       }
-      if (instituion != null && instituion.isNotEmpty) {
-        institutions.add(instituion);
+      if (institution != null && institution.isNotEmpty) {
+        institutions.add(institution);
       }
     }
 
-    fetchTotals(bankName: bankNames, type: accountType);
+    // Optional: fetchTotals call removed because it was unawaited and unused
 
     return FilterData(
-      categories: categories.toList()..sort(), 
-      institutions: institutions.toList()..sort(), 
-      dates: [],
+      categories: categories.toList()..sort(),
+      institutions: institutions.toList()..sort(),
+      dates: dates.toList()..sort(),
     );
   }
 }

@@ -9,7 +9,7 @@ import '/services/service_locator.dart';
 class NotificationService {
   static final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
+  String? get user => supabaseService.currentUserId;
 
   static final NotificationService _instance = NotificationService._internal();
 
@@ -131,10 +131,13 @@ class NotificationService {
   }
 
   Future<List<NotificationItem>> fetchNotifications({int? limit}) async {
+    final currentUser = user;
+    if (currentUser == null) return [];
+
     var query = _client
       .from('notifications')
       .select('*')
-      .eq('user_id', user)
+      .eq('user_id', currentUser)
       .order('created_at', ascending: false);
 
     if (limit != null) {
@@ -156,10 +159,12 @@ class NotificationService {
       required String notificationId,
       required bool currentIsRead,
     }) async {
+      final currentUser = user;
+    if (currentUser == null) return;
     await _client
       .from('notifications')
       .update({'is_read': currentIsRead})
       .eq('id', notificationId)
-      .eq('user_id', user);
+      .eq('user_id', currentUser);
   }
 }
