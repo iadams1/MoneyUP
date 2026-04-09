@@ -176,13 +176,22 @@ async def predict_budget(request: PredictionRequest):
                 message="Not enough spending history to make a prediction."
             )
 
-        # Project what a full month looks like based on current rate
+        # Current daily rate based on actual spending so far
         daily_rate = amount_spent / day_of_month
+
+        # Project what transactions will look like for a FULL month
+        # Scale up transaction count to what we'd expect over 30 days
         projected_monthly_transactions = max(1, round((len(transactions_list) / day_of_month) * 30))
+
+        # Project average transaction — stays the same, individual amounts don't change
         projected_avg_transaction = float(np.mean(daily_amounts))
         projected_max = float(np.max(daily_amounts))
         projected_min = float(np.min(daily_amounts))
         projected_std = float(np.std(daily_amounts)) if len(daily_amounts) > 1 else 0.0
+
+        # Project what TOTAL spending will look like at end of month
+        projected_total_if_continues = daily_rate * 30
+        projected_pct_budget_used = projected_total_if_continues / budget_amount
 
         features = pd.DataFrame([{
             'budget_amount': budget_amount,
@@ -193,18 +202,20 @@ async def predict_budget(request: PredictionRequest):
             'max_transaction': projected_max,
             'min_transaction': projected_min,
             'std_transaction': projected_std,
-            'spending_period_days': 30,
-            'daily_spending_rate': daily_rate,
-            'pct_budget_used': amount_spent / budget_amount
+            'spending_period_days': 30,           # full month — matches training data
+            'daily_spending_rate': daily_rate,    # current rate, model uses this to project
+            'pct_budget_used': projected_pct_budget_used  # where we're HEADED, not where we are
         }])
 
-        # Run through ML model directly with reconstructed features
+        # Run through ML model
         predictor_instance = get_budget_predictor()
         predicted_spending, lower_bound, upper_bound = predictor_instance.predict_with_confidence_intervals(
             features, predictor_instance.best_model
         )
 
         projected_final = float(predicted_spending[0])
+
+        # Confidence bounds should never go below what's already spent
         low = float(max(amount_spent, lower_bound[0]))
         high = float(upper_bound[0])
         predicted_overage = projected_final - budget_amount
