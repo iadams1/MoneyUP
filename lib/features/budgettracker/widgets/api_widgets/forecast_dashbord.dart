@@ -60,12 +60,14 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
   Future<void> _fetchPrediction() async {
     try {
       final result = await _service.getPrediction(budgetId: widget.budgetId);
-      final daily = await _service.getTransactionSpending(budgetId: widget.budgetId);
-      
-      debugPrint('Daily points: $daily'); 
-      debugPrint('Current spent: ${result.currentSpent}'); 
+      final daily = await _service.getTransactionSpending(
+        budgetId: widget.budgetId,
+      );
+
+      debugPrint('Daily points: $daily');
+      debugPrint('Current spent: ${result.currentSpent}');
       debugPrint('Predicted final: ${result.predictedFinalSpending}');
-      debugPrint('Budget amount: ${result.budgetAmount}'); 
+      debugPrint('Budget amount: ${result.budgetAmount}');
 
       // Fall back to synthetic only if no history yet
       List<Map<String, double>> chartPoints = daily;
@@ -74,8 +76,8 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
         final currentSpent = result.currentSpent ?? 0;
         for (int day = 1; day <= today.toInt(); day++) {
           final progress = day / today;
-          final naturalSpend = currentSpent * 
-              (progress + 0.15 * math.sin(progress * math.pi));
+          final naturalSpend =
+              currentSpent * (progress + 0.15 * math.sin(progress * math.pi));
           chartPoints.add({
             'day': day.toDouble(),
             'cumulative': naturalSpend.clamp(0, currentSpent),
@@ -127,21 +129,35 @@ class _BudgetPredictionChartState extends State<BudgetPredictionChart>
     }
     if (_result == null || !_result!.success) {
       return Center(
-        child: Text(
-          _result?.message ?? 'No data',
-          style: const TextStyle(color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.bar_chart_outlined, size: 48, color: Colors.black26),
+              const SizedBox(height: 16),
+              const Text(
+                'No spending history yet',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Start logging transactions to see your forecast.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.black38,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
         ),
       );
-    }
-
-    // Build simple chart points from current data
-    final today = DateTime.now().day.toDouble();
-    //final currentSpent = _result!.currentSpent ?? 0;
-    final dailyRate = _result!.currentSpent! / today;
-
-    final List<Map<String, double>> chartPoints = [];
-    for (int day = 1; day <= today.toInt(); day++) {
-      chartPoints.add({'day': day.toDouble(), 'cumulative': dailyRate * day});
     }
 
     final data = PredictionData(
