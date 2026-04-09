@@ -182,7 +182,15 @@ class _LoginState extends State<LoginScreen> {
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
                                     );
+                                    //REFRESH THE USER session
+                                    await Supabase.instance.client.auth.refreshSession();
 
+                                    // Optional: debug print to confirm the user changed
+                                    print('Logged in as: ${Supabase.instance.client.auth.currentUser?.id}');
+
+                                    // Now check the Plaid flag
+                                    // final supabase = Supabase.instance.client;
+                                    // final user = supabase.auth.currentUser;
                                     //REALTIME NOTIFICATION START AFTER LOGIN
                                     Supabase.instance.client.auth.onAuthStateChange.listen((data) 
                                     {

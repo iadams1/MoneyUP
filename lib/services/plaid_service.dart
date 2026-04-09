@@ -87,63 +87,61 @@ class _PlaidServiceState extends State<PlaidService> {
     }
   }
 
-  Future<void> _handlePlaidSuccess(LinkSuccess success) async {
-    try {
-      final exchangeResponse = await Supabase.instance.client.functions.invoke(
-        'exchange-public-token',
-        body: {'public_token': success.publicToken},
-      );
+  Future<void> _handlePlaidSuccess(LinkSuccess success) async 
+  {
+    try 
+    {
+    final supabase = Supabase.instance.client;
 
-      if (exchangeResponse.status != 200) {
-        throw Exception('Token exchange failed: ${exchangeResponse.status}');
-      }
+        debugPrint('Plaid Success - Public Token: ${success.publicToken}');
+        debugPrint('Institution from metadata: ${success.metadata.institution}');
 
-      final data = exchangeResponse.data as Map<String, dynamic>;
-      if (data['success'] != true) {
-        throw Exception(data['error'] ?? 'Exchange did not succeed');
-      }
-      
-      await SupabaseService().syncAll();
-      debugPrint('Plaid connection saved successfully');
+        final exchangeResponse = await supabase.functions.invoke(
+          'exchange-public-token',
+          body: {
+            'public_token': success.publicToken,
+            // Send whatever we have, even if null
+            'institution_id': success.metadata.institution?.id,
+            'institution_name': success.metadata.institution?.name,
+          },
+        );
 
-      // ────────────────────────────────────────────────
-      // NEW: Mark that the user has completed Plaid onboarding
-      final supabase = Supabase.instance.client;
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId != null) {
-        final updateResult = await supabase
-            .from('profiles')
-            .update({'has_plaid_connected': true})
-            .eq('id', userId)
-            .maybeSingle();
-
-        if (updateResult == null) {
-          debugPrint(
-            'Warning: No profile row found to update for user $userId',
-          );
-        } else {
-          debugPrint('has_plaid_connected set to true for user $userId');
+        if (exchangeResponse.status != 200) {
+          throw Exception('Token exchange failed: ${exchangeResponse.status}');
         }
-      } else {
-        debugPrint('Warning: No current user when trying to update profile');
-      }
-      // ────────────────────────────────────────────────
 
-      if (!mounted) return;
+        final data = exchangeResponse.data as Map<String, dynamic>;
+        if (data['success'] != true) {
+          throw Exception(data['error'] ?? 'Exchange failed');
+        }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Bank account connected!')));
+        debugPrint('Plaid connection saved successfully');
 
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e, stack) {
-      debugPrint('Exchange error: $e\n$stack');
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to connect: $e')));
-      }
+        // Update profile flag
+        final userId = supabase.auth.currentUser?.id;
+        if (userId != null) {
+          await supabase
+              .from('profiles')
+              .update({'has_plaid_connected': true})
+              .eq('id', userId);
+        }
+
+        await SupabaseService().syncAll();
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bank account connected! Syncing data...')),
+        );
+
+        Navigator.pushReplacementNamed(context, '/home');
+      } catch (e, stack) {
+        debugPrint('Plaid success error: $e\n$stack');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to connect bank: $e')),
+          );
+        }
     }
   }
 
