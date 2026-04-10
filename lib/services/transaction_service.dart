@@ -35,7 +35,9 @@ class TransactionService {
 
     if (filters != null) {
       if (filters.selectedCategories.isNotEmpty) {
-        query = query.inFilter('category', filters.selectedCategories.toList());
+        query = query.inFilter(
+          'category',
+          filters.selectedCategories.toList());
       }
       if (filters.selectedBanks.isNotEmpty) {
         query = query.inFilter(
@@ -47,19 +49,29 @@ class TransactionService {
         query = query.gte('authorized_date', filters.startDate!.toIso8601String());
       }
       if (filters.endDate != null) {
-        query = query.lte('authorized_date', filters.endDate!.toIso8601String());
+        final end = filters.endDate!;
+        final endOfDay = DateTime(
+          end.year,
+          end.month,
+          end.day,
+          23, 59, 59, 999,
+        );
+        query = query.lte(
+          'authorized_date',
+          endOfDay.toIso8601String(),
+        );
       }
     }
 
     final response = await query.order('authorized_date', ascending: false);
     final rows = List<Map<String, dynamic>>.from(response);
-    return rows.map(Transaction.fromJson).toList();
+    return rows.map((row) => Transaction.fromJson(row)).toList();
   }
 
   /// Fetch total balances per account type
   Future<Map<String, double>> fetchTotals({
-    List<String>? bankName,
-    String? type,
+    List<String>? selectedBanks,
+    TransactionType? filter,
   }) async {
     final currentUser = user;
     if (currentUser == null) {
@@ -78,18 +90,23 @@ class TransactionService {
         .eq('user_id', currentUser)
         .eq('is_active', true);
 
-    if (type != null && type.isNotEmpty) {
-      query = query.eq('type', type);
+    if (filter != null) {
+      final typeString = filter == TransactionType.credit ? 'credit' : 'depository';
+      query = query.eq('type', typeString);
     }
 
-    if (bankName != null && bankName.isNotEmpty) {
-      query = query.inFilter('plaid_items.institution_name', bankName);
+    if (selectedBanks != null && selectedBanks.isNotEmpty) {
+      query = query.inFilter(
+        'plaid_items.institution_name',
+        selectedBanks,
+      );
     }
 
     final response = await query;
 
     double totalCredit = 0;
     double totalDebit = 0;
+    double totalBalance = 0;
 
     for (final row in response as List) {
       double parseBalance(dynamic value) {
@@ -100,6 +117,8 @@ class TransactionService {
 
       final amount = parseBalance(row['available_balance']);
       final accountType = row['type'];
+
+      totalBalance += amount;
 
       if (accountType == 'depository') {
         totalDebit += amount;
@@ -169,6 +188,7 @@ class TransactionService {
     }
 
     // Optional: fetchTotals call removed because it was unawaited and unused
+    fetchTotals(selectedBanks: bankNames, filter: filter);
 
     return FilterData(
       categories: categories.toList()..sort(),

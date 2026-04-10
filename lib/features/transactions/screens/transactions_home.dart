@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 
 import '../widgets/filters/active_filter_chips.dart';
 import '/features/transactions/widgets/filter_dialog.dart';
@@ -8,6 +7,7 @@ import '/features/transactions/widgets/no_transaction_view.dart';
 import '/features/transactions/widgets/transaction_card.dart';
 import '/services/transaction_service.dart';
 import '/shared/screen/loading_screen.dart';
+import '/shared/utils/show_notification_dashboard.dart';
 import '/shared/widgets/bottom_nav.dart';
 import '/shared/widgets/profile_menu_card.dart';
 import '/models/transaction.dart';
@@ -44,13 +44,11 @@ class _TransactionsHomeState extends State<TransactionsHome> {
         filters: filters,
       );
 
-      final type = filter == TransactionType.credit ? 'credit' : 'depository';
-
       final totals = await _transactionService.fetchTotals(
-        bankName: _currentFilters.selectedBanks.isEmpty
+        selectedBanks: _currentFilters.selectedBanks.isEmpty
             ? null
             : _currentFilters.selectedBanks.toList(),
-        type: type,
+        filter: filter,
       );
 
       setState(() {
