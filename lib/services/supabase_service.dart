@@ -21,22 +21,71 @@ class SupabaseService {
     DATABASE SECTION
   ====================================
   */
-  /// Sync accounts + transactions (most common use)
+
+  /// Sync accounts + transactions in the correct order (Recommended)
+  /// This is the main method you should call most of the time
   Future<void> syncAll() async {
-    await _client.functions.invoke('sync-plaid-accounts', body: {});
-    await _client.functions.invoke('sync-plaid-transactions', body: {});
+    try {
+      final response = await _client.functions.invoke(
+        'sync-plaid-data',
+        body: {}, // You can pass item_id later if you want to sync only one account
+      );
+
+      print('✅ sync-plaid-data completed successfully');
+      print('Response: ${response.data}');
+    } catch (e) {
+      print('❌ sync-plaid-data failed: $e');
+      rethrow; // Let the caller handle the error if needed
+    }
   }
 
-  /// Sync only transactions (cursor-based)
+  /// Sync only transactions (cursor-based) - kept for backward compatibility
   Future<void> syncTransactions({String? itemId}) async {
-    final body = itemId != null ? {'item_id': itemId} : {};
-    await _client.functions.invoke('sync-plaid-transactions', body: body);
+    try {
+      final body = itemId != null ? {'item_id': itemId} : {};
+      final response = await _client.functions.invoke(
+        'sync-plaid-transactions',
+        body: body,
+      );
+
+      print('✅ syncTransactions completed');
+      print('Response: ${response.data}');
+    } catch (e) {
+      print('❌ syncTransactions failed: $e');
+      rethrow;
+    }
   }
 
-  /// Sync only accounts (balances)
+  /// Sync only accounts (balances) - kept for backward compatibility
   Future<void> syncAccounts({String? itemId}) async {
-    final body = itemId != null ? {'item_id': itemId} : {};
-    await _client.functions.invoke('sync-plaid-accounts', body: body);
+    try {
+      final body = itemId != null ? {'item_id': itemId} : {};
+      final response = await _client.functions.invoke(
+        'sync-plaid-accounts',
+        body: body,
+      );
+
+      print('✅ syncAccounts completed');
+      print('Response: ${response.data}');
+    } catch (e) {
+      print('❌ syncAccounts failed: $e');
+      rethrow;
+    }
   }
 
+  /// Optional: New method for full sync with better error handling
+  Future<Map<String, dynamic>?> syncAllWithResult() async {
+    try {
+      final response = await _client.functions.invoke(
+        'sync-plaid-data',
+        body: {},
+      );
+
+      print('✅ Full sync completed');
+      return response.data as Map<String, dynamic>?;
+    } catch (e) {
+      print('❌ Full sync failed: $e');
+      return null;
+    }
+  }
 }

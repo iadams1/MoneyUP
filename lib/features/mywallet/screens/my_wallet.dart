@@ -332,6 +332,7 @@ class _MyWallet extends State<MyWallet> {
                             mask: card.mask,
                             currentAmount: card.availableBalance ?? 0.0,
                             cardholderName: card.cardholderName ?? "",
+                            cardColor: card.cardColor,
                           );
                         },
                       ),

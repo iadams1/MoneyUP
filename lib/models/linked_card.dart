@@ -4,6 +4,7 @@ class LinkedCard{
   final String mask;
   final String type;
   final bool isActive; 
+  final String cardColor;
 
   final String? bankName;
   final double? currentBalance;
@@ -16,6 +17,7 @@ class LinkedCard{
     required this.accountName,
     required this.mask,
     required this.type,
+    required this.cardColor,
     this.bankName,
     this.availableBalance,
     this.currentBalance,
@@ -28,6 +30,12 @@ class LinkedCard{
     final plaid = map["plaid_items"] as Map<String, dynamic>?;
     final profile = map["profiles"] as Map<String, dynamic>?;
 
+    double parseBalance(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString()) ?? 0.0;
+    }
+
     return LinkedCard(
       accountId: map["account_id"] as dynamic, 
       accountName: map["name"] as String, 
@@ -35,12 +43,16 @@ class LinkedCard{
       type: map["type"] as String,
       isActive: map["is_active"] as bool,
 
-      availableBalance: (map["available_balance"] as num?)?.toDouble(),
-      currentBalance: (map["current_balance"] as num?)?.toDouble(),
-      creditLimit: (map["credit_limit"] as num?)?.toDouble(),
+      availableBalance: parseBalance(map['available_balance']) != 0.0
+          ? parseBalance(map['available_balance'])
+          : parseBalance(map['current_balance']),
+      currentBalance: parseBalance(map['current_balance']),
+      creditLimit: parseBalance(map['credit_limit']),
+      cardColor: map["card_color"] as String,
 
       bankName: plaid?["institution_name"] as String?,
       cardholderName: profile?["full_name"] as String?,
     );
   }
+
 }

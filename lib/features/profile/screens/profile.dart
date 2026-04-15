@@ -19,15 +19,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _handleLogout() async {
     try {
+      // stop any listeners first if you have them
+      // _subscription?.cancel();
+      // RealtimeNotificationService().stopListening();
+
+      // clear local state here if this widget owns any
+      if (mounted) {
+        setState(() {
+          // _linkToken = null;
+          // _accounts = [];
+          // _isLoading = false;
+          // _hasPlaidConnected = false;
+        });
+      }
+
       await _authService.signOut();
 
       if (!mounted) return;
 
-      // Clear navigation stack and go to login
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false, // removes all previous routes
+        (route) => false,
       );
     } catch (e) {
       if (!mounted) return;

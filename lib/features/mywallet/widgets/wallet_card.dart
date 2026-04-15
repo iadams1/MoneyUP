@@ -9,6 +9,7 @@ class WalletCard extends StatelessWidget {
   final String mask;
   final double currentAmount;
   final String cardholderName;
+  final String cardColor;
 
   const WalletCard({
     super.key,
@@ -17,11 +18,12 @@ class WalletCard extends StatelessWidget {
     required this.mask,
     required this.currentAmount,
     required this.cardholderName,
+    required this.cardColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final gradient = CardGradients.gradientForCardId(cardId!);
+    final gradient = CardGradients.fromName(cardColor);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(8, 8, 8, 25),

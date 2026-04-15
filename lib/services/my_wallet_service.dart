@@ -6,9 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class MyWalletService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
-  
+  /// Current logged-in user ID
+  String? get user => supabaseService.currentUserId;
+
+  /// Fetch all linked cards for the current user
   Future<List<LinkedCard>> fetchLinkedCards() async {
+    final currentUser = user;
+    if (currentUser == null) return [];
+
     final rows = await _client
         .from('plaid_accounts')
         .select('''
@@ -21,35 +26,38 @@ class MyWalletService {
           credit_limit, 
           plaid_items!left(institution_name), 
           profiles!left(full_name),
-          is_active
+          is_active, 
+          card_color
         ''')
-        .eq('user_id', user);
+        .eq('user_id', currentUser);
 
-    return (rows as List)
-        .map((r) => LinkedCard.fromMap(r as Map<String, dynamic>))
+    return rows
+        .map((r) => LinkedCard.fromMap(r))
         .toList();
   }
 
+  /// Fetch the primary (first) linked card
   Future<LinkedCard?> fetchPrimaryCard() async {
     final cards = await fetchLinkedCards();
-    if (cards.isEmpty) return null;
-    return cards.first;
+    return cards.isNotEmpty ? cards.first : null;
   }
 
-  Future<void> deleteCardAccount({required dynamic accountId}) async {
+  /// Soft-delete a card account (mark as inactive)
+  Future<void> deleteCardAccount({required String accountId}) async {
+    final currentUser = user;
+    if (currentUser == null) return;
+
     try {
       await _client
-        .from('plaid_accounts')
-        .update({
-          'is_active': false,
-        })
-        .eq('account_id', accountId)
-        .eq('user_id', user);
-      
-      debugPrint('Deletion was successful!');
-    } catch (error) {
-      debugPrint('Error Deleting rows: $error');
-        rethrow;
+          .from('plaid_accounts')
+          .update({'is_active': false})
+          .eq('account_id', accountId)
+          .eq('user_id', currentUser);
+
+      debugPrint('✅ Card marked as inactive successfully');
+    } catch (error, stack) {
+      debugPrint('❌ Error deleting card: $error\n$stack');
+      rethrow;
     }
   }
 }

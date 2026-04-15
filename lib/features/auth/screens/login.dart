@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/services/auth_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/realtime_notifications.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,34 +14,32 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginState();
-
 }
 
 class _LoginState extends State<LoginScreen> {
-  final _formkey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Add password visibility state
-  final bool _obscurePassword = true;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formkey,
-      child: Scaffold(
-        body: Stack(
+    return Scaffold(
+      body: Form(
+        key: _formKey,
+        child: Stack(
           fit: StackFit.expand,
-          children: <Widget>[
+          children: [
+            // BACKGROUND IMAGE
             Image.asset(
-              // BACKGROUND
               'assets/images/mu_bg.png',
               fit: BoxFit.fill,
             ),
+            // LOGIN IMAGE
             Container(
-              // LOGIN IMAGE
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: 120),
+              padding: const EdgeInsets.only(top: 120),
               child: Image.asset(
                 'assets/images/mu_login.png',
                 width: 350,
@@ -49,230 +47,186 @@ class _LoginState extends State<LoginScreen> {
                 fit: BoxFit.cover,
               ),
             ),
+            // LOGIN FORM BOX
             Align(
-              // LOGIN SCREEN BOX
               alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50.0),
-                    topRight: Radius.circular(50.0),
+              child: SingleChildScrollView(
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50.0),
+                      topRight: Radius.circular(50.0),
+                    ),
+                    color: Colors.white,
                   ),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            // EMAIL ADDRESS
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: TextFormField(
-                              controller: _emailController,
-                              validator: MultiValidator([
-                                RequiredValidator(
-                                  errorText: 'Enter email address',
-                                ),
-                                EmailValidator(
+                  child: Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // EMAIL FIELD
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: MultiValidator([
+                              RequiredValidator(
+                                  errorText: 'Enter email address'),
+                              EmailValidator(
                                   errorText:
-                                      'Invalid email address. Please try again.',
-                                ),
-                              ]).call,
-                              decoration: InputDecoration(
-                                hintText: 'Email Address',
-                                labelText: 'Email Address',
-                                labelStyle: TextStyle(
-                                  color: Color(0x4F000000),
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'SF Pro',
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.email_outlined, 
-                                  color: Colors.black
-                                ),
-                                errorStyle: TextStyle(fontSize: 16.0),
-                                filled: true,
-                                fillColor: HexColor('#E7E7E7'),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(9.0),
-                                  ),
-                                ),
+                                      'Invalid email address. Please try again.'),
+                            ]).call,
+                            decoration: InputDecoration(
+                              hintText: 'Email Address',
+                              labelText: 'Email Address',
+                              labelStyle: const TextStyle(
+                                color: Color(0x4F000000),
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'SF Pro',
+                              ),
+                              prefixIcon: const Icon(Icons.email_outlined,
+                                  color: Colors.black),
+                              errorStyle: const TextStyle(fontSize: 16.0),
+                              filled: true,
+                              fillColor: HexColor('#E7E7E7'),
+                              border: const OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(9.0)),
                               ),
                             ),
                           ),
-                          Padding(
-                            // PASSWORD ENTRY
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: TextFormField(
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              validator: MultiValidator([
-                                RequiredValidator(errorText: 'Enter password'),
-                                MinLengthValidator(
-                                  8,
+                        ),
+                        // PASSWORD FIELD
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            validator: MultiValidator([
+                              RequiredValidator(errorText: 'Enter password'),
+                              MinLengthValidator(8,
                                   errorText:
-                                      'Password must be at least 8 characters',
-                                ),
-                              ]).call,
-                              decoration: InputDecoration(
-                                hintText: 'Password',
-                                labelText: 'Password',
-                                labelStyle: TextStyle(
-                                  color: Color(0x4F000000),
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'SF Pro',
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock_outline, 
-                                  color: Colors.black
-                                ),
-                                errorStyle: TextStyle(fontSize: 16.0),
-                                filled: true,
-                                fillColor: HexColor('#E7E7E7'),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(9.0),
-                                  ),
-                                ),
+                                      'Password must be at least 8 characters'),
+                            ]).call,
+                            decoration: InputDecoration(
+                              hintText: 'Password',
+                              labelText: 'Password',
+                              labelStyle: const TextStyle(
+                                color: Color(0x4F000000),
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'SF Pro',
                               ),
-                            ),
-                          ),
-                          Padding(
-                            // LOGIN BUTTON
-                            padding: const EdgeInsets.only(top: 30.0),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(50.0),
+                              prefixIcon:
+                                  const Icon(Icons.lock_outline, color: Colors.black),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.black,
                                 ),
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: <HexColor>[
-                                    HexColor('#124074'),
-                                    HexColor('#332677'),
-                                    HexColor('#124074'),
-                                    HexColor('#0D1250'),
-                                  ],
-                                  tileMode: TileMode.mirror,
-                                ),
-                              ),
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  if (!(_formkey.currentState?.validate() ??
-                                      false)) {
-                                    return;
-                                  }
-
-                                  try 
-                                  {
-                                    await AuthService().login(
-                                      email: _emailController.text.trim(),
-                                      password: _passwordController.text,
-                                    );
-
-                                    //REALTIME NOTIFICATION START AFTER LOGIN
-                                    Supabase.instance.client.auth.onAuthStateChange.listen((data) 
-                                    {
-                                      final session = data.session;
-
-                                      if (session != null) {
-                                        debugPrint("🔥 Auth state changed → starting realtime");
-
-                                        RealtimeNotificationService()
-                                            .startListening(session.user.id);
-                                      }
-                                    });
-                                    
-                                    if (!mounted) return;
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MyHomePage(title: ''),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    debugPrint('LOGIN ERROR: $e');
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Invalid email or password',
-                                        ),
-                                      ),
-                                    );
-                                  }
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: const Color.fromARGB(
-                                    255,
-                                    144,
-                                    68,
-                                    232,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16
-                                  ),
-                                ),
+                              ),
+                              errorStyle: const TextStyle(fontSize: 16.0),
+                              filled: true,
+                              fillColor: HexColor('#E7E7E7'),
+                              border: const OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(9.0)),
                               ),
                             ),
                           ),
-                          Center(
-                            // PUSH TO SIGNUP SCREEN
-                            child: Container(
-                              alignment: FractionalOffset.bottomCenter,
-                              padding: EdgeInsets.only(top: 40),
-                              child: RichText(
-                                text: TextSpan(
-                                  text: "Don't have an account? ",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black,
-                                    fontFamily: 'SF Pro',
+                        ),
+                        // LOGIN BUTTON
+                        Padding(
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      HexColor('#124074'),
+                                      HexColor('#332677'),
+                                      HexColor('#124074'),
+                                      HexColor('#0D1250'),
+                                    ],
                                   ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: 'Sign up',
-                                      style: TextStyle(
-                                        color: HexColor('#7247B8'),
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'SF Pro',
-                                      ),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SignUpScreen(),
-                                            ),
-                                          );
-                                        },
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        // SIGNUP LINK
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 40),
+                            child: RichText(
+                              text: TextSpan(
+                                text: "Don't have an account? ",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                  fontFamily: 'SF Pro',
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'Sign up',
+                                    style: TextStyle(
+                                      color: HexColor('#7247B8'),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const SignUpScreen()),
+                                        );
+                                      },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
                   ),
                 ),
@@ -282,6 +236,35 @@ class _LoginState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // HANDLE LOGIN LOGIC
+  Future<void> _handleLogin() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    try {
+      await AuthService().login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) throw Exception("Session not established after login");
+
+      RealtimeNotificationService().startListening(session.user.id);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MyHomePage(title: '')),
+      );
+    } catch (e) {
+      debugPrint('LOGIN ERROR: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password')),
+      );
+    }
   }
 
   @override

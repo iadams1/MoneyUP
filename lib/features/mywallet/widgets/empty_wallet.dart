@@ -13,6 +13,7 @@ Widget emptyWalletState() {
             mask: "XXXX",
             currentAmount: 0,
             cardholderName: "Add your first card",
+            cardColor: "gradient_7",
           ),
         ),
       ),

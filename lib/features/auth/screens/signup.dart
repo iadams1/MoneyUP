@@ -1,11 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/features/auth/screens/verification.dart';
 import 'package:moneyup/services/auth_service.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -15,19 +15,16 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUpScreen> {
-  final _formkey = GlobalKey<FormState>();
-
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
-  // Password visibility toggles
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  // Instance of AuthService
   final AuthService _authService = AuthService();
 
   @override
@@ -47,275 +44,237 @@ class _SignUpState extends State<SignUpScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
-          Container(
-            alignment: Alignment.topCenter,
-            padding: const EdgeInsets.only(top: 50.0),
-            child: Image.asset(
-              'assets/images/mu_signup.png',
-              width: 350,
-              height: 350,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50.0),
-                  topRight: Radius.circular(50.0),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  alignment: Alignment.topCenter,
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Image.asset(
+                    'assets/images/mu_signup.png',
+                    width: 350,
+                    height: 350,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                color: Colors.white,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: IntrinsicHeight(
+                Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    ),
+                    color: Colors.white,
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const SizedBox(height: 12),
-                        Form(
-                          key: _formkey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                                child: TextFormField(
-                                  controller: _nameController,
-                                  validator: MultiValidator([
-                                    RequiredValidator(errorText: 'Enter your name'),
-                                    MinLengthValidator(3, errorText: 'Minimum 3 characters'),
-                                  ]).call,
-                                  decoration: InputDecoration(
-                                    hintText: 'Full Name',
-                                    labelText: 'Full Name',
-                                    prefixIcon: const Icon(Icons.create_outlined, color: Colors.black),
-                                    filled: true,
-                                    fillColor: HexColor('#E7E7E7'),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                                child: TextFormField(
-                                  controller: _usernameController,
-                                  validator: MultiValidator([
-                                    RequiredValidator(errorText: 'Enter your username'),
-                                    MinLengthValidator(3, errorText: 'Minimum 3 characters'),
-                                  ]).call,
-                                  
-                                  decoration: InputDecoration(
-                                    hintText: 'Username',
-                                    labelText: 'Username',
-                                    prefixIcon: const Icon(Icons.person_outline, color: Colors.black),
-                                    filled: true,
-                                    fillColor: HexColor('#E7E7E7'),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                                child: TextFormField(
-                                  controller: _emailController,
-                                  validator: MultiValidator([
-                                    RequiredValidator(errorText: 'Enter email address'),
-                                    EmailValidator(errorText: 'Invalid email address'),
-                                  ]).call,
-                                  decoration: InputDecoration(
-                                    hintText: 'Email Address',
-                                    labelText: 'Email Address',
-                                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.black),
-                                    filled: true,
-                                    fillColor: HexColor('#E7E7E7'),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                                child: TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: _obscurePassword,
-                                  validator: MultiValidator([
-                                    RequiredValidator(errorText: 'Enter password'),
-                                    MinLengthValidator(8, errorText: 'Minimum 8 characters'),
-                                  ]).call,
-                                  decoration: InputDecoration(
-                                    hintText: 'Password',
-                                    labelText: 'Password',
-                                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
-                                    filled: true,
-                                    fillColor: HexColor('#E7E7E7'),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                        color: Colors.grey[700],
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
-                                child: TextFormField(
-                                  controller: _confirmController,
-                                  obscureText: _obscureConfirmPassword,
-                                  validator: (val) {
-                                    if (val == null || val.isEmpty) return 'Re-type password';
-                                    if (val != _passwordController.text) return 'Passwords do not match';
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Re-type Password',
-                                    labelText: 'Re-type Password',
-                                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
-                                    filled: true,
-                                    fillColor: HexColor('#E7E7E7'),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                                        color: Colors.grey[700],
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20.0, left: 12.0, right: 12.0),
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(Radius.circular(50.0)),
-                                    gradient: LinearGradient(
-                                      colors: [HexColor('#124074'), HexColor('#332677')],
-                                    ),
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: () async 
-                                    {
-                                      if (_formkey.currentState!.validate()) {
-                                        try {
-                                          await _authService.signUp(
-                                            email: _emailController.text.trim(),
-                                            password: _passwordController.text.trim(),
-                                            fullName: _nameController.text.trim(),
-                                            username: _usernameController.text.trim(),
-                                          );
-
-
-                                          if (mounted) 
-                                          {
-
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute
-                                              (
-                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
-                                                // builder: (context) => PlaidConnectScreen(),
-                                              ),
-                                            );
-                                          }
-                                        } on AuthException catch (error) {
-                                          // This is the proper way → catch the specific type
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(error.message),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          // Fallback for any other unexpected errors
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('An unexpected error occurred: $e'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                    ),
-                                    child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
-                                  ),
-                                ),
-                              ),
-                              Center(
-                                child: Container(
-                                  padding: const EdgeInsets.only(top: 30, bottom: 20),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: 'Already have an account? ',
-                                      style: const TextStyle(fontSize: 15, color: Colors.black),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Login',
-                                          style: TextStyle(color: HexColor('#7247B8'), fontWeight: FontWeight.bold),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                              );
-                                            },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildTextField(
+                            controller: _nameController,
+                            label: 'Full Name',
+                            hint: 'Full Name',
+                            icon: Icons.create_outlined,
+                            validator: MultiValidator([
+                              RequiredValidator(errorText: 'Enter your name'),
+                              MinLengthValidator(3, errorText: 'Minimum 3 characters'),
+                            ]).call,
                           ),
-                        ),
-                      ],
+                          _buildTextField(
+                            controller: _usernameController,
+                            label: 'Username',
+                            hint: 'Username',
+                            icon: Icons.person_outline,
+                            validator: MultiValidator([
+                              RequiredValidator(errorText: 'Enter your username'),
+                              MinLengthValidator(3, errorText: 'Minimum 3 characters'),
+                            ]).call,
+                          ),
+                          _buildTextField(
+                            controller: _emailController,
+                            label: 'Email Address',
+                            hint: 'Email Address',
+                            icon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: MultiValidator([
+                              RequiredValidator(errorText: 'Enter email address'),
+                              EmailValidator(errorText: 'Invalid email address'),
+                            ]).call,
+                          ),
+                          _buildTextField(
+                            controller: _passwordController,
+                            label: 'Password',
+                            hint: 'Password',
+                            icon: Icons.lock_outline,
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                color: Colors.grey[700],
+                              ),
+                              onPressed: () => setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              }),
+                            ),
+                            validator: MultiValidator([
+                              RequiredValidator(errorText: 'Enter password'),
+                              MinLengthValidator(8, errorText: 'Minimum 8 characters'),
+                            ]).call,
+                          ),
+                          _buildTextField(
+                            controller: _confirmController,
+                            label: 'Re-type Password',
+                            hint: 'Re-type Password',
+                            icon: Icons.lock_outline,
+                            obscureText: _obscureConfirmPassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                color: Colors.grey[700],
+                              ),
+                              onPressed: () => setState(() {
+                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                              }),
+                            ),
+                            validator: (val) {
+                              if (val == null || val.isEmpty) return 'Re-type password';
+                              if (val != _passwordController.text) return 'Passwords do not match';
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          _buildGradientButton(
+                            text: 'Sign Up',
+                            onPressed: _handleSignUp,
+                          ),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 30, bottom: 20),
+                              child: RichText(
+                                text: TextSpan(
+                                  text: 'Already have an account? ',
+                                  style: const TextStyle(fontSize: 15, color: Colors.black),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Login',
+                                      style: TextStyle(
+                                        color: HexColor('#7247B8'),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () => Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => const LoginScreen()),
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        validator: validator,
+        decoration: InputDecoration(
+          hintText: hint,
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.black),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: HexColor('#E7E7E7'),
+          border: const OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.all(Radius.circular(9.0)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradientButton({required String text, required VoidCallback onPressed}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: SizedBox(
+        width: double.infinity,
+        height: 45,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+          ),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [HexColor('#124074'), HexColor('#332677')]),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Center(child: Text(text, style: const TextStyle(color: Colors.white))),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleSignUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        fullName: _nameController.text.trim(),
+        username: _usernameController.text.trim(),
+      );
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VerificationScreen(email: _emailController.text.trim()),
+        ),
+      );
+    } on AuthException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An unexpected error occurred: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 }

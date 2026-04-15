@@ -4,7 +4,6 @@ import 'package:moneyup/core/utils/formatters.dart';
 import 'package:moneyup/features/budgettracker/widgets/api_widgets/forecast_dashbord.dart';
 import 'package:moneyup/shared/screen/loading_screen.dart';
 import 'package:moneyup/shared/widgets/app_avatar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:moneyup/features/home/screens/my_home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
