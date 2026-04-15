@@ -41,12 +41,15 @@ class BudgetService {
     BudgetType type,
   ) async {
     try {
+      final safeSpent = spent < 0 ? 0 : spent;
+      final safeRemaining = (goal - spent) < 0 ? 0: (goal - spent);
+      
       await _client.from('budgets').insert({
         'user_ID': user,
         'Title': title,
         'Goal': goal,
-        'AmountSpent': spent,
-        'AmountRemaining': goal - spent,
+        'AmountSpent': safeSpent,
+        'AmountRemaining': safeRemaining,
         'Category': type.label,
       });
     } catch (e) {
