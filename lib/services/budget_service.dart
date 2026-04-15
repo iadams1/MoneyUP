@@ -8,32 +8,28 @@ import '/services/service_locator.dart';
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String? get user => supabaseService.currentUserId;
+  String get user => supabaseService.currentUserId!;
 
-  /// Fetch a random budget via RPC
   Future<Budget?> getRandomBudget() async {
     try {
+
       final response = await _client.rpc(
-        'get_random_budget',
+        'get_random_budget', 
         params: {'p_user_id': user},
       );
 
-      if (response is! List || response.isEmpty) return null;
+      if (response == null) return null;
 
-      final data = response.first;
-      if (data is Map<String, dynamic>) {
-        return Budget.fromJson(data);
-      } else {
-        debugPrint("Unexpected RPC response format: $data");
-        return null;
-      }
+      if (response is List && response.isEmpty) return null;
+
+      final data = (response as List).first;
+      return Budget.fromJson(data);
     } catch (e) {
       debugPrint("RPC ERROR: $e");
       rethrow;
     }
   }
 
-  /// Insert a new budget record
   Future<void> insertBudget(
     String title,
     double goal,
@@ -57,9 +53,7 @@ class BudgetService {
     }
   }
 
-  /// Fetch all budgets with category IDs included
   Future<List<Budget>> getUserBudgets() async {
-    if (user == null) return [];
 
     final budgetsResponse = await _client
         .from('budgets')
@@ -70,67 +64,60 @@ class BudgetService {
         .from('category_table')
         .select('category_ID, Title');
 
-    final budgets = budgetsResponse;
-    final categories = categoriesResponse;
+    final budgets = List<Map<String, dynamic>>.from(budgetsResponse);
+    final categories = List<Map<String, dynamic>>.from(categoriesResponse);
 
     final budgetsWithId = budgets.map((budget) {
-      final matchingCategory = (categories).firstWhere(
+      final matchingCategory = categories.firstWhere(
         (c) => c['Title'] == budget['Category'],
         orElse: () => {'category_ID': 0},
       );
 
+      final categoryID = (matchingCategory['category_ID'] ?? 0);
+
       return {
-        ...budget,
-        'category_ID': matchingCategory['category_ID'] ?? 0,
+        ...budget, 
+        'category_ID': categoryID
       };
     }).toList();
-
+    
     return budgetsWithId.map((row) => Budget.fromJson(row)).toList();
   }
 
-  /// Soft-delete a budget by ID
   Future<void> deleteBudget(dynamic budgetId) async {
-    if (user == null) return;
-
     try {
-      await _client
+      await Supabase.instance.client
           .from('budgets')
           .delete()
           .eq('budget_ID', budgetId)
           .eq('user_ID', user as Object);
 
-      debugPrint('✅ Budget deletion successful');
-    } catch (error, stack) {
-      debugPrint('❌ Error deleting budget: $error\n$stack');
+      debugPrint('Deletion was successful!');
+
+    } catch (error) {
+      debugPrint('Error Deleting rows: $error');
       rethrow;
     }
   }
 
-  /// Fetch spending rows for a date range
   Future<List<Map<String, dynamic>>> getSpendingRows({
     required DateTime start,
     required DateTime end,
   }) async {
-    if (user == null) return [];
-
-    // Convert to date strings (YYYY-MM-DD)
-    final startDate = start.toIso8601String().split('T')[0];
-    final endDate = end.toIso8601String().split('T')[0];
-
+    
     final response = await _client
         .from('plaid_transactions')
-        .select('category_table!inner(category_ID, Title), amount, authorized_date')
-        .eq('user_id', user as dynamic)
-        .gte('authorized_date', startDate)
-        .lt('authorized_date', endDate);
-
+        .select(
+          'category_table!inner(category_ID, Title), amount, authorized_date',
+        )
+        .eq('user_id', user)
+        .gte('date', start.toIso8601String().split("T")[0])
+        .lt('date', end.toIso8601String().split("T")[0]);
+    
     return List<Map<String, dynamic>>.from(response);
   }
 
-  /// Fetch a specific budget by ID
   Future<Budget?> getSpecificBudget(dynamic budgetId) async {
-    if (user == null) return null;
-
     final response = await _client
         .from('budgets')
         .select('*')
@@ -138,17 +125,16 @@ class BudgetService {
         .eq('user_ID', user as Object)
         .limit(1);
 
-    final rows = List<Map<String, dynamic>>.from(response);
+     final rows = List<Map<String, dynamic>>.from(response);
     if (rows.isEmpty) return null;
 
     return Budget.fromJson(rows.first);
   }
 
-  /// Update budget amounts
   Future<void> updateBudget({
-    required dynamic budgetId,
-    required double amountSpent,
-    required double amountRemaining,
+    required dynamic budgetId, 
+    required double amountSpent, 
+    required double amountRemaining
   }) async {
     if (user == null) return;
 
@@ -170,13 +156,11 @@ class BudgetService {
     }
   }
 
-  /// Fetch top spending categories in a date range
   Future<List<Map<String, dynamic>>> getMonthlySpending({
     required DateTime start,
     required DateTime end,
   }) async {
-    if (user == null) return [];
-
+    
     final response = await _client.rpc(
       'get_top_spending_categories',
       params: {
@@ -186,6 +170,7 @@ class BudgetService {
       },
     );
 
-    return response is List ? List<Map<String, dynamic>>.from(response) : [];
+    return List<Map<String, dynamic>>.from(response);
   }
+
 }
