@@ -59,7 +59,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
 
       // Background Gradient
@@ -145,7 +145,9 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             menuHeight: 300,
                             width: 340,
                             menuStyle: MenuStyle(
-                              backgroundColor: WidgetStatePropertyAll(Colors.white),
+                              backgroundColor: WidgetStatePropertyAll(
+                                Colors.white,
+                              ),
                             ),
                             textStyle: TextStyle(
                               fontSize: 19,
@@ -155,7 +157,9 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             dropdownMenuEntries: BudgetType.values.map((type) {
                               return DropdownMenuEntry(
                                 value: type,
-                                label: Formatters.formatCategoryTitle(type.label), // use the custom string
+                                label: Formatters.formatCategoryTitle(
+                                  type.label,
+                                ), // use the custom string
                               );
                             }).toList(),
                             onSelected: (value) {
@@ -339,7 +343,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp',),
+                    builder: (_) => MyHomePage(title: 'MoneyUp'),
                   ),
                 );
               },
@@ -349,9 +353,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => TransactionsHome(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
                 );
               },
             ),
@@ -360,20 +362,16 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => EducationScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
                 );
               },
             ),
             IconButton(
               icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
               onPressed: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ProfileScreen(),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
                 );
               },
             ),

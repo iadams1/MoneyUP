@@ -245,7 +245,7 @@ class _PredictiveBudgetForecastorState
             children: [AppAvatar(size: 60), SizedBox(height: 20)],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [

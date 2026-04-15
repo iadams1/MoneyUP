@@ -8,7 +8,8 @@ class PredictionService {
   //static const String _baseUrl = 'http://10.0.2.2:8000'; //Android Emulator
   //static const String _baseUrl = 'http://127.0.0.1:8000';  //Localhost
   //static const String _baseUrl = 'http://10.200.230.23:8000';  //university wifi
-  static const String _baseUrl = 'http://172.20.10.2:8000';  //Phone hotspot network
+  static const String _baseUrl =
+      'http://172.20.10.2:8000'; //Phone hotspot network
 
   // Get current logged in user's ID automatically
   String? get _currentUserId => Supabase.instance.client.auth.currentUser?.id;
@@ -40,7 +41,9 @@ class PredictionService {
       return [];
     }
 
-    debugPrint('🔍 Querying budget_history for budgetId: $budgetId, userId: $userId');
+    debugPrint(
+      '🔍 Querying budget_history for budgetId: $budgetId, userId: $userId',
+    );
 
     final response = await Supabase.instance.client
         .from('budget_history')

@@ -62,14 +62,14 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
 
     try {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open the link.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not open the link.')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error opening link: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error opening link: $e')));
     }
   }
 
@@ -98,9 +98,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppAvatar(
-                size: 60,
-              ),
+              AppAvatar(size: 60),
               Container(
                 // NOTIFICATION ICON
                 alignment: Alignment.topRight,
@@ -119,7 +117,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
             ],
           ),
         ),
-        toolbarHeight: 120,
+        toolbarHeight: 130,
       ),
       body: Stack(
         children: [
@@ -156,108 +154,106 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Title
-                              Text(
-                                article.displayTitle,
-                                style: const TextStyle(
-                                  fontSize: 30,
-                                  height: 1.1,
-                                  fontWeight: FontWeight.w600,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Text(
+                            article.displayTitle,
+                            style: const TextStyle(
+                              fontSize: 30,
+                              height: 1.1,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          // Author
+                          Text(
+                            article.displaySource,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // View Full Article Button
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(200),
                                 ),
                               ),
-
-                              const SizedBox(height: 5),
-
-                              // Author
-                              Text(
-                                article.displaySource,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              // View Full Article Button
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(200),
-                                    ),
+                              onPressed: () {
+                                openArticleUrl(article.sourceURL);
+                              },
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromRGBO(25, 50, 100, 1),
+                                      Color.fromRGBO(47, 52, 126, 1),
+                                    ],
                                   ),
-                                  onPressed: () {
-                                    openArticleUrl(article.sourceURL);
-                                  },
-                                  child: Ink(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color.fromRGBO(25, 50, 100, 1),
-                                          Color.fromRGBO(47, 52, 126, 1),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(200),
-                                    ),
-                                    child: const SizedBox(
-                                      width: 230,
-                                      height: 40,
-                                      child: Center(
-                                        child: Text(
-                                          'View Full Article',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  borderRadius: BorderRadius.circular(200),
                                 ),
-                              ),
-
-                              const SizedBox(height: 15),
-
-                              const Text(
-                                "Summary",
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              const SizedBox(height: 5),
-
-                              // Summary Box
-                              Expanded(
-                                child: RawScrollbar(
-                                  controller: _summaryScrollController,
-                                  thumbVisibility: true,
-                                  radius: const Radius.circular(10),
-                                  thickness: 5,
-                                  thumbColor: Color.fromRGBO(47, 52, 126, 100),
-                                  child: SingleChildScrollView(
-                                    controller: _summaryScrollController,
-                                    physics: const BouncingScrollPhysics(),
-                                    padding: const EdgeInsets.only(
-                                      right: 16,
-                                      bottom: 8,
-                                    ),
+                                child: const SizedBox(
+                                  width: 230,
+                                  height: 40,
+                                  child: Center(
                                     child: Text(
-                                      article.summary,
-                                      style: const TextStyle(
-                                        fontSize: 19
+                                      'View Full Article',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 17,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          const Text(
+                            "Summary",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          // Summary Box
+                          Expanded(
+                            child: RawScrollbar(
+                              controller: _summaryScrollController,
+                              thumbVisibility: true,
+                              radius: const Radius.circular(10),
+                              thickness: 5,
+                              thumbColor: Color.fromRGBO(47, 52, 126, 100),
+                              child: SingleChildScrollView(
+                                controller: _summaryScrollController,
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(
+                                  right: 16,
+                                  bottom: 8,
+                                ),
+                                child: Text(
+                                  article.summary,
+                                  style: const TextStyle(fontSize: 19),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
