@@ -47,7 +47,7 @@ class StreakBanner extends StatelessWidget {
     overlayEntry = OverlayEntry(
       builder: (context) {
         return Positioned(
-          top: 0,
+          top: 65,
           left: 0,
           right: 0,
           child: SlideTransition(

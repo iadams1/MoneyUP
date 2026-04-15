@@ -67,7 +67,7 @@ class _BudgetPageState extends State<BudgetPage> {
       goalSpent.value -= userAmount;
     }
 
-    goalRemain.value = overallGoalAmount.value - goalSpent.value;
+    goalRemain.value = (overallGoalAmount.value - goalSpent.value).clamp(0, overallGoalAmount.value);
 
     if (goalRemain.value < 0) {
       goalRemain.value = 0;
@@ -459,7 +459,7 @@ class _BudgetPageState extends State<BudgetPage> {
                     ),
                   ),
 
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
 
                   ValueListenableBuilder(
                     valueListenable: goalSpent,
@@ -521,7 +521,7 @@ class _BudgetPageState extends State<BudgetPage> {
                     },
                   ),
 
-                  SizedBox(height: 20),
+                  SizedBox(height: 15),
 
                   ValueListenableBuilder<double>(
                     valueListenable: overallGoalAmount,

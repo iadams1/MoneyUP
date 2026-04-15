@@ -49,7 +49,7 @@ class _SignUpState extends State<SignUpScreen> {
               children: [
                 Container(
                   alignment: Alignment.topCenter,
-                  padding: const EdgeInsets.only(top: 50),
+                  padding: const EdgeInsets.only(top: 70),
                   child: Image.asset(
                     'assets/images/mu_signup.png',
                     width: 350,

@@ -149,14 +149,18 @@ class BudgetService {
   }) async {
     if (user == null) return;
 
+    final safeSpent = amountSpent < 0 ? 0 : amountSpent;
+    final safeRemaining = amountRemaining < 0 ? 0: amountRemaining;
+
     try {
       await _client
           .from('budgets')
           .update({
-            'AmountSpent': amountSpent,
-            'AmountRemaining': amountRemaining,
+            'AmountSpent': safeSpent,
+            'AmountRemaining': safeRemaining,
           })
           .eq('budget_ID', budgetId)
+          .eq('user_ID', user as Object)
           .select();
     } catch (e) {
       debugPrint('Error updating budget: $e');
