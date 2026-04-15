@@ -28,13 +28,13 @@ class SupabaseService {
     try {
       final response = await _client.functions.invoke(
         'sync-plaid-data',
-        body: {}, // You can pass item_id later if you want to sync only one account
+         // You can pass item_id later if you want to sync only one account
       );
 
-      print('✅ sync-plaid-data completed successfully');
+      print('sync-plaid-data completed successfully');
       print('Response: ${response.data}');
     } catch (e) {
-      print('❌ sync-plaid-data failed: $e');
+      print('sync-plaid-data failed: $e');
       rethrow; // Let the caller handle the error if needed
     }
   }
@@ -48,10 +48,10 @@ class SupabaseService {
         body: body,
       );
 
-      print('✅ syncTransactions completed');
+      print('syncTransactions completed');
       print('Response: ${response.data}');
     } catch (e) {
-      print('❌ syncTransactions failed: $e');
+      print('syncTransactions failed: $e');
       rethrow;
     }
   }
@@ -65,10 +65,10 @@ class SupabaseService {
         body: body,
       );
 
-      print('✅ syncAccounts completed');
+      print('syncAccounts completed');
       print('Response: ${response.data}');
     } catch (e) {
-      print('❌ syncAccounts failed: $e');
+      print('syncAccounts failed: $e');
       rethrow;
     }
   }
@@ -81,10 +81,10 @@ class SupabaseService {
         body: {},
       );
 
-      print('✅ Full sync completed');
+      print('Full sync completed');
       return response.data as Map<String, dynamic>?;
     } catch (e) {
-      print('❌ Full sync failed: $e');
+      print('Full sync failed: $e');
       return null;
     }
   }
