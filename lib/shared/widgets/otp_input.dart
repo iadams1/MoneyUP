@@ -17,7 +17,6 @@ class OtpInput extends StatefulWidget {
 
 class _OtpInputState extends State<OtpInput> {
   late FocusNode _nodes;
-  bool _isActive = false;
 
   @override
   void initState() {
@@ -32,10 +31,6 @@ class _OtpInputState extends State<OtpInput> {
   }
 
   void _focusInput() {
-    setState(() {
-      _isActive = true;
-    });
-
     _nodes.requestFocus();
   }
 

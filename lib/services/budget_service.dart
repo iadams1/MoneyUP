@@ -8,7 +8,7 @@ import '/services/service_locator.dart';
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
+  String? get user => supabaseService.currentUserId;
 
   Future<Budget?> getRandomBudget() async {
     try {
@@ -104,13 +104,14 @@ class BudgetService {
     required DateTime start,
     required DateTime end,
   }) async {
+    dynamic currentUser = user;
     
     final response = await _client
         .from('plaid_transactions')
         .select(
           'category_table!inner(category_ID, Title), amount, authorized_date',
         )
-        .eq('user_id', user)
+        .eq('user_id', currentUser)
         .gte('date', start.toIso8601String().split("T")[0])
         .lt('date', end.toIso8601String().split("T")[0]);
     

@@ -12,7 +12,6 @@ import '/models/budget.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class BudgetPage extends StatefulWidget {
@@ -115,109 +114,70 @@ class _BudgetPageState extends State<BudgetPage> {
             ),
           ),
           actions: [
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final enteredAmount = amountController.text.trim();
-                      if (enteredAmount.isNotEmpty) {
-                        final double amount =
-                            double.tryParse(enteredAmount) ?? 0.0;
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            SizedBox(width: 30),
+            ElevatedButton(
+              onPressed: () async {
+                final enteredAmount = amountController.text.trim();
+                if (enteredAmount.isNotEmpty) {
+                  final double amount =
+                      double.tryParse(enteredAmount) ?? 0.0;
 
-                        previousSaved = goalSpent.value;
-                        calculateBudget(amount, isAddition);
-                        await updateBudget();
-                        if (isAddition) {
-                          try {
-                            final userId =
-                                Supabase.instance.client.auth.currentUser?.id;
-                            debugPrint(
-                              'Logging spend - userId: $userId, budgetId: ${widget.budgetId}, amount: $amount',
-                            );
+                  previousSaved = goalSpent.value;
+                  calculateBudget(amount, isAddition);
+                  await updateBudget();
+                  if (isAddition) {
+                    try {
+                      final userId = supabaseService.currentUserId;
+                      debugPrint(
+                        'Logging spend - userId: $userId, budgetId: ${widget.budgetId}, amount: $amount',
+                      );
 
-                            if (userId != null) {
-                              final payload = {
-                                'budget_id': widget.budgetId,
-                                'user_id': userId,
-                                'amount': amount,
-                                'log_date': DateTime.now()
-                                    .toIso8601String()
-                                    .split('T')[0],
-                              };
-                              debugPrint('Payload being sent: $payload');
-                              debugPrint('budgetId value: ${widget.budgetId}');
-                              debugPrint(
-                                'budgetId type: ${widget.budgetId.runtimeType}',
-                              );
-                              final response = await Supabase.instance.client
-                                  .from('budget_logs')
-                                  .insert({
-                                    'budget_id': widget.budgetId,
-                                    'user_id': userId,
-                                    'amount': amount,
-                                    'log_date': DateTime.now()
-                                        .toIso8601String()
-                                        .split('T')[0],
-                                  });
-                              debugPrint(
-                                'Budget log insert response: $response',
-                              );
-                            } else {
-                              debugPrint('No user logged in');
-                            }
-                          } catch (e) {
-                            debugPrint('Error logging spend to ML: $e');
-                            debugPrint('Error logging spend to ML: $e');
-                          }
-                        }
-                        // Log to budget_logs for ML model (only when adding spending)
-                        // if (isAddition) {
-                        //   try {
-                        //     final userId = Supabase.instance.client.auth.currentUser?.id;
-                        //     if (userId != null) {
-                        //       await Supabase.instance.client
-                        //           .from('budget_logs')
-                        //           .insert({
-                        //             'budget_id': widget.budgetId,
-                        //             'user_id': userId,
-                        //             'amount': amount,
-                        //             'log_date': DateTime.now().toIso8601String().split('T')[0],
-                        //           });
-                        //     }
-                        //   } catch (e) {
-                        //     debugPrint('Error logging spend to ML: $e');
-                        //   }
-                        // }
+                      if (userId != null) {
+                        final payload = {
+                          'budget_id': widget.budgetId,
+                          'user_id': userId,
+                          'amount': amount,
+                          'log_date': DateTime.now()
+                              .toIso8601String()
+                              .split('T')[0],
+                        };
+                        debugPrint('Payload being sent: $payload');
+                        debugPrint('budgetId value: ${widget.budgetId}');
+                        debugPrint(
+                          'budgetId type: ${widget.budgetId.runtimeType}',
+                        );
+                      } else {
+                        debugPrint('No user logged in');
                       }
-                      if (context.mounted) Navigator.pop(context, _didUpdate);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                    ),
-                    child: const Text(
-                      'Submit',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                    } catch (e) {
+                      debugPrint('Error logging spend to ML: $e');
+                      debugPrint('Error logging spend to ML: $e');
+                    }
+                  }
+                }
+                if (context.mounted) Navigator.pop(context, _didUpdate);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+              ),
+              child: const Text(
+                'Submit',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -332,80 +292,82 @@ class _BudgetPageState extends State<BudgetPage> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
               ),
               height: 680,
-              child: Column(
-                children: [
-                  // Space to seperate AppBar and top edge
-                  SizedBox(height: 9),
-
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(right: 25),
-                              child: IconButton(
-                                icon: Image.asset(
-                                  'assets/icons/chevronLeftArrow.png',
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Space to seperate AppBar and top edge
+                    SizedBox(height: 9),
+                
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(right: 25),
+                                child: IconButton(
+                                  icon: Image.asset(
+                                    'assets/icons/chevronLeftArrow.png',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, _didUpdate);
+                                  },
                                 ),
-                                onPressed: () {
-                                  Navigator.pop(context, _didUpdate);
-                                },
                               ),
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(right: 15),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          PredictiveBudgetForecastor(
-                                            budgetId: widget.budgetId
-                                                .toString(),
-                                            budgetName: budget!.title,
-                                            goalAmount: budget.goal,
-                                          ),
+                
+                              Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                  );
-                                },
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color.fromRGBO(25, 50, 100, 1),
-                                        Color.fromRGBO(47, 52, 126, 1),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(200),
                                   ),
-                                  child: SizedBox(
-                                    width: 155,
-                                    height: 40,
-                                    child: Center(
-                                      child: Text(
-                                        "View Forecastor",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color.fromARGB(
-                                            255,
-                                            255,
-                                            255,
-                                            255,
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            PredictiveBudgetForecastor(
+                                              budgetId: widget.budgetId
+                                                  .toString(),
+                                              budgetName: budget!.title,
+                                              goalAmount: budget.goal,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(25, 50, 100, 1),
+                                          Color.fromRGBO(47, 52, 126, 1),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(200),
+                                    ),
+                                    child: SizedBox(
+                                      width: 155,
+                                      height: 40,
+                                      child: Center(
+                                        child: Text(
+                                          "View Forecastor",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color.fromARGB(
+                                              255,
+                                              255,
+                                              255,
+                                              255,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -413,181 +375,181 @@ class _BudgetPageState extends State<BudgetPage> {
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 360,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 25),
-                                    child: Text(
-                                      budget!.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 30,
-                                        height: 1,
+                            ],
+                          ),
+                
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 360,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 25),
+                                      child: Text(
+                                        budget!.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 30,
+                                          height: 1,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    "Budget Goal",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 23,
-                                      color: const Color.fromARGB(51, 0, 0, 0),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 5),
-
-                  ValueListenableBuilder(
-                    valueListenable: goalSpent,
-                    builder: (context, currentSaved, _) {
-                      IconData arrowIcon;
-                      Color arrowColor;
-
-                      if (currentSaved > previousSaved) {
-                        arrowIcon = Icons.arrow_upward;
-                        arrowColor = Colors.red;
-                      } else if (currentSaved < previousSaved) {
-                        arrowIcon = Icons.arrow_downward;
-                        arrowColor = Colors.green;
-                      } else {
-                        arrowIcon = Icons.remove; // no change
-                        arrowColor = const Color.fromARGB(6, 0, 0, 0);
-                      }
-
-                      final pct = overallGoalAmount.value == 0
-                          ? 0.0
-                          : (currentSaved / overallGoalAmount.value).clamp(
-                              0.0,
-                              1.0,
-                            );
-                      final pctText = (pct * 100).toStringAsFixed(0);
-
-                      return Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            width: 240,
-                            height: 240,
-                            child: CircularPercentIndicator(
-                              radius: 120,
-                              lineWidth: 38,
-                              percent:
-                                  (goalSpent.value / overallGoalAmount.value)
-                                      .clamp(0.0, 1.0),
-                              center: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(arrowIcon, color: arrowColor, size: 40),
-                                  Text(
-                                    "$pctText%",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 40,
+                
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 25),
+                                    child: Text(
+                                      "Budget Goal",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 23,
+                                        color: const Color.fromARGB(51, 0, 0, 0),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              backgroundColor: const Color.fromARGB(6, 0, 0, 0),
-                              progressColor: budgetColor,
-                              circularStrokeCap: CircularStrokeCap.round,
-                            ),
+                            ],
                           ),
                         ],
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 15),
-
-                  ValueListenableBuilder<double>(
-                    valueListenable: overallGoalAmount,
-                    builder: (context, overall, _) {
-                      return Text(
-                        "Budget Goal \$${overall.toStringAsFixed(2)}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 25,
-                        ),
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 20),
-
-                  ValueListenableBuilder<double>(
-                    valueListenable: goalSpent,
-                    builder: (context, spent, _) {
-                      return Text(
-                        "\$${spent.toStringAsFixed(2)} Spent",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 25,
-                        ),
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 2),
-
-                  ValueListenableBuilder<double>(
-                    valueListenable: goalRemain,
-                    builder: (context, remain, _) {
-                      return Text(
-                        "\$${remain.toStringAsFixed(2)} Remaining",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 19,
-                          color: const Color.fromARGB(87, 8, 8, 8),
-                        ),
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 15),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Image.asset('assets/icons/plusCircle.png'),
-                        onPressed: () {
-                          _showAmountDialog(isAddition: true);
-                        },
                       ),
-                      SizedBox(width: 50),
-                      IconButton(
-                        icon: Image.asset('assets/icons/minusCircle.png'),
-                        onPressed: () {
-                          _showAmountDialog(isAddition: false);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                
+                    SizedBox(height: 5),
+                
+                    ValueListenableBuilder(
+                      valueListenable: goalSpent,
+                      builder: (context, currentSaved, _) {
+                        IconData arrowIcon;
+                        Color arrowColor;
+                
+                        if (currentSaved > previousSaved) {
+                          arrowIcon = Icons.arrow_upward;
+                          arrowColor = Colors.red;
+                        } else if (currentSaved < previousSaved) {
+                          arrowIcon = Icons.arrow_downward;
+                          arrowColor = Colors.green;
+                        } else {
+                          arrowIcon = Icons.remove; // no change
+                          arrowColor = const Color.fromARGB(6, 0, 0, 0);
+                        }
+                
+                        final pct = overallGoalAmount.value == 0
+                            ? 0.0
+                            : (currentSaved / overallGoalAmount.value).clamp(
+                                0.0,
+                                1.0,
+                              );
+                        final pctText = (pct * 100).toStringAsFixed(0);
+                
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 240,
+                              height: 240,
+                              child: CircularPercentIndicator(
+                                radius: 120,
+                                lineWidth: 38,
+                                percent:
+                                    (goalSpent.value / overallGoalAmount.value)
+                                        .clamp(0.0, 1.0),
+                                center: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(arrowIcon, color: arrowColor, size: 40),
+                                    Text(
+                                      "$pctText%",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 40,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                backgroundColor: const Color.fromARGB(6, 0, 0, 0),
+                                progressColor: budgetColor,
+                                circularStrokeCap: CircularStrokeCap.round,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                
+                    SizedBox(height: 15),
+                
+                    ValueListenableBuilder<double>(
+                      valueListenable: overallGoalAmount,
+                      builder: (context, overall, _) {
+                        return Text(
+                          "Budget Goal \$${overall.toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 25,
+                          ),
+                        );
+                      },
+                    ),
+                
+                    SizedBox(height: 20),
+                
+                    ValueListenableBuilder<double>(
+                      valueListenable: goalSpent,
+                      builder: (context, spent, _) {
+                        return Text(
+                          "\$${spent.toStringAsFixed(2)} Spent",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 25,
+                          ),
+                        );
+                      },
+                    ),
+                
+                    SizedBox(height: 2),
+                
+                    ValueListenableBuilder<double>(
+                      valueListenable: goalRemain,
+                      builder: (context, remain, _) {
+                        return Text(
+                          "\$${remain.toStringAsFixed(2)} Remaining",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 19,
+                            color: const Color.fromARGB(87, 8, 8, 8),
+                          ),
+                        );
+                      },
+                    ),
+                
+                    SizedBox(height: 15),
+                
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset('assets/icons/plusCircle.png'),
+                          onPressed: () {
+                            _showAmountDialog(isAddition: true);
+                          },
+                        ),
+                        SizedBox(width: 50),
+                        IconButton(
+                          icon: Image.asset('assets/icons/minusCircle.png'),
+                          onPressed: () {
+                            _showAmountDialog(isAddition: false);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

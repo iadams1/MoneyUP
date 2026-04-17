@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   horizontal: 5,
                 ),
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 5),
                   ProfileMenu(text: 'Edit Account', press: () => {}),
                   ProfileMenu(text: 'Reset Password', press: () => {}),
                   ProfileMenu(text: 'Change Theme', press: () => {}),

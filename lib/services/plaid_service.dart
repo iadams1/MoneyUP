@@ -230,7 +230,7 @@ class _PlaidServiceState extends State<PlaidService> {
         throw Exception('User is not signed in or session expired.');
       }
 
-      final publicToken = success.publicToken;
+      String publicToken = success.publicToken;
       debugPrint('Plaid public token exists: ${publicToken.isNotEmpty}');
 
       if (publicToken.isEmpty) {

@@ -106,7 +106,6 @@ class TransactionService {
 
     double totalCredit = 0;
     double totalDebit = 0;
-    double totalBalance = 0;
 
     for (final row in response as List) {
       double parseBalance(dynamic value) {
@@ -117,8 +116,6 @@ class TransactionService {
 
       final amount = parseBalance(row['available_balance']);
       final accountType = row['type'];
-
-      totalBalance += amount;
 
       if (accountType == 'depository') {
         totalDebit += amount;
