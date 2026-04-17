@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
+import 'package:moneyup/shared/widgets/bottom_nav.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/features/home/screens/my_home_page.dart';
-import '/features/education/screens/education.dart';
-import '/features/profile/screens/profile.dart';
-import '/features/transactions/screens/transactions_home.dart';
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
@@ -189,8 +186,87 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                   borderRadius: BorderRadius.circular(200),
                                 ),
                               ),
-                              onPressed: () {
-                                openArticleUrl(article.sourceURL);
+                              onPressed: () async {
+                                final confirmed = await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text(
+                                      'View Full Article',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    content: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: Text(
+                                      'Do you want to view the full article?',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  actions: [
+                                    Center(
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, false),
+                                              child: const Text(
+                                                "Cancel",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color.fromARGB(
+                                                      255,
+                                                      184,
+                                                      27,
+                                                      27,
+                                                    ),
+                                                padding: EdgeInsets.zero,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                // Proceed with going to an outside source
+                                                openArticleUrl(article.sourceURL);
+                                                Navigator.pop(context, true);
+                                              },
+                                              child: const Text(
+                                                "View Article",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed != true) return;
+                              openArticleUrl(article.sourceURL);
                               },
                               child: Ink(
                                 decoration: BoxDecoration(
@@ -203,7 +279,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                   borderRadius: BorderRadius.circular(200),
                                 ),
                                 child: const SizedBox(
-                                  width: 230,
+                                  width: 200,
                                   height: 40,
                                   child: Center(
                                     child: Text(
@@ -218,9 +294,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 15),
-
                           const Text(
                             "Summary",
                             style: TextStyle(
@@ -230,7 +304,6 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                           ),
 
                           const SizedBox(height: 5),
-
                           // Summary Box
                           Expanded(
                             child: RawScrollbar(
@@ -263,53 +336,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 253, 249),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedHomeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/educationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 2),
     );
   }
 }

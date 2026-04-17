@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
+import 'package:moneyup/features/auth/screens/user_select.dart';
 
-import '/features/auth/screens/login.dart';
+// import '/features/auth/screens/login.dart';
 import '/features/profile/widgets/profile_menu.dart';
-import '/services/auth_service.dart';
+// import '/services/auth_service.dart';
 import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/logout_dialog.dart';
+import '/shared/utils/show_notification_dashboard.dart';
 import '/shared/widgets/bottom_nav.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -15,44 +17,44 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final AuthService _authService = AuthService();
+  // final AuthService _authService = AuthService();
 
-  Future<void> _handleLogout() async {
-    try {
-      // stop any listeners first if you have them
-      // _subscription?.cancel();
-      // RealtimeNotificationService().stopListening();
+  // Future<void> _handleLogout() async {
+  //   try {
+  //     // stop any listeners first if you have them
+  //     // _subscription?.cancel();
+  //     // RealtimeNotificationService().stopListening();
 
-      // clear local state here if this widget owns any
-      if (mounted) {
-        setState(() {
-          // _linkToken = null;
-          // _accounts = [];
-          // _isLoading = false;
-          // _hasPlaidConnected = false;
-        });
-      }
+  //     // clear local state here if this widget owns any
+  //     if (mounted) {
+  //       setState(() {
+  //         // _linkToken = null;
+  //         // _accounts = [];
+  //         // _isLoading = false;
+  //         // _hasPlaidConnected = false;
+  //       });
+  //     }
 
-      await _authService.signOut();
+  //     await _authService.signOut();
 
-      if (!mounted) return;
+  //     if (!mounted) return;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    } catch (e) {
-      if (!mounted) return;
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const LoginScreen()),
+  //       (route) => false,
+  //     );
+  //   } catch (e) {
+  //     if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Logout failed: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Logout failed: ${e.toString()}'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +112,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 children: [
                   const SizedBox(height: 20),
-                  ProfileMenu(text: 'Edit Account', press: () => {}),
+                  ProfileMenu(
+                    text: 'Edit Account',
+                    press: () =>
+                      Navigator.push(
+                        context, 
+                          MaterialPageRoute(builder: (_) => const UserSelectScreen()),
+                      ),
+                  ),
                   ProfileMenu(text: 'Reset Password', press: () => {}),
                   ProfileMenu(text: 'Change Theme', press: () => {}),
                   ProfileMenu(text: 'Language', press: () => {}),
@@ -130,95 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         onPressed: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text(
-                                'Log Out',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 27,
-                                ),
-                              ),
-                              content: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  20.0,
-                                  0,
-                                  20.0,
-                                  0,
-                                ),
-                                child: Text(
-                                  'Are you sure you want to log out?',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 17,
-                                  ),
-                                ),
-                              ),
-                              backgroundColor: Colors.white,
-                              actions: [
-                                Center(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, false),
-                                          child: const Text(
-                                            "Cancel",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color.fromARGB(
-                                                  255,
-                                                  184,
-                                                  27,
-                                                  27,
-                                                ),
-                                            padding: EdgeInsets.zero,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            // Proceed with logout...
-                                            _handleLogout();
-                                            Navigator.pop(context, true);
-                                          },
-                                          child: const Text(
-                                            "Logout",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-
-                          if (confirmed != true) return;
-
-                          // Proceed with logout...
-                          _handleLogout();
+                          await LogoutDialog.show(context);
                         },
                         child: Ink(
                           decoration: BoxDecoration(
@@ -244,6 +165,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
+
+                          // final confirmed = await showDialog<bool>(
+                          //   context: context,
+                          //   builder: (context) => AlertDialog(
+                          //     title: const Text(
+                          //       'Log Out',
+                          //       textAlign: TextAlign.center,
+                          //       style: TextStyle(
+                          //         fontWeight: FontWeight.w600,
+                          //         fontSize: 27,
+                          //       ),
+                          //     ),
+                          //     content: Padding(
+                          //       padding: const EdgeInsets.fromLTRB(
+                          //         20.0,
+                          //         0,
+                          //         20.0,
+                          //         0,
+                          //       ),
+                          //       child: Text(
+                          //         'Are you sure you want to log out?',
+                          //         textAlign: TextAlign.center,
+                          //         style: TextStyle(
+                          //           fontWeight: FontWeight.w500,
+                          //           fontSize: 17,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     backgroundColor: Colors.white,
+                          //     actions: [
+                          //       Center(
+                          //         child: Row(
+                          //           children: [
+                          //             Expanded(
+                          //               child: TextButton(
+                          //                 onPressed: () =>
+                          //                     Navigator.pop(context, false),
+                          //                 child: const Text(
+                          //                   "Cancel",
+                          //                   style: TextStyle(
+                          //                     fontSize: 20,
+                          //                     fontWeight: FontWeight.w500,
+                          //                     color: Colors.black,
+                          //                   ),
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //             SizedBox(width: 10),
+                          //             Expanded(
+                          //               child: ElevatedButton(
+                          //                 style: ElevatedButton.styleFrom(
+                          //                   backgroundColor:
+                          //                       const Color.fromARGB(
+                          //                         255,
+                          //                         184,
+                          //                         27,
+                          //                         27,
+                          //                       ),
+                          //                   padding: EdgeInsets.zero,
+                          //                   shape: RoundedRectangleBorder(
+                          //                     borderRadius:
+                          //                         BorderRadius.circular(20),
+                          //                   ),
+                          //                 ),
+                          //                 onPressed: () {
+                          //                   // Proceed with logout...
+                          //                   handleLogout();
+                          //                   Navigator.pop(context, true);
+                          //                 },
+                          //                 child: const Text(
+                          //                   "Logout",
+                          //                   style: TextStyle(
+                          //                     fontSize: 20,
+                          //                     fontWeight: FontWeight.w600,
+                          //                     color: Colors.white,
+                          //                   ),
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // );
+
+                          // if (confirmed != true) return;
+                          // // Proceed with logout...
+                          // handleLogout();
+                        
                       ),
                     ),
                   ),

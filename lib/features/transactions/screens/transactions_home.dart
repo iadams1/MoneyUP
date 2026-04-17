@@ -163,17 +163,16 @@ class _TransactionsHomeState extends State<TransactionsHome> {
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ),
-              IconButton(
-                // INFO ICON BUTTON
-                onPressed: () {
-                  //
-                },
-                icon: Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
+              // IconButton(// INFO ICON BUTTON
+              //   onPressed: () {
+              //     // 
+              //   },
+              //   icon: Icon(
+              //     Icons.info_outline_rounded,
+              //     color: Colors.white,
+              //     size: 25,
+              //   ),
+              // ),
               IconButton(
                 onPressed: () {
                   showNotificationDropdown(context);

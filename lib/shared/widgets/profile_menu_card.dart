@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/app_avatar.dart';
-import '/features/profile/screens/profile.dart';
+
+import '/features/auth/screens/user_select.dart';
+import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/logout_dialog.dart';
 
 class ProfileMenuCard extends StatelessWidget{
-  const ProfileMenuCard({super.key});
+  const ProfileMenuCard({super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -11,16 +13,16 @@ class ProfileMenuCard extends StatelessWidget{
       offset: const Offset(0, 70),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: Colors.white,
-      onSelected: (value) {
+      onSelected: (value) async{
         switch (value) {
           case 'profile':
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              MaterialPageRoute(builder: (_) => const UserSelectScreen()),
             );
             break;
           case 'logout':
-            //  LOGOUT LOGIC
+            await LogoutDialog.show(context);
             break;
         }
       },
@@ -30,8 +32,8 @@ class ProfileMenuCard extends StatelessWidget{
           child: Row(
             children: [
               Icon(Icons.person, size: 20,),
-              SizedBox(width: 10,),
-              Text("Profile")
+              SizedBox(width: 5),
+              Text("Edit Avatar")
             ],
           ),
         ),
@@ -40,15 +42,14 @@ class ProfileMenuCard extends StatelessWidget{
           child: Row(
             children: [
               Icon(Icons.logout_outlined, size: 20,),
-              SizedBox(width: 10,),
-              Text("Logout")
+              SizedBox(width: 5),
+              Text("Log Out")
             ],
           ),
         ),
       ],
-      child: AppAvatar(
-        size: 60,
-      ),
+      child: AppAvatar(size: 60),
     );
   }
 }
+
