@@ -409,11 +409,15 @@ class _MyWallet extends State<MyWallet> {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   elevation: 0,
                 ),
-                onPressed: () {
-                  showDialog(
+                onPressed: () async {
+                  await showDialog(
                     context: context,
+                    barrierDismissible: false,
                     builder: (_) => const PlaidService(),
                   );
+                  if (mounted) {
+                    await _loadWallets();
+                  }
                 },
                 icon: Image.asset("assets/icons/plusCircle.png"),
               ),
