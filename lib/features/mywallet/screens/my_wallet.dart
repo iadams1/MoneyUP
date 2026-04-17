@@ -14,6 +14,7 @@ import '/shared/widgets/app_avatar.dart';
 import '/models/linked_card.dart';
 import '/services/plaid_service.dart';
 import '/services/service_locator.dart';
+import 'package:moneyup/services/plaid_listener_service.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});
@@ -410,12 +411,22 @@ class _MyWallet extends State<MyWallet> {
                   elevation: 0,
                 ),
                 onPressed: () async {
+                  PlaidListenerService().onSuccess = () {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Bank account connected!'),
+                        ),
+                      );
+                    }
+                  };
                   await showDialog(
                     context: context,
                     barrierDismissible: false,
                     builder: (_) => const PlaidService(),
                   );
                   if (mounted) {
+                    PlaidListenerService().onSuccess = null;
                     await _loadWallets();
                   }
                 },

@@ -13,6 +13,8 @@ import 'package:moneyup/services/plaid_service.dart';
 import 'package:moneyup/services/notification_service.dart';
 import 'package:moneyup/services/plaid_listener_service.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
   debugPrint("FCM TOKEN: $token"); //Debug
@@ -48,6 +50,7 @@ class MyApp extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'MoneyUP',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

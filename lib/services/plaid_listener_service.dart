@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/supabase_service.dart';
+import 'package:moneyup/main.dart' show navigatorKey;
 
 class PlaidListenerService {
   static final PlaidListenerService _instance =
@@ -68,6 +69,16 @@ class PlaidListenerService {
       }
 
       debugPrint('Plaid connected and synced successfully');
+      navigatorKey.currentState?.pop();
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bank account connected!')),
+        );
+      }
+      
       onSuccess?.call();
     } catch (e) {
       debugPrint('Plaid exchange error: $e');
