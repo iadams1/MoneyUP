@@ -11,6 +11,7 @@ import 'package:moneyup/features/auth/screens/signup.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/services/plaid_service.dart';
 import 'package:moneyup/services/notification_service.dart';
+import 'package:moneyup/services/plaid_listener_service.dart';
 
 void getToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
@@ -29,6 +30,8 @@ void main() async {
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
+
+  PlaidListenerService().init(); 
 
   final prefs = await SharedPreferences.getInstance();
   final hasSeenOnboarding =
