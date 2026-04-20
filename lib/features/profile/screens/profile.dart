@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/screens/user_select.dart';
 
-// import '/features/auth/screens/login.dart';
+import '/services/service_locator.dart';
+import '/shared/contrants/user_icons.dart';
 import '/features/profile/widgets/profile_menu.dart';
-// import '/services/auth_service.dart';
 import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/logout_dialog.dart';
 import '/shared/utils/show_notification_dashboard.dart';
@@ -17,44 +16,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // final AuthService _authService = AuthService();
-
-  // Future<void> _handleLogout() async {
-  //   try {
-  //     // stop any listeners first if you have them
-  //     // _subscription?.cancel();
-  //     // RealtimeNotificationService().stopListening();
-
-  //     // clear local state here if this widget owns any
-  //     if (mounted) {
-  //       setState(() {
-  //         // _linkToken = null;
-  //         // _accounts = [];
-  //         // _isLoading = false;
-  //         // _hasPlaidConnected = false;
-  //       });
-  //     }
-
-  //     await _authService.signOut();
-
-  //     if (!mounted) return;
-
-  //     Navigator.pushAndRemoveUntil(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const LoginScreen()),
-  //       (route) => false,
-  //     );
-  //   } catch (e) {
-  //     if (!mounted) return;
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Logout failed: ${e.toString()}'),
-  //         backgroundColor: Colors.red,
-  //       ),
-  //     );
-  //   }
-  // }
+  int _selectedUserIndex = 12;
+  bool _isSaving = false;
+  bool _showEditAccount = false;
 
   @override
   Widget build(BuildContext context) {
@@ -114,18 +78,199 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 20),
                   ProfileMenu(
                     text: 'Edit Account',
-                    press: () =>
-                      Navigator.push(
-                        context, 
-                          MaterialPageRoute(builder: (_) => const UserSelectScreen()),
-                      ),
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_up_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () {
+                      setState(() {
+                        _showEditAccount = !_showEditAccount;
+                      });
+                    },
                   ),
-                  ProfileMenu(text: 'Reset Password', press: () => {}),
-                  ProfileMenu(text: 'Change Theme', press: () => {}),
-                  ProfileMenu(text: 'Language', press: () => {}),
-                  ProfileMenu(text: 'Currency', press: () => {}),
-                  ProfileMenu(text: 'Help & Support', press: () => {}),
-                  ProfileMenu(text: 'Terms and Conditions', press: () => {}),
+                  AnimatedCrossFade(
+                    crossFadeState: _showEditAccount
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                    duration: Duration(microseconds: 250),
+                    firstChild: Padding(
+                      padding: EdgeInsetsGeometry.symmetric(horizontal: 20, vertical: 10),
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: UserImages.all.length - 1,
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                              ),
+                              itemBuilder: (context, i) {
+                                final bool isSelected = i == _selectedUserIndex;
+                  
+                                return InkWell(
+                                  onTap: () => setState(() => _selectedUserIndex = i),
+                                  child: AnimatedScale(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeOut,
+                                    scale: isSelected ? 1.1 : 1.0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(500),
+                                        border: Border.all(
+                                          width: 2,
+                                          color: isSelected
+                                              ? const Color.fromARGB(255, 255, 255, 255)
+                                              : const Color.fromARGB(0, 255, 255, 255),
+                                        ),
+                                        color: const Color.fromARGB(0, 255, 255, 255),
+                                      ),
+                                      child: Image.asset(UserImages.all[i]),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 15),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: _isSaving
+                                  ? null
+                                  : () async {
+                                    try {
+                                      setState(() => _isSaving = true);
+            
+                                      await profileService.saveProfileSelection(
+                                        profileIconId: _selectedUserIndex,
+                                      );
+          
+                                      if (!mounted) return;
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              "Success",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            content: Text(
+                                              'Profile icon successfully updated!',
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context), 
+                                                child: Text(
+                                                  'OK',
+                                                  style: TextStyle(
+                                                    fontFamily: 'SF Pro',
+                                                    color: Colors.deepPurpleAccent,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    } catch (e) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text("Error"),
+                                            content: Text("Failed to save profile: $e",),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context), 
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      );
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() => _isSaving = false);
+                                      }
+                                    }
+                                  },
+                                child: _isSaving
+                                  ? CircularProgressIndicator()
+                                  : Text('Save')
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    secondChild: SizedBox.shrink(),
+                  ),
+                  ProfileMenu(
+                    text: 'Reset Password',
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () => {}
+                  ),
+                  ProfileMenu(
+                    text: 'Change Theme', 
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () => {}
+                  ),
+                  ProfileMenu(
+                    text: 'Language', 
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () => {}),
+                  ProfileMenu(
+                    text: 'Currency', 
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () => {}),
+                  ProfileMenu(
+                    text: 'Help & Support',
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                     press: () => {}),
+                  ProfileMenu(
+                    text: 'Terms and Conditions', 
+                    trailing: Icon(
+                      _showEditAccount 
+                        ? Icons.keyboard_arrow_right_outlined 
+                        : Icons.keyboard_arrow_down_outlined
+                    ),
+                    press: () => {}),
                   const SizedBox(height: 20),
                   Center(
                     child: Padding(
@@ -165,96 +310,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-
-                          // final confirmed = await showDialog<bool>(
-                          //   context: context,
-                          //   builder: (context) => AlertDialog(
-                          //     title: const Text(
-                          //       'Log Out',
-                          //       textAlign: TextAlign.center,
-                          //       style: TextStyle(
-                          //         fontWeight: FontWeight.w600,
-                          //         fontSize: 27,
-                          //       ),
-                          //     ),
-                          //     content: Padding(
-                          //       padding: const EdgeInsets.fromLTRB(
-                          //         20.0,
-                          //         0,
-                          //         20.0,
-                          //         0,
-                          //       ),
-                          //       child: Text(
-                          //         'Are you sure you want to log out?',
-                          //         textAlign: TextAlign.center,
-                          //         style: TextStyle(
-                          //           fontWeight: FontWeight.w500,
-                          //           fontSize: 17,
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     backgroundColor: Colors.white,
-                          //     actions: [
-                          //       Center(
-                          //         child: Row(
-                          //           children: [
-                          //             Expanded(
-                          //               child: TextButton(
-                          //                 onPressed: () =>
-                          //                     Navigator.pop(context, false),
-                          //                 child: const Text(
-                          //                   "Cancel",
-                          //                   style: TextStyle(
-                          //                     fontSize: 20,
-                          //                     fontWeight: FontWeight.w500,
-                          //                     color: Colors.black,
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //             SizedBox(width: 10),
-                          //             Expanded(
-                          //               child: ElevatedButton(
-                          //                 style: ElevatedButton.styleFrom(
-                          //                   backgroundColor:
-                          //                       const Color.fromARGB(
-                          //                         255,
-                          //                         184,
-                          //                         27,
-                          //                         27,
-                          //                       ),
-                          //                   padding: EdgeInsets.zero,
-                          //                   shape: RoundedRectangleBorder(
-                          //                     borderRadius:
-                          //                         BorderRadius.circular(20),
-                          //                   ),
-                          //                 ),
-                          //                 onPressed: () {
-                          //                   // Proceed with logout...
-                          //                   handleLogout();
-                          //                   Navigator.pop(context, true);
-                          //                 },
-                          //                 child: const Text(
-                          //                   "Logout",
-                          //                   style: TextStyle(
-                          //                     fontSize: 20,
-                          //                     fontWeight: FontWeight.w600,
-                          //                     color: Colors.white,
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // );
-
-                          // if (confirmed != true) return;
-                          // // Proceed with logout...
-                          // handleLogout();
-                        
                       ),
                     ),
                   ),

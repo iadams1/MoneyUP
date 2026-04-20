@@ -16,8 +16,8 @@ class ProfileMenuCard extends StatelessWidget{
       onSelected: (value) async{
         switch (value) {
           case 'profile':
-            Navigator.push(
-              context, 
+            Navigator.pushReplacement(
+              context,
               MaterialPageRoute(builder: (_) => const UserSelectScreen()),
             );
             break;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/home/screens/my_home_page.dart';
-import 'package:moneyup/services/service_locator.dart';
-import 'package:moneyup/shared/contrants/user_icons.dart';
+
+import '/features/home/screens/my_home_page.dart';
+import '/services/service_locator.dart';
+import '/shared/contrants/user_icons.dart';
 
 class UserSelectScreen extends StatefulWidget {
   const UserSelectScreen({super.key});
@@ -202,10 +203,20 @@ class _UserSelectScreen extends State<UserSelectScreen> {
                                       );
                                       
                                     } catch (e) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text("Failed to save profile: $e",),
-                                        ),
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text("Success"),
+                                            content: Text("Failed to save profile: $e",),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context), 
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        }
                                       );
                                     } finally {
                                       if (mounted) {

@@ -4,7 +4,7 @@ class ProfileMenu extends StatelessWidget {
   final String text;
   final VoidCallback? press;
 
-  const ProfileMenu({super.key, required this.text, this.press});
+  const ProfileMenu({super.key, required this.text, this.press, required Icon trailing});
 
   @override
   Widget build(BuildContext context) {
