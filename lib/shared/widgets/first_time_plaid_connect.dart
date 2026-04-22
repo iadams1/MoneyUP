@@ -95,7 +95,7 @@ Future<void> showFirstTimePlaidConnect(BuildContext context) async {
                         ),
                       ),
 
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
 
                       Expanded(
                         child: ElevatedButton(

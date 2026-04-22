@@ -25,7 +25,38 @@ class _SignUpState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  bool _nameError = false;
+  bool _usernameError = false;
+  bool _emailError = false;
+  bool _passwordError = false;
+  bool _confirmError = false;
+
   final AuthService _authService = AuthService();
+
+  final MultiValidator _nameValidator = MultiValidator([
+    RequiredValidator(errorText: 'Enter your name'),
+    MinLengthValidator(3, errorText: 'Minimum 3 characters'),
+  ]);
+
+  final MultiValidator _usernameValidator = MultiValidator([
+    RequiredValidator(errorText: 'Enter your username'),
+    MinLengthValidator(3, errorText: 'Minimum 3 characters'),
+  ]);
+
+  final MultiValidator _emailValidator = MultiValidator([
+    RequiredValidator(errorText: 'Enter email address'),
+    EmailValidator(errorText: 'Invalid email address'),
+  ]);
+
+  final MultiValidator _passwordValidator = MultiValidator([
+    RequiredValidator(errorText: 'Enter password'),
+    MinLengthValidator(8, errorText: 'Minimum 8 characters'),
+  ]);
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -35,6 +66,63 @@ class _SignUpState extends State<SignUpScreen> {
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
+  }
+
+  String? _validateName(String? value) {
+    final result = _nameValidator.call(value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _nameError = result != null);
+      }
+    });
+    return result;
+  }
+
+  String? _validateUsername(String? value) {
+    final result = _usernameValidator.call(value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _usernameError = result != null);
+      }
+    });
+    return result;
+  }
+
+  String? _validateEmail(String? value) {
+    final result = _emailValidator.call(value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _emailError = result != null);
+      }
+    });
+    return result;
+  }
+
+  String? _validatePassword(String? value) {
+    final result = _passwordValidator.call(value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _passwordError = result != null);
+      }
+    });
+    return result;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    String? result;
+    if (value == null || value.isEmpty) {
+      result = 'Re-type password';
+    } else if (value != _passwordController.text) {
+      result = 'Passwords do not match';
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _confirmError = result != null);
+      }
+    });
+
+    return result;
   }
 
   @override
@@ -78,20 +166,16 @@ class _SignUpState extends State<SignUpScreen> {
                             label: 'Full Name',
                             hint: 'Full Name',
                             icon: Icons.create_outlined,
-                            validator: MultiValidator([
-                              RequiredValidator(errorText: 'Enter your name'),
-                              MinLengthValidator(3, errorText: 'Minimum 3 characters'),
-                            ]).call,
+                            validator: _validateName,
+                            hasError: _nameError,
                           ),
                           _buildTextField(
                             controller: _usernameController,
                             label: 'Username',
                             hint: 'Username',
                             icon: Icons.person_outline,
-                            validator: MultiValidator([
-                              RequiredValidator(errorText: 'Enter your username'),
-                              MinLengthValidator(3, errorText: 'Minimum 3 characters'),
-                            ]).call,
+                            validator: _validateUsername,
+                            hasError: _usernameError,
                           ),
                           _buildTextField(
                             controller: _emailController,
@@ -99,10 +183,8 @@ class _SignUpState extends State<SignUpScreen> {
                             hint: 'Email Address',
                             icon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
-                            validator: MultiValidator([
-                              RequiredValidator(errorText: 'Enter email address'),
-                              EmailValidator(errorText: 'Invalid email address'),
-                            ]).call,
+                            validator: _validateEmail,
+                            hasError: _emailError,
                           ),
                           _buildTextField(
                             controller: _passwordController,
@@ -110,19 +192,21 @@ class _SignUpState extends State<SignUpScreen> {
                             hint: 'Password',
                             icon: Icons.lock_outline,
                             obscureText: _obscurePassword,
+                            hasError: _passwordError,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: Colors.grey[700],
                               ),
-                              onPressed: () => setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              }),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
-                            validator: MultiValidator([
-                              RequiredValidator(errorText: 'Enter password'),
-                              MinLengthValidator(8, errorText: 'Minimum 8 characters'),
-                            ]).call,
+                            validator: _validatePassword,
                           ),
                           _buildTextField(
                             controller: _confirmController,
@@ -130,20 +214,22 @@ class _SignUpState extends State<SignUpScreen> {
                             hint: 'Re-type Password',
                             icon: Icons.lock_outline,
                             obscureText: _obscureConfirmPassword,
+                            hasError: _confirmError,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                _obscureConfirmPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: Colors.grey[700],
                               ),
-                              onPressed: () => setState(() {
-                                _obscureConfirmPassword = !_obscureConfirmPassword;
-                              }),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
+                                });
+                              },
                             ),
-                            validator: (val) {
-                              if (val == null || val.isEmpty) return 'Re-type password';
-                              if (val != _passwordController.text) return 'Passwords do not match';
-                              return null;
-                            },
+                            validator: _validateConfirmPassword,
                           ),
                           const SizedBox(height: 20),
                           _buildGradientButton(
@@ -152,11 +238,15 @@ class _SignUpState extends State<SignUpScreen> {
                           ),
                           Center(
                             child: Padding(
-                              padding: const EdgeInsets.only(top: 30, bottom: 20),
+                              padding:
+                                  const EdgeInsets.only(top: 30, bottom: 20),
                               child: RichText(
                                 text: TextSpan(
                                   text: 'Already have an account? ',
-                                  style: const TextStyle(fontSize: 15, color: Colors.black),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
                                   children: [
                                     TextSpan(
                                       text: 'Login',
@@ -167,7 +257,10 @@ class _SignUpState extends State<SignUpScreen> {
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () => Navigator.pushReplacement(
                                               context,
-                                              MaterialPageRoute(builder: (_) => const LoginScreen()),
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const LoginScreen(),
+                                              ),
                                             ),
                                     ),
                                   ],
@@ -197,6 +290,7 @@ class _SignUpState extends State<SignUpScreen> {
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     Widget? suffixIcon,
+    bool hasError = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -205,23 +299,40 @@ class _SignUpState extends State<SignUpScreen> {
         keyboardType: keyboardType,
         obscureText: obscureText,
         validator: validator,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
           hintText: hint,
           labelText: label,
           prefixIcon: Icon(icon, color: Colors.black),
-          suffixIcon: suffixIcon,
+          suffixIcon: hasError
+              ? const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.red,
+                )
+              : suffixIcon,
           filled: true,
           fillColor: HexColor('#E7E7E7'),
           border: const OutlineInputBorder(
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.all(Radius.circular(9.0)),
           ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(9.0),
+            borderSide: const BorderSide(color: Colors.red),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(9.0),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildGradientButton({required String text, required VoidCallback onPressed}) {
+  Widget _buildGradientButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: SizedBox(
@@ -233,14 +344,23 @@ class _SignUpState extends State<SignUpScreen> {
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             padding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+            ),
           ),
           child: Ink(
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [HexColor('#124074'), HexColor('#332677')]),
+              gradient: LinearGradient(
+                colors: [HexColor('#124074'), HexColor('#332677')],
+              ),
               borderRadius: BorderRadius.circular(50),
             ),
-            child: Center(child: Text(text, style: const TextStyle(color: Colors.white))),
+            child: Center(
+              child: Text(
+                text,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ),
       ),
@@ -262,18 +382,26 @@ class _SignUpState extends State<SignUpScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => VerificationScreen(email: _emailController.text.trim()),
+          builder: (_) => VerificationScreen(
+            email: _emailController.text.trim(),
+          ),
         ),
       );
     } on AuthException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Colors.red,
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('An unexpected error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

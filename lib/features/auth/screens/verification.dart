@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/core/utils/other_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '/features/auth/screens/confirmation.dart';
@@ -160,16 +161,38 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   Container(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(top: 20.0, bottom: 40.0),
-                    child: const Text(
-                      'Please enter the code we sent to the email address',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'SF Pro',
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'Please enter the code we sent to your email address: ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'SF Pro',
+                        ),
+                        children: [
+                          TextSpan(
+                            text: OtherHelpers.maskEmail(widget.email),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'SF Pro',
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    )
+                    // child: Text(
+                    //   'Please enter the code we sent to your email address: ${widget.email}',
+                    //   textAlign: TextAlign.left,
+                    //   style: const TextStyle(
+                    //     color: Colors.white,
+                    //     fontSize: 18,
+                    //     fontWeight: FontWeight.w400,
+                    //     fontFamily: 'SF Pro',
+                    //   ),
+                    // ),
                   ),
                   Container(
                     alignment: Alignment.bottomCenter,
