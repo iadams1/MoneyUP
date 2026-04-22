@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';
 
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -21,6 +22,7 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // Add password visibility state
   bool _obscurePassword = true;
 
   @override
