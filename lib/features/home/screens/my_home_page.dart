@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:moneyup/features/home/widgets/greeting_text.dart';
-import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
-import 'package:moneyup/shared/widgets/first_time_plaid_connect.dart';
-import 'package:moneyup/features/budgettracker/ui/time_filter.dart';
-import 'package:moneyup/features/budgettracker/utils/time_range.dart';
-import 'package:moneyup/features/home/widgets/monthly_spending_overview_view.dart';
-import 'package:moneyup/features/home/widgets/no_spending_overview.dart';
-// import '/shared/widgets/profile_menu_card.dart';
+
+import '/features/home/widgets/greeting_text.dart';
+import '/features/budgettracker/ui/time_filter.dart';
+import '/features/budgettracker/utils/time_range.dart';
+import '/features/home/widgets/monthly_spending_overview_view.dart';
+import '/features/home/widgets/no_spending_overview.dart';
+import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/budget_view.dart';
 import '../widgets/no_budget_view.dart';
-import 'package:moneyup/shared/widgets/profile_menu_card.dart';
-import '/features/mywallet/screens/my_wallet.dart';
 import '../widgets/primary_card_view.dart';
 import '/models/budget.dart';
 import '/models/linked_card.dart';
 import '/services/service_locator.dart';
+import '/shared/widgets/profile_menu_card.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/core/utils/formatters.dart';
 import '/shared/widgets/streak_banner.dart';
+import '/shared/utils/show_notification_dashboard.dart';
+import '/shared/widgets/error_system.dart';
+import '/shared/widgets/first_time_plaid_connect.dart';
+import '/core/utils/formatters.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -76,9 +77,13 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      // ScaffoldMessenger.of(
-      //   context,
-      // ).showSnackBar(SnackBar(content: Text('Home failed: $e')));
+      showDialog(
+        context: context,
+        builder: (_) => ErrorDialog(
+          message: 'Home failed: $e',
+          onButtonPressed: () => Navigator.pop(context, false),
+        ),
+      );
     }
   }
 

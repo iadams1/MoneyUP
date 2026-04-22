@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '/shared/widgets/error_system.dart';
 import '/features/auth/screens/confirmation.dart';
 import '/services/auth_service.dart';
 import '/shared/widgets/otp_input.dart';
@@ -34,10 +35,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Future<void> _onContinuePressed() async {
     final code = _codeController.text.trim();
     if (code.length != _codeLength) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter the full 6-digit code"),
-          backgroundColor: Colors.red,
+      showDialog(
+        context: context,
+        builder: (_) => ErrorDialog(
+          message: "Please enter the full 6-digit code",
+          onButtonPressed: () => Navigator.pop(context),
         ),
       );
       return;
@@ -60,16 +62,21 @@ class _VerificationScreenState extends State<VerificationScreen> {
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: e.message,
+            onButtonPressed: () => Navigator.pop(context),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Verification failed: ${e.toString()}"),
-            backgroundColor: Colors.red,
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: "Verification failed: ${e.toString()}",
+            onButtonPressed: () => Navigator.pop(context),
           ),
         );
       }
@@ -87,25 +94,31 @@ class _VerificationScreenState extends State<VerificationScreen> {
       await _authService.resendOtp(email: widget.email, type: OtpType.signup);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Code resent successfully! Check your email."),
-            backgroundColor: Colors.green,
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: "Code resent successfully! Check your email.",
+            onButtonPressed: () => Navigator.pop(context),
           ),
         );
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: e.message,
+            onButtonPressed: () => Navigator.pop(context),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error resending code"),
-            backgroundColor: Colors.red,
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: "Error resending code",
+            onButtonPressed: () => Navigator.pop(context),
           ),
         );
       }
@@ -187,26 +200,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           controller: _codeController,
                           length: _codeLength,
                         ),
-                        // TextFormField(
-                        //   controller: _codeController,
-                        //   keyboardType: TextInputType.number,
-                        //   textAlign: TextAlign.center,
-                        //   maxLength: _codeLength,
-                        //   style: const TextStyle(
-                        //     fontSize: 24,
-                        //     letterSpacing: 10,
-                        //   ),
-                        //   decoration: InputDecoration(
-                        //     hintText: '_ _ _ _ _ _',
-                        //     border: InputBorder.none,
-                        //     counterText: "",
-                        //     filled: true,
-                        //     fillColor: Colors.transparent,
-                        //     contentPadding: const EdgeInsets.symmetric(
-                        //       vertical: 40,
-                        //     ), // adjusted for better look
-                        //   ),
-                        // ),
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 20.0,

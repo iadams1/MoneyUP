@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';
 
 import '/services/service_locator.dart';
 import '/shared/contrants/user_icons.dart';
@@ -191,18 +192,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     } catch (e) {
                                       showDialog(
                                         context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: Text("Error"),
-                                            content: Text("Failed to save profile: $e",),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(context), 
-                                                child: Text('OK'),
-                                              ),
-                                            ],
-                                          );
-                                        }
+                                        builder: (_) => ErrorDialog(
+                                          message: "Failed to save profile: $e", 
+                                          onButtonPressed: () => Navigator.pop(context),
+                                        ),
                                       );
                                     } finally {
                                       if (mounted) {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
-import 'package:moneyup/shared/widgets/bottom_nav.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/models/article.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
+import '/shared/utils/show_notification_dashboard.dart';
+import '/shared/widgets/bottom_nav.dart';
+import '/shared/widgets/error_system.dart';
 
 class ArticleDetailsScreen extends StatefulWidget {
   final int articleId;
@@ -59,14 +60,22 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
 
     try {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Could not open the link.')));
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: 'Could not open the link.',
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error opening link: $e')));
+      showDialog(
+        context: context,
+        builder: (_) => ErrorDialog(
+          message: 'Error opening link: $e',
+          onButtonPressed: () => Navigator.pop(context),
+        ),
+      );
     }
   }
 

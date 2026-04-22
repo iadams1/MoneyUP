@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/error_system.dart';
 import '/features/auth/screens/login.dart';
 import '/services/auth_service.dart';
 
@@ -89,10 +90,11 @@ class LogoutDialog {
     } catch (e) {
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Logout failed: ${e.toString()}'),
-          backgroundColor: Colors.red,
+      showDialog(
+        context: context,
+        builder: (_) => ErrorDialog(
+          message: 'Logout failed: ${e.toString()}',
+          onButtonPressed: () => Navigator.pop(context),
         ),
       );
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';
 
 import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -23,7 +24,7 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   // Add password visibility state
-  final bool _obscurePassword = true;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +145,17 @@ class _LoginState extends State<LoginScreen> {
                                     Radius.circular(9.0),
                                   ),
                                 ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.grey[700],
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -181,16 +193,25 @@ class _LoginState extends State<LoginScreen> {
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
                                     );
+                                    //REFRESH THE USER session
+                                    await Supabase.instance.client.auth.refreshSession();
 
+                                    // Optional: debug print to confirm the user changed
+                                    print('Logged in as: ${Supabase.instance.client.auth.currentUser?.id}');
+
+                                    // Now check the Plaid flag
+                                    // final supabase = Supabase.instance.client;
+                                    // final user = supabase.auth.currentUser;
                                     // ✅ Ensure session exists
-                                    final session = Supabase.instance.client.auth.currentSession;
+                                    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+                                      final session = data.session;
 
-                                    if (session == null) {
-                                      throw Exception("Session not established after login");
-                                    }
+                                      if (session != null) {
+                                        debugPrint("🔥 Auth state changed → starting realtime");
 
-                                    // ✅ Start realtime manually with correct user
-                                    RealtimeNotificationService().startListening(session.user.id);
+                                        RealtimeNotificationService().startListening(session.user.id);
+                                      }
+                                    });
                                     
                                     if (!mounted) return;
                                     Navigator.pushReplacement(
@@ -200,15 +221,16 @@ class _LoginState extends State<LoginScreen> {
                                       ),
                                     );
                                   } catch (e) {
-                                    debugPrint('LOGIN ERROR: $e');
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Invalid email or password',
-                                        ),
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => ErrorDialog(
+                                        title: 'Invalid Credentials',
+                                        message: 'Invalid email or password', 
+                                        onButtonPressed: () => Navigator.pop(context),
                                       ),
                                     );
+
+                                    debugPrint('LOGIN ERROR: $e');
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

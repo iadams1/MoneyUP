@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:moneyup/services/supabase_service.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '/services/supabase_service.dart';
+import '/shared/widgets/error_system.dart';
 import '/shared/widgets/plaid_connect_dialog.dart';
 
 class PlaidService extends StatefulWidget {
@@ -109,77 +110,68 @@ class _PlaidServiceState extends State<PlaidService> {
     }
   }
 
-  Future<void> _handlePlaidSuccess(LinkSuccess success) async {
-    debugPrint('Plaid success received');
+  Future<void> _handlePlaidSuccess(LinkSuccess success) async 
+  {
+    try 
+    {
+    final supabase = Supabase.instance.client;
 
-    try {
-      final supabase = Supabase.instance.client;
+        debugPrint('Plaid Success - Public Token: ${success.publicToken}');
+        debugPrint('Institution from metadata: ${success.metadata.institution}');
 
-      debugPrint('Calling exchange-public-token...');
-      final exchangeResponse = await supabase.functions
-          .invoke(
-            'exchange-public-token',
-            body: {'public_token': success.publicToken},
-          )
-          .timeout(const Duration(seconds: 15));
+        final exchangeResponse = await supabase.functions.invoke(
+          'exchange-public-token',
+          body: {
+            'public_token': success.publicToken,
+            // Send whatever we have, even if null
+            'institution_id': success.metadata.institution?.id,
+            'institution_name': success.metadata.institution?.name,
+          },
+        );
 
-      debugPrint('Exchange status: ${exchangeResponse.status}');
-      debugPrint('Exchange data: ${exchangeResponse.data}');
+        if (exchangeResponse.status != 200) {
+          throw Exception('Token exchange failed: ${exchangeResponse.status}');
+        }
 
-      if (exchangeResponse.status != 200) {
-        throw Exception('Token exchange failed: ${exchangeResponse.status}');
-      }
+        final data = exchangeResponse.data as Map<String, dynamic>;
+        if (data['success'] != true) {
+          throw Exception(data['error'] ?? 'Exchange failed');
+        }
 
-      final data = exchangeResponse.data as Map<String, dynamic>;
-      if (data['success'] != true) {
-        throw Exception(data['error'] ?? 'Exchange did not succeed');
-      }
+        debugPrint('Plaid connection saved successfully');
 
-      
-      await SupabaseService().syncAll();
-      debugPrint('Plaid connection saved successfully');
+        // Update profile flag
+        final userId = supabase.auth.currentUser?.id;
+        if (userId != null) {
+          await supabase
+              .from('profiles')
+              .update({'has_plaid_connected': true})
+              .eq('id', userId);
+        }
 
-      // ────────────────────────────────────────────────
-      // NEW: Mark that the user has completed Plaid onboarding
-      final userId = supabase.auth.currentUser?.id;
-      if (userId != null) {
-        debugPrint('Updating has_plaid_connected for $userId');
+        await SupabaseService().syncAll();
 
-        await supabase
-            .from('profiles')
-            .update({'has_plaid_connected': true})
-            .eq('id', userId);
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: 'Bank account connected! Syncing data...',
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        );
 
-        debugPrint('Profile updated successfully');
-      } else {
-        debugPrint('No current user found');
-      }
-
-      if (!mounted) return;
-
-      setState(() {
-        _linkToken = null;
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bank account connected!')),
-      );
-
-      debugPrint('Navigating to /home');
-      Navigator.of(context).pushReplacementNamed('/home');
-    } catch (e, stack) {
-      debugPrint('Exchange error: $e\n$stack');
-
-      if (!mounted) return;
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to connect: $e')),
-      );
+        Navigator.pushReplacementNamed(context, '/home');
+      } catch (e, stack) {
+        debugPrint('Plaid success error: $e\n$stack');
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (_) => ErrorDialog(
+              message: 'Failed to connect bank: $e',
+              onButtonPressed: () => Navigator.pop(context),
+            ),
+          );
+        }
     }
   }
 
