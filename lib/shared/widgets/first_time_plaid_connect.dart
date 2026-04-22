@@ -19,7 +19,7 @@ Future<void> showFirstTimePlaidConnect(BuildContext context) async {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(17.5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -95,7 +95,7 @@ Future<void> showFirstTimePlaidConnect(BuildContext context) async {
                         ),
                       ),
 
-                      SizedBox(width: 10),
+                      const SizedBox(width: 2),
 
                       Expanded(
                         child: ElevatedButton(

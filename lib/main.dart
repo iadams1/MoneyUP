@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         '/welcome': (context) => const WelcomeScreen(),
         '/preview': (context) => const PreviewScreen(),
       },
-      initialRoute: '/login',
+      initialRoute: '/preview',
     );
   }
 }
