@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:moneyup/services/plaid_listener_service.dart';
-
-import '/services/supabase_service.dart';
-import '/shared/widgets/error_system.dart';
 import '/shared/widgets/plaid_connect_dialog.dart';
 
 class PlaidService extends StatefulWidget {

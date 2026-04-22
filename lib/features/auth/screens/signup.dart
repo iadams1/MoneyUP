@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:moneyup/features/auth/screens/login.dart';
 import 'package:moneyup/shared/widgets/error_system.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -388,21 +389,27 @@ class _SignUpState extends State<SignUpScreen> {
         ),
       );
     } on AuthException catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // This is the proper way → catch the specific type
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: error.message,
+            onButtonPressed: () => Navigator.pop(context, false),
+          ),
+        );
+      }
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An unexpected error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Fallback for any other unexpected errors
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => ErrorDialog(
+            message: 'An unexpected error occurred: $e',
+            onButtonPressed: () => Navigator.pop(context, false),
+          ),
+        );
+      }
     }
   }
 }

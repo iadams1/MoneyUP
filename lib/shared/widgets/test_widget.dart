@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/shared/widgets/error_widget.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({super.key});

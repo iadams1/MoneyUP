@@ -263,8 +263,18 @@ class _LoginState extends State<LoginScreen> {
     } catch (e) {
       debugPrint('LOGIN ERROR: $e');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
+
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => ErrorDialog(
+          title: 'Login Failed',
+          message: 'Invalid email or password. Please try again.',
+          buttonText: 'Try Again',
+          onButtonPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       );
     }
   }
