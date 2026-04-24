@@ -8,7 +8,7 @@ import '/services/service_locator.dart';
 class BudgetService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  String get user => supabaseService.currentUserId!;
+  String? get user => supabaseService.currentUserId;
 
   Future<Budget?> getRandomBudget() async {
     try {
@@ -37,12 +37,15 @@ class BudgetService {
     BudgetType type,
   ) async {
     try {
+      final safeSpent = spent < 0 ? 0 : spent;
+      final safeRemaining = (goal - spent) < 0 ? 0: (goal - spent);
+      
       await _client.from('budgets').insert({
         'user_ID': user,
         'Title': title,
         'Goal': goal,
-        'AmountSpent': spent,
-        'AmountRemaining': (goal - spent),
+        'AmountSpent': safeSpent,
+        'AmountRemaining': safeRemaining,
         'Category': type.label,
       });
     } catch (e) {
@@ -101,13 +104,14 @@ class BudgetService {
     required DateTime start,
     required DateTime end,
   }) async {
+    dynamic currentUser = user;
     
     final response = await _client
         .from('plaid_transactions')
         .select(
           'category_table!inner(category_ID, Title), amount, authorized_date',
         )
-        .eq('user_id', user)
+        .eq('user_id', currentUser)
         .gte('date', start.toIso8601String().split("T")[0])
         .lt('date', end.toIso8601String().split("T")[0]);
     
@@ -133,14 +137,20 @@ class BudgetService {
     required double amountSpent, 
     required double amountRemaining
   }) async {
+    if (user == null) return;
+
+    final safeSpent = amountSpent < 0 ? 0 : amountSpent;
+    final safeRemaining = amountRemaining < 0 ? 0: amountRemaining;
+
     try {
       await _client
           .from('budgets')
           .update({
-            'AmountSpent': amountSpent,
-            'AmountRemaining': amountRemaining,
+            'AmountSpent': safeSpent,
+            'AmountRemaining': safeRemaining,
           })
           .eq('budget_ID', budgetId)
+          .eq('user_ID', user as Object)
           .select();
     } catch (e) {
       debugPrint('Error updating budget: $e');

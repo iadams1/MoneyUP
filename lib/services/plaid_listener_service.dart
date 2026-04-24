@@ -1,9 +1,10 @@
-// lib/services/plaid_listener_service.dart
 import 'package:flutter/material.dart';
+import 'package:moneyup/services/supabase_service.dart';
 import 'package:plaid_flutter/plaid_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/services/supabase_service.dart';
-import 'package:moneyup/main.dart' show navigatorKey;
+import 'dart:convert';
+import 'package:moneyup/main.dart';
+import 'package:moneyup/shared/widgets/bank_connection_banner.dart';
 
 class PlaidListenerService {
   static final PlaidListenerService _instance =
@@ -12,7 +13,6 @@ class PlaidListenerService {
   PlaidListenerService._internal();
 
   bool _initialized = false;
-  VoidCallback? onSuccess;
 
   void init() {
     if (_initialized) return;
@@ -50,13 +50,20 @@ class PlaidListenerService {
           .timeout(const Duration(seconds: 30));
 
       debugPrint('Exchange response: ${response.data}');
+      debugPrint('Exchange response type: ${response.data.runtimeType}');
 
-      if (response.status != 200)
+      if (response.status != 200) {
         throw Exception('Exchange failed: ${response.status}');
+      }
 
-      final data = response.data as Map<String, dynamic>;
-      if (data['success'] != true)
+      final rawData = response.data;
+      final Map<String, dynamic> data =
+          rawData is String ? jsonDecode(rawData) as Map<String, dynamic>
+                            : Map<String, dynamic>.from(rawData as Map);
+
+      if (data['success'] != true) {
         throw Exception(data['error'] ?? 'Exchange failed');
+      }
 
       await SupabaseService().syncAll();
 
@@ -69,17 +76,20 @@ class PlaidListenerService {
       }
 
       debugPrint('Plaid connected and synced successfully');
-      navigatorKey.currentState?.pop();
-      await Future.delayed(const Duration(milliseconds: 300));
+      debugPrint('About to fire onSuccess callback');
 
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bank account connected!')),
-        );
+      final navigator = appNavigatorKey.currentState;
+      final overlayContext = navigator?.overlay;
+
+      if (navigator == null || overlayContext == null) {
+        debugPrint('No valid navigator or overlay context available');
+        return;
       }
-      
-      onSuccess?.call();
+
+      debugPrint('Launching banner UI...');
+      BankConnectionSuccessBanner.showBankConnectionSuccessBanner(overlayContext);
+
+      navigator.pushNamedAndRemoveUntil('/home', (route) => false);
     } catch (e) {
       debugPrint('Plaid exchange error: $e');
     }
