@@ -7,14 +7,14 @@ import '/features/auth/screens/signup.dart';
 import '/features/home/screens/my_home_page.dart';
 import '/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:moneyup/services/realtime_notifications.dart';
+import 'package:moneyup/shared/widgets/plaid_connect_dialog.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';     // ← Add this import
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginState();
-
 }
 
 class _LoginState extends State<LoginScreen> {
@@ -22,8 +22,82 @@ class _LoginState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Add password visibility state
-  final bool _obscurePassword = true;
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  Future<void> _handleLogin() async {
+    if (!(_formkey.currentState?.validate() ?? false)) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await AuthService().login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      // Refresh session to ensure we have the latest user
+      await Supabase.instance.client.auth.refreshSession();
+
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception("Login succeeded but no user session found");
+      }
+
+      debugPrint('Logged in successfully as user: ${currentUser.id}');
+
+      // Check if user has connected a bank
+      bool hasConnected = false;
+      try {
+        final response = await Supabase.instance.client
+            .from('profiles')
+            .select('has_plaid_connected')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+        hasConnected = response?['has_plaid_connected'] == true;
+      } catch (e) {
+        debugPrint('Error checking plaid flag: $e');
+        hasConnected = false; // Fail open → show Plaid screen
+      }
+
+      // Navigate based on Plaid connection status
+      if (hasConnected) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    } on AuthException catch (e) {
+      _showErrorDialog(e.message);
+    } catch (e) {
+      _showErrorDialog('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ErrorDialog(
+        title: 'Login Failed',
+        message: message,
+        buttonText: 'Try Again',
+        onButtonPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +106,11 @@ class _LoginState extends State<LoginScreen> {
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,
-          children: <Widget>[
-            Image.asset(
-              // BACKGROUND
-              'assets/images/mu_bg.png',
-              fit: BoxFit.fill,
-            ),
+          children: [
+            Image.asset('assets/images/mu_bg.png', fit: BoxFit.fill),
             Container(
-              // LOGIN IMAGE
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: 120),
+              padding: const EdgeInsets.only(top: 120),
               child: Image.asset(
                 'assets/images/mu_login.png',
                 width: 350,
@@ -50,11 +119,10 @@ class _LoginState extends State<LoginScreen> {
               ),
             ),
             Align(
-              // LOGIN SCREEN BOX
               alignment: Alignment.bottomCenter,
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(50.0),
                     topRight: Radius.circular(50.0),
@@ -62,200 +130,139 @@ class _LoginState extends State<LoginScreen> {
                   color: Colors.white,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: const EdgeInsets.all(25.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
+                        children: [
+                          // Email Field
                           Padding(
-                            // EMAIL ADDRESS
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _emailController,
                               validator: MultiValidator([
-                                RequiredValidator(
-                                  errorText: 'Enter email address',
-                                ),
-                                EmailValidator(
-                                  errorText:
-                                      'Invalid email address. Please try again.',
-                                ),
+                                RequiredValidator(errorText: 'Enter email address'),
+                                EmailValidator(errorText: 'Invalid email address. Please try again.'),
                               ]).call,
                               decoration: InputDecoration(
                                 hintText: 'Email Address',
                                 labelText: 'Email Address',
-                                labelStyle: TextStyle(
+                                labelStyle: const TextStyle(
                                   color: Color(0x4F000000),
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.w500,
                                   fontFamily: 'SF Pro',
                                 ),
-                                prefixIcon: Icon(
-                                  Icons.email_outlined, 
-                                  color: Colors.black
-                                ),
-                                errorStyle: TextStyle(fontSize: 16.0),
+                                prefixIcon: const Icon(Icons.email_outlined, color: Colors.black),
+                                errorStyle: const TextStyle(fontSize: 16.0),
                                 filled: true,
                                 fillColor: HexColor('#E7E7E7'),
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(9.0),
-                                  ),
+                                  borderRadius: BorderRadius.circular(9.0),
                                 ),
                               ),
                             ),
                           ),
+
+                          // Password Field
                           Padding(
-                            // PASSWORD ENTRY
                             padding: const EdgeInsets.only(top: 20.0),
                             child: TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
                               validator: MultiValidator([
                                 RequiredValidator(errorText: 'Enter password'),
-                                MinLengthValidator(
-                                  8,
-                                  errorText:
-                                      'Password must be at least 8 characters',
-                                ),
+                                MinLengthValidator(8, errorText: 'Password must be at least 8 characters'),
                               ]).call,
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 labelText: 'Password',
-                                labelStyle: TextStyle(
+                                labelStyle: const TextStyle(
                                   color: Color(0x4F000000),
                                   fontSize: 15.0,
                                   fontWeight: FontWeight.w500,
                                   fontFamily: 'SF Pro',
                                 ),
-                                prefixIcon: Icon(
-                                  Icons.lock_outline, 
-                                  color: Colors.black
-                                ),
-                                errorStyle: TextStyle(fontSize: 16.0),
+                                prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
+                                errorStyle: const TextStyle(fontSize: 16.0),
                                 filled: true,
                                 fillColor: HexColor('#E7E7E7'),
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(9.0),
+                                  borderRadius: BorderRadius.circular(9.0),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.grey,
                                   ),
+                                  onPressed: () {
+                                    setState(() => _obscurePassword = !_obscurePassword);
+                                  },
                                 ),
                               ),
                             ),
                           ),
-                          Padding(
-                            // LOGIN BUTTON
-                            padding: const EdgeInsets.only(top: 30.0),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(50.0),
-                                ),
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: <HexColor>[
-                                    HexColor('#124074'),
-                                    HexColor('#332677'),
-                                    HexColor('#124074'),
-                                    HexColor('#0D1250'),
-                                  ],
-                                  tileMode: TileMode.mirror,
-                                ),
-                              ),
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  if (!(_formkey.currentState?.validate() ??
-                                      false)) {
-                                    return;
-                                  }
 
-                                  try 
-                                  {
-                                    await AuthService().login(
-                                      email: _emailController.text.trim(),
-                                      password: _passwordController.text,
-                                    );
-                                    //REFRESH THE USER session
-                                    await Supabase.instance.client.auth.refreshSession();
+                          const SizedBox(height: 30),
 
-                                    // Optional: debug print to confirm the user changed
-                                    print('Logged in as: ${Supabase.instance.client.auth.currentUser?.id}');
-
-                                    // Now check the Plaid flag
-                                    // final supabase = Supabase.instance.client;
-                                    // final user = supabase.auth.currentUser;
-                                    //REALTIME NOTIFICATION START AFTER LOGIN
-                                    Supabase.instance.client.auth.onAuthStateChange.listen((data) 
-                                    {
-                                      final session = data.session;
-
-                                      if (session != null) {
-                                        debugPrint("🔥 Auth state changed → starting realtime");
-
-                                        RealtimeNotificationService()
-                                            .startListening(session.user.id);
-                                      }
-                                    });
-                                    
-                                    if (!mounted) return;
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MyHomePage(title: ''),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    debugPrint('LOGIN ERROR: $e');
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Invalid email or password',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: const Color.fromARGB(
-                                    255,
-                                    144,
-                                    68,
-                                    232,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16
-                                  ),
-                                ),
+                          // Login Button
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50.0),
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: <HexColor>[
+                                  HexColor('#124074'),
+                                  HexColor('#332677'),
+                                  HexColor('#124074'),
+                                  HexColor('#0D1250'),
+                                ],
+                                tileMode: TileMode.mirror,
                               ),
                             ),
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Login',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                            ),
                           ),
+
+                          // Sign up link
                           Center(
-                            // PUSH TO SIGNUP SCREEN
                             child: Container(
-                              alignment: FractionalOffset.bottomCenter,
-                              padding: EdgeInsets.only(top: 40),
+                              padding: const EdgeInsets.only(top: 40),
                               child: RichText(
                                 text: TextSpan(
                                   text: "Don't have an account? ",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     color: Colors.black,
                                     fontFamily: 'SF Pro',
                                   ),
-                                  children: <TextSpan>[
+                                  children: [
                                     TextSpan(
                                       text: 'Sign up',
                                       style: TextStyle(
@@ -268,8 +275,7 @@ class _LoginState extends State<LoginScreen> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SignUpScreen(),
+                                              builder: (context) => const SignUpScreen(),
                                             ),
                                           );
                                         },

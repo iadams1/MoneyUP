@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:moneyup/features/auth/screens/verification.dart';
-import 'package:moneyup/services/auth_service.dart';
-import 'package:moneyup/features/auth/screens/login.dart';
+
+import '/features/auth/screens/verification.dart';
+import '/services/auth_service.dart';
+import '/features/auth/screens/login.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';   // ← Add this import
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -23,11 +25,10 @@ class _SignUpState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
-  // Password visibility toggles
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
-  // Instance of AuthService
   final AuthService _authService = AuthService();
 
   @override
@@ -38,6 +39,54 @@ class _SignUpState extends State<SignUpScreen> {
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    if (!_formkey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        fullName: _nameController.text.trim(),
+        username: _usernameController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      // Navigate to verification screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VerificationScreen(
+            email: _emailController.text.trim(),
+          ),
+        ),
+      );
+    } on AuthException catch (error) {
+      _showErrorDialog(error.message);
+    } catch (e) {
+      _showErrorDialog('An unexpected error occurred. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ErrorDialog(
+        title: 'Sign Up Failed',
+        message: message,
+        buttonText: 'Try Again',
+        onButtonPressed: () => Navigator.pop(context),
+      ),
+    );
   }
 
   @override
@@ -81,7 +130,8 @@ class _SignUpState extends State<SignUpScreen> {
                           key: _formkey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
+                            children: [
+                              // Name Field
                               Padding(
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
@@ -103,6 +153,8 @@ class _SignUpState extends State<SignUpScreen> {
                                   ),
                                 ),
                               ),
+
+                              // Username Field
                               Padding(
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
@@ -111,7 +163,6 @@ class _SignUpState extends State<SignUpScreen> {
                                     RequiredValidator(errorText: 'Enter your username'),
                                     MinLengthValidator(3, errorText: 'Minimum 3 characters'),
                                   ]).call,
-                                  
                                   decoration: InputDecoration(
                                     hintText: 'Username',
                                     labelText: 'Username',
@@ -125,6 +176,8 @@ class _SignUpState extends State<SignUpScreen> {
                                   ),
                                 ),
                               ),
+
+                              // Email Field
                               Padding(
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
@@ -146,6 +199,8 @@ class _SignUpState extends State<SignUpScreen> {
                                   ),
                                 ),
                               ),
+
+                              // Password Field
                               Padding(
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
@@ -171,14 +226,14 @@ class _SignUpState extends State<SignUpScreen> {
                                         color: Colors.grey[700],
                                       ),
                                       onPressed: () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
+                                        setState(() => _obscurePassword = !_obscurePassword);
                                       },
                                     ),
                                   ),
                                 ),
                               ),
+
+                              // Confirm Password Field
                               Padding(
                                 padding: const EdgeInsets.only(top: 12.0, left: 12.0, right: 12.0),
                                 child: TextFormField(
@@ -205,14 +260,14 @@ class _SignUpState extends State<SignUpScreen> {
                                         color: Colors.grey[700],
                                       ),
                                       onPressed: () {
-                                        setState(() {
-                                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                                        });
+                                        setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
                                       },
                                     ),
                                   ),
                                 ),
                               ),
+
+                              // Sign Up Button
                               Padding(
                                 padding: const EdgeInsets.only(top: 20.0, left: 12.0, right: 12.0),
                                 child: Container(
@@ -225,61 +280,29 @@ class _SignUpState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: () async 
-                                    {
-                                      if (_formkey.currentState!.validate()) {
-                                        try {
-                                          await _authService.signUp(
-                                            email: _emailController.text.trim(),
-                                            password: _passwordController.text.trim(),
-                                            fullName: _nameController.text.trim(),
-                                            username: _usernameController.text.trim(),
-                                          );
-
-
-                                          if (mounted) 
-                                          {
-
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute
-                                              (
-                                                builder: (context) => VerificationScreen(email: _emailController.text.trim()),
-                                                // builder: (context) => PlaidConnectScreen(),
-                                              ),
-                                            );
-                                          }
-                                        } on AuthException catch (error) {
-                                          // This is the proper way → catch the specific type
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(error.message),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          // Fallback for any other unexpected errors
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('An unexpected error occurred: $e'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      }
-                                    },
+                                    onPressed: _isLoading ? null : _handleSignUp,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                     ),
-                                    child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Text(
+                                            'Sign Up',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
                                   ),
                                 ),
                               ),
+
+                              // Login link
                               Center(
                                 child: Container(
                                   padding: const EdgeInsets.only(top: 30, bottom: 20),
@@ -290,12 +313,17 @@ class _SignUpState extends State<SignUpScreen> {
                                       children: [
                                         TextSpan(
                                           text: 'Login',
-                                          style: TextStyle(color: HexColor('#7247B8'), fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                            color: HexColor('#7247B8'),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () {
                                               Navigator.push(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                                MaterialPageRoute(
+                                                  builder: (context) => const LoginScreen(),
+                                                ),
                                               );
                                             },
                                         ),

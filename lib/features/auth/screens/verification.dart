@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '/features/auth/screens/confirmation.dart';
 import '/services/auth_service.dart';
 import '/shared/widgets/otp_input.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';   // ← Add this import
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -19,7 +20,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _codeController = TextEditingController();
   final int _codeLength = 6;
 
-  // Instance of AuthService
   final AuthService _authService = AuthService();
 
   bool _isVerifying = false;
@@ -34,12 +34,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Future<void> _onContinuePressed() async {
     final code = _codeController.text.trim();
     if (code.length != _codeLength) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter the full 6-digit code"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorDialog("Please enter the full 6-digit code");
       return;
     }
 
@@ -57,22 +52,13 @@ class _VerificationScreenState extends State<VerificationScreen> {
           context,
           MaterialPageRoute(builder: (context) => const ConfirmationScreen()),
         );
+      } else {
+        _showErrorDialog("Verification failed. Please try again.");
       }
     } on AuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-        );
-      }
+      _showErrorDialog(e.message);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Verification failed: ${e.toString()}"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showErrorDialog("An unexpected error occurred. Please try again.");
     } finally {
       if (mounted) {
         setState(() => _isVerifying = false);
@@ -84,7 +70,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() => _isResending = true);
 
     try {
-      await _authService.resendOtp(email: widget.email, type: OtpType.signup);
+      await _authService.resendOtp(
+        email: widget.email,
+        type: OtpType.signup,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -95,25 +84,28 @@ class _VerificationScreenState extends State<VerificationScreen> {
         );
       }
     } on AuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-        );
-      }
+      _showErrorDialog(e.message);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error resending code"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showErrorDialog("Failed to resend code. Please try again.");
     } finally {
       if (mounted) {
         setState(() => _isResending = false);
       }
     }
+  }
+
+  // New method to show consistent error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ErrorDialog(
+        title: 'Verification Error',
+        message: message,
+        buttonText: 'OK',
+        onButtonPressed: () => Navigator.pop(context),
+      ),
+    );
   }
 
   @override
@@ -187,40 +179,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           controller: _codeController,
                           length: _codeLength,
                         ),
-                        // TextFormField(
-                        //   controller: _codeController,
-                        //   keyboardType: TextInputType.number,
-                        //   textAlign: TextAlign.center,
-                        //   maxLength: _codeLength,
-                        //   style: const TextStyle(
-                        //     fontSize: 24,
-                        //     letterSpacing: 10,
-                        //   ),
-                        //   decoration: InputDecoration(
-                        //     hintText: '_ _ _ _ _ _',
-                        //     border: InputBorder.none,
-                        //     counterText: "",
-                        //     filled: true,
-                        //     fillColor: Colors.transparent,
-                        //     contentPadding: const EdgeInsets.symmetric(
-                        //       vertical: 40,
-                        //     ), // adjusted for better look
-                        //   ),
-                        // ),
                         Padding(
-                          padding: const EdgeInsets.only(
-                            left: 20.0,
-                            right: 20.0,
-                          ),
+                          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(50.0),
-                                ),
+                                borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -234,9 +201,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 ),
                               ),
                               child: ElevatedButton(
-                                onPressed: _isVerifying
-                                    ? null
-                                    : _onContinuePressed,
+                                onPressed: _isVerifying ? null : _onContinuePressed,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
@@ -269,9 +234,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.black54,
-                                    ),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black54),
                                   ),
                                 )
                               : const Text(
