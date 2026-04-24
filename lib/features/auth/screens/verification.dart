@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/core/utils/other_helpers.dart';
+import 'package:moneyup/features/auth/widgets/verification_resend_banner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '/shared/widgets/error_system.dart';
@@ -87,7 +88,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       }
     }
   }
-
+ 
   Future<void> _onResendCodePressed() async {
     setState(() => _isResending = true);
 
@@ -95,13 +96,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
       await _authService.resendOtp(email: widget.email, type: OtpType.signup);
 
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => ErrorDialog(
-            message: "Code resent successfully! Check your email.",
-            onButtonPressed: () => Navigator.pop(context),
-          ),
-        );
+        final overlayState = Overlay.of(context);
+        VerificationResendBanner.showVerificationResendBanner(overlayState);
       }
     } on AuthException catch (e) {
       if (mounted) {
