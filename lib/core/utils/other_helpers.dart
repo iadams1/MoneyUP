@@ -8,7 +8,7 @@ class OtherHelpers {
   final domain = parts[1];
 
   if (username.length <= 2) {
-    return '${username[0]}*@${domain}';
+    return '${username[0]}*@$domain';
   }
 
   final visible = username.substring(0, 2);
