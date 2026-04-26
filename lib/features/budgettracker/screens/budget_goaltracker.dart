@@ -12,6 +12,7 @@ import '/models/budget.dart';
 import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
+import '/shared/widgets/bottom_nav.dart';
 
 // ------------ Budget Goal Tracker Page Widget ------------ //
 class BudgetPage extends StatefulWidget {
@@ -66,7 +67,10 @@ class _BudgetPageState extends State<BudgetPage> {
       goalSpent.value -= userAmount;
     }
 
-    goalRemain.value = (overallGoalAmount.value - goalSpent.value).clamp(0, overallGoalAmount.value);
+    goalRemain.value = (overallGoalAmount.value - goalSpent.value).clamp(
+      0,
+      overallGoalAmount.value,
+    );
 
     if (goalRemain.value < 0) {
       goalRemain.value = 0;
@@ -130,8 +134,7 @@ class _BudgetPageState extends State<BudgetPage> {
               onPressed: () async {
                 final enteredAmount = amountController.text.trim();
                 if (enteredAmount.isNotEmpty) {
-                  final double amount =
-                      double.tryParse(enteredAmount) ?? 0.0;
+                  final double amount = double.tryParse(enteredAmount) ?? 0.0;
 
                   previousSaved = goalSpent.value;
                   calculateBudget(amount, isAddition);
@@ -148,9 +151,9 @@ class _BudgetPageState extends State<BudgetPage> {
                           'budget_id': widget.budgetId,
                           'user_id': userId,
                           'amount': amount,
-                          'log_date': DateTime.now()
-                              .toIso8601String()
-                              .split('T')[0],
+                          'log_date': DateTime.now().toIso8601String().split(
+                            'T',
+                          )[0],
                         };
                         debugPrint('Payload being sent: $payload');
                         debugPrint('budgetId value: ${widget.budgetId}');
@@ -297,7 +300,7 @@ class _BudgetPageState extends State<BudgetPage> {
                   children: [
                     // Space to seperate AppBar and top edge
                     SizedBox(height: 9),
-                
+
                     Container(
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.all(16),
@@ -318,7 +321,7 @@ class _BudgetPageState extends State<BudgetPage> {
                                   },
                                 ),
                               ),
-                
+
                               Padding(
                                 padding: const EdgeInsets.only(right: 15),
                                 child: ElevatedButton(
@@ -377,7 +380,7 @@ class _BudgetPageState extends State<BudgetPage> {
                               ),
                             ],
                           ),
-                
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -400,7 +403,7 @@ class _BudgetPageState extends State<BudgetPage> {
                                       ),
                                     ),
                                   ),
-                
+
                                   Padding(
                                     padding: EdgeInsets.only(left: 25),
                                     child: Text(
@@ -408,7 +411,12 @@ class _BudgetPageState extends State<BudgetPage> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 23,
-                                        color: const Color.fromARGB(51, 0, 0, 0),
+                                        color: const Color.fromARGB(
+                                          51,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -419,15 +427,15 @@ class _BudgetPageState extends State<BudgetPage> {
                         ],
                       ),
                     ),
-                
+
                     SizedBox(height: 5),
-                
+
                     ValueListenableBuilder(
                       valueListenable: goalSpent,
                       builder: (context, currentSaved, _) {
                         IconData arrowIcon;
                         Color arrowColor;
-                
+
                         if (currentSaved > previousSaved) {
                           arrowIcon = Icons.arrow_upward;
                           arrowColor = Colors.red;
@@ -438,7 +446,7 @@ class _BudgetPageState extends State<BudgetPage> {
                           arrowIcon = Icons.remove; // no change
                           arrowColor = const Color.fromARGB(6, 0, 0, 0);
                         }
-                
+
                         final pct = overallGoalAmount.value == 0
                             ? 0.0
                             : (currentSaved / overallGoalAmount.value).clamp(
@@ -446,7 +454,7 @@ class _BudgetPageState extends State<BudgetPage> {
                                 1.0,
                               );
                         final pctText = (pct * 100).toStringAsFixed(0);
-                
+
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -462,7 +470,11 @@ class _BudgetPageState extends State<BudgetPage> {
                                 center: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(arrowIcon, color: arrowColor, size: 40),
+                                    Icon(
+                                      arrowIcon,
+                                      color: arrowColor,
+                                      size: 40,
+                                    ),
                                     Text(
                                       "$pctText%",
                                       style: TextStyle(
@@ -472,7 +484,12 @@ class _BudgetPageState extends State<BudgetPage> {
                                     ),
                                   ],
                                 ),
-                                backgroundColor: const Color.fromARGB(6, 0, 0, 0),
+                                backgroundColor: const Color.fromARGB(
+                                  6,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 progressColor: budgetColor,
                                 circularStrokeCap: CircularStrokeCap.round,
                               ),
@@ -481,9 +498,9 @@ class _BudgetPageState extends State<BudgetPage> {
                         );
                       },
                     ),
-                
+
                     SizedBox(height: 15),
-                
+
                     ValueListenableBuilder<double>(
                       valueListenable: overallGoalAmount,
                       builder: (context, overall, _) {
@@ -496,9 +513,9 @@ class _BudgetPageState extends State<BudgetPage> {
                         );
                       },
                     ),
-                
+
                     SizedBox(height: 20),
-                
+
                     ValueListenableBuilder<double>(
                       valueListenable: goalSpent,
                       builder: (context, spent, _) {
@@ -511,9 +528,9 @@ class _BudgetPageState extends State<BudgetPage> {
                         );
                       },
                     ),
-                
+
                     SizedBox(height: 2),
-                
+
                     ValueListenableBuilder<double>(
                       valueListenable: goalRemain,
                       builder: (context, remain, _) {
@@ -527,9 +544,9 @@ class _BudgetPageState extends State<BudgetPage> {
                         );
                       },
                     ),
-                
+
                     SizedBox(height: 15),
-                
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -556,53 +573,54 @@ class _BudgetPageState extends State<BudgetPage> {
         ],
       ),
 
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(255, 255, 255, 255),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: -1),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: const Color.fromARGB(255, 255, 255, 255),
+      //   height: 80,
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+      //     children: [
+      //       IconButton(
+      //         icon: Image.asset('assets/icons/homeIcon.png'),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute<void>(
+      //               builder: (_) => MyHomePage(title: 'MoneyUp'),
+      //             ),
+      //           );
+      //         },
+      //       ),
+      //         IconButton(
+      //           icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+      //           onPressed: () {
+      //             Navigator.push(
+      //               context,
+      //               MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
+      //             );
+      //           },
+      //         ),
+      //         IconButton(
+      //           icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
+      //           onPressed: () {
+      //             Navigator.push(
+      //               context,
+      //               MaterialPageRoute<void>(builder: (_) => EducationScreen()),
+      //             );
+      //           },
+      //         ),
+      //         IconButton(
+      //           icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+      //           onPressed: () {
+      //             Navigator.push(
+      //               context,
+      //               MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
+      //             );
+      //           },
+      //         ),
+      //       ],
+      //     ),
+      //   ),
     );
   }
 }

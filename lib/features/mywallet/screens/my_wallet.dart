@@ -14,6 +14,7 @@ import '/shared/widgets/app_avatar.dart';
 import '/models/linked_card.dart';
 import '/services/plaid_service.dart';
 import '/services/service_locator.dart';
+import '/shared/widgets/bottom_nav.dart';
 
 class MyWallet extends StatefulWidget {
   const MyWallet({super.key});
@@ -425,53 +426,55 @@ class _MyWallet extends State<MyWallet> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(0, 255, 255, 255),
-        height: 70,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset('assets/icons/homeIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => MyHomePage(title: 'MoneyUp'),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: const Color.fromARGB(0, 255, 255, 255),
+      //   height: 70,
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+      //     children: [
+      //       IconButton(
+      //         icon: Image.asset('assets/icons/homeIcon.png'),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute<void>(
+      //               builder: (_) => MyHomePage(title: 'MoneyUp'),
+      //             ),
+      //           );
+      //         },
+      //       ),
+      //       IconButton(
+      //         icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
+      //           );
+      //         },
+      //       ),
+      //       IconButton(
+      //         icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute<void>(builder: (_) => EducationScreen()),
+      //           );
+      //         },
+      //       ),
+      //       IconButton(
+      //         icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
+      //           );
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // ),
+      // Replace with:
+      bottomNavigationBar: BottomNavBar(currentIndex: -1),
     );
   }
 }
