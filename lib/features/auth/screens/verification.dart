@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '/shared/widgets/error_system.dart';
 import '/features/auth/screens/confirmation.dart';
 import '/services/auth_service.dart';
-import '/shared/widgets/otp_input.dart';
+import '../widgets/otp_input.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;

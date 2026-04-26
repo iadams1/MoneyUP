@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
-import 'package:moneyup/features/profile/widgets/terms_dialog.dart';
+import 'package:moneyup/shared/widgets/terms_dialog.dart';
 import 'package:moneyup/shared/widgets/error_system.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';

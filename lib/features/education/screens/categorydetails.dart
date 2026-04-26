@@ -8,7 +8,7 @@ import '/services/service_locator.dart';
 import '/shared/screen/loading_screen.dart';
 import '/shared/widgets/app_avatar.dart';
 import '/shared/widgets/bottom_nav.dart';
-import '/shared/widgets/category_info.dart';
+import '../widgets/category_info.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
   final String category;

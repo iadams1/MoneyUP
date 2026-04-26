@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/profile/widgets/terms_dialog.dart';
+import 'package:moneyup/shared/widgets/terms_dialog.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({super.key});
