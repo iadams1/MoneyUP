@@ -1,6 +1,6 @@
 // ── Legend ───────────────────────────────────
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/theme/colors.dart';
+import 'package:moneyup/core/constants/app_colors.dart';
 import 'package:moneyup/features/budgettracker/utils/line_painter.dart';
 
 Widget buildLegend(Color statusColor) {

@@ -172,7 +172,7 @@ class _EducationScreenState extends State<EducationScreen> {
                           Text(
                             "Daily Tips",
                             style: TextStyle(
-                              fontSize: 34,
+                              fontSize: 30,
                               fontFamily: 'SF Pro',
                               fontWeight: FontWeight.w600,
                             ),
@@ -265,7 +265,7 @@ class _EducationScreenState extends State<EducationScreen> {
                                   Text(
                                     "Articles",
                                     style: TextStyle(
-                                      fontSize: 34,
+                                      fontSize: 30,
                                       fontFamily: 'SF Pro',
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -283,7 +283,7 @@ class _EducationScreenState extends State<EducationScreen> {
                                     child: Text(
                                       "See All",
                                       style: TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 17,
                                         fontFamily: 'SF Pro',
                                         fontWeight: FontWeight.w600,
                                         color: Color.fromRGBO(156, 156, 156, 1),
@@ -307,7 +307,7 @@ class _EducationScreenState extends State<EducationScreen> {
                           Text(
                             "Categories",
                             style: TextStyle(
-                              fontSize: 34,
+                              fontSize: 30,
                               fontFamily: 'SF Pro',
                               fontWeight: FontWeight.w600,
                             ),

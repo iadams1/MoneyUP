@@ -199,11 +199,14 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                 final confirmed = await showDialog<bool>(
                                   context: context,
                                   builder: (_) => AlertDialog(
-                                    title: const Text(
-                                      'View Full Article',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
+                                    title: Center(
+                                      child: Text(
+                                        'View Full Article',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20,
+                                        ),
                                       ),
                                     ),
                                     content: Padding(
@@ -213,7 +216,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 20,
+                                        fontSize: 18,
                                       ),
                                     ),
                                   ),
@@ -229,7 +232,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                               child: const Text(
                                                 "Cancel",
                                                 style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.w500,
                                                   color: Colors.black,
                                                 ),
@@ -241,12 +244,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                             child: ElevatedButton(
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
-                                                    const Color.fromARGB(
-                                                      255,
-                                                      184,
-                                                      27,
-                                                      27,
-                                                    ),
+                                                    const Color.fromARGB(255, 35, 15, 116),
                                                 padding: EdgeInsets.zero,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
@@ -261,7 +259,7 @@ class _ArticleDetailsScreenState extends State<ArticleDetailsScreen> {
                                               child: const Text(
                                                 "View Article",
                                                 style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.w600,
                                                   color: Colors.white,
                                                 ),

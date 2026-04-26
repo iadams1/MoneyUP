@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:moneyup/features/auth/screens/login.dart';
+import 'package:moneyup/features/profile/widgets/terms_dialog.dart';
 import 'package:moneyup/shared/widgets/error_system.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -235,7 +236,22 @@ class _SignUpState extends State<SignUpScreen> {
                           const SizedBox(height: 20),
                           _buildGradientButton(
                             text: 'Sign Up',
-                            onPressed: _handleSignUp,
+                            onPressed: () async {
+                              final accepted = await TermsDialog.showTermsSignUpDialog(context);
+
+                              if (accepted == true){
+                                _handleSignUp();
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => ErrorDialog(
+                                    message: "You must accept the Terms and Conditions to continue.",
+                                    onButtonPressed: () => Navigator.pop(context, false),
+                                  ),
+                                );
+                              }
+
+                            },
                           ),
                           Center(
                             child: Padding(

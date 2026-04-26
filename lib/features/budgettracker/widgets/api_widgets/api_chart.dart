@@ -1,7 +1,7 @@
 // ── Chart ────────────────────────────────────
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/theme/colors.dart';
+import 'package:moneyup/core/constants/app_colors.dart';
 import 'package:moneyup/models/data_model.dart';
 
 Widget buildChart(

@@ -69,7 +69,7 @@ class VerificationResendBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "A new code has been send to your email.",
+                  "A new code has been sent to your email.",
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,

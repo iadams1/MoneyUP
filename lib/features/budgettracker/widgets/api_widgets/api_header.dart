@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/core/theme/colors.dart';
+import 'package:moneyup/core/constants/app_colors.dart';
 import 'package:moneyup/features/budgettracker/widgets/api_widgets/api_budget_pill.dart';
 import 'package:moneyup/models/data_model.dart';
 

@@ -1,6 +1,6 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:moneyup/core/config/env_config.dart';
 
 class SupabaseConfig {
-  static String get url => dotenv.env['SUPABASE_URL']!;
-  static String get anonKey => dotenv.env['SUPABASE_KEY']!;
+  static String get url => EnvConfig.supabaseUrl;
+  static String get key => EnvConfig.supabaseKey;
 }

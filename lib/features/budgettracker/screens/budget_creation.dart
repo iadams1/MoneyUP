@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
+import 'package:moneyup/shared/widgets/error_system.dart';
 
 import '/features/education/screens/education.dart';
 import '/features/home/screens/my_home_page.dart';
@@ -108,7 +109,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         ),
 
                         SizedBox(
-                          width: 340,
+                          width: 325,
                           child: TextField(
                             controller: budgetTitle,
                             decoration: InputDecoration(
@@ -116,7 +117,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                               fillColor: Color.fromRGBO(121, 121, 121, 0.357),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(0),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               suffixIcon: IconButton(
                                 icon: Image.asset('assets/icons/X.png'),
@@ -139,11 +140,11 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         ),
 
                         SizedBox(
-                          width: 340,
+                          width: 325,
                           child: DropdownMenu<BudgetType>(
-                            hintText: "Select a Spending Category.",
+                            hintText: "Pick a Spending Category.",
                             menuHeight: 300,
-                            width: 340,
+                            width: 325,
                             menuStyle: MenuStyle(
                               backgroundColor: WidgetStatePropertyAll(
                                 Colors.white,
@@ -172,8 +173,10 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                             inputDecorationTheme: InputDecorationTheme(
                               filled: true,
                               fillColor: Color.fromRGBO(121, 121, 121, 0.357),
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 10,
@@ -193,7 +196,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         ),
 
                         SizedBox(
-                          width: 340,
+                          width: 325,
                           child: TextField(
                             controller: budgetGoal,
                             decoration: InputDecoration(
@@ -201,7 +204,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                               fillColor: Color.fromRGBO(121, 121, 121, 0.357),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(0),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               suffixIcon: IconButton(
                                 icon: Image.asset('assets/icons/X.png'),
@@ -224,7 +227,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                         ),
 
                         SizedBox(
-                          width: 340,
+                          width: 325,
                           child: TextField(
                             controller: budgetSaved,
                             decoration: InputDecoration(
@@ -232,7 +235,7 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                               fillColor: Color.fromRGBO(121, 121, 121, 0.357),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(0),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               suffixIcon: IconButton(
                                 icon: Image.asset('assets/icons/X.png'),
@@ -276,7 +279,6 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                                   child: ElevatedButton(
                                     onPressed: () async {
                                       if (budgetGoal.text.isNotEmpty &&
-                                          budgetSaved.text.isNotEmpty &&
                                           budgetTitle.text.isNotEmpty) {
                                         final title = budgetTitle.text.trim();
                                         final goal =
@@ -296,8 +298,18 @@ class _BudgetCreationState extends State<BudgetCreationPage> {
                                           saved,
                                           selectedType!,
                                         );
+
+                                        Navigator.pop(context, true);
+                                      } else {
+                                        showDialog(
+                                          context: context, 
+                                          builder: (_) => ErrorDialog(
+                                            message: "Your missing required fields in the form. Please return to fill them out.", 
+                                            onButtonPressed: () => Navigator.pop(context, false),
+                                          ),
+                                        );
                                       }
-                                      Navigator.pop(context, true);
+                                      
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,

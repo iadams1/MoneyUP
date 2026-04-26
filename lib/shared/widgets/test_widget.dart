@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moneyup/features/auth/widgets/verification_resend_banner.dart';
+import 'package:moneyup/features/profile/widgets/terms_dialog.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({super.key});
@@ -10,8 +10,8 @@ class PreviewScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Preview')),
-      body: const Center(
-        child: VerificationResendBanner(),
+      body: Center(
+        child: TermsDialog(isProfile: false, isSignUp: true),
       ),
     );
   }
