@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneyup/shared/utils/show_notification_dashboard.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import '/features/budgettracker/widgets/budget_forecastor.dart';
+import 'budget_forecastor.dart';
 import '/features/budgettracker/utils/category_colors.dart';
 import '/models/budget.dart';
 import '/services/service_locator.dart';
@@ -53,23 +53,21 @@ class _BudgetPageState extends State<BudgetPage> {
     previousSaved = goalSpent.value;
 
     if (isAddition) {
-      goalSpent.value += userAmount;
+      goalSpent.value = (goalSpent.value + userAmount).clamp(
+        0,
+        overallGoalAmount.value,
+      );
     } else {
-      if (goalSpent.value == 0) {
-        userAmount = 0;
-      }
-      if (goalSpent.value - userAmount < 0) return;
-      goalSpent.value -= userAmount;
+      goalSpent.value = (goalSpent.value - userAmount).clamp(
+        0,
+        overallGoalAmount.value,
+      );
     }
 
     goalRemain.value = (overallGoalAmount.value - goalSpent.value).clamp(
       0,
       overallGoalAmount.value,
     );
-
-    if (goalRemain.value < 0) {
-      goalRemain.value = 0;
-    }
   }
 
   @override
@@ -79,10 +77,12 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   Future<void> updateBudget() async {
-    try {
+     try {
+      final safeSpent = goalSpent.value.clamp(0, overallGoalAmount.value);
+
       await budgetService.updateBudget(
         budgetId: widget.budgetId,
-        amountSpent: goalSpent.value,
+        amountSpent: safeSpent.toDouble(), 
         goal: overallGoalAmount.value,
       );
 
@@ -245,7 +245,7 @@ class _BudgetPageState extends State<BudgetPage> {
 
     return Scaffold(
       key: key,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -569,53 +569,6 @@ class _BudgetPageState extends State<BudgetPage> {
       ),
 
       bottomNavigationBar: BottomNavBar(currentIndex: -1),
-      // bottomNavigationBar: BottomAppBar(
-      //   color: const Color.fromARGB(255, 255, 255, 255),
-      //   height: 80,
-      //   child: Row(
-      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //     children: [
-      //       IconButton(
-      //         icon: Image.asset('assets/icons/homeIcon.png'),
-      //         onPressed: () {
-      //           Navigator.push(
-      //             context,
-      //             MaterialPageRoute<void>(
-      //               builder: (_) => MyHomePage(title: 'MoneyUp'),
-      //             ),
-      //           );
-      //         },
-      //       ),
-      //         IconButton(
-      //           icon: Image.asset('assets/icons/unselectedTransactionsIcon.png'),
-      //           onPressed: () {
-      //             Navigator.push(
-      //               context,
-      //               MaterialPageRoute<void>(builder: (_) => TransactionsHome()),
-      //             );
-      //           },
-      //         ),
-      //         IconButton(
-      //           icon: Image.asset('assets/icons/unselectedEducationIcon.png'),
-      //           onPressed: () {
-      //             Navigator.push(
-      //               context,
-      //               MaterialPageRoute<void>(builder: (_) => EducationScreen()),
-      //             );
-      //           },
-      //         ),
-      //         IconButton(
-      //           icon: Image.asset('assets/icons/unselectedSettingsIcon.png'),
-      //           onPressed: () {
-      //             Navigator.push(
-      //               context,
-      //               MaterialPageRoute<void>(builder: (_) => ProfileScreen()),
-      //             );
-      //           },
-      //         ),
-      //       ],
-      //     ),
-      //   ),
     );
   }
 }

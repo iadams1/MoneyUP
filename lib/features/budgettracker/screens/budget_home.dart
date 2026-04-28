@@ -522,7 +522,7 @@ class _BudgetGoalPageState extends State<BudgetGoalPage> {
         ],
       ),
 
-      bottomNavigationBar: BottomNavBar(currentIndex: 0),
+      bottomNavigationBar: BottomNavBar(currentIndex: -1),
     );
   }
 }
