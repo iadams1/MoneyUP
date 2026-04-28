@@ -44,7 +44,7 @@ class _BudgetPageState extends State<BudgetPage> {
   void initBudget(double saved, double goal, double needed) {
     goalSpent.value = saved;
     overallGoalAmount.value = goal;
-    goalRemain.value = needed;
+    goalRemain.value = (goal - saved).clamp(0.0, goal);
     previousSaved = saved;
   }
 
@@ -83,7 +83,7 @@ class _BudgetPageState extends State<BudgetPage> {
       await budgetService.updateBudget(
         budgetId: widget.budgetId,
         amountSpent: goalSpent.value,
-        amountRemaining: goalRemain.value,
+        goal: overallGoalAmount.value,
       );
 
       _didUpdate = true;
