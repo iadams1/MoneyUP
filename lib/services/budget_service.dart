@@ -12,9 +12,8 @@ class BudgetService {
 
   Future<Budget?> getRandomBudget() async {
     try {
-
       final response = await _client.rpc(
-        'get_random_budget', 
+        'get_random_budget',
         params: {'p_user_id': user},
       );
 
@@ -37,9 +36,9 @@ class BudgetService {
     BudgetType type,
   ) async {
     try {
-      final safeSpent = spent < 0 ? 0 : spent;
-      final safeRemaining = (goal - spent) < 0 ? 0: (goal - spent);
-      
+      final safeSpent = spent < 0 ? 0.0 : spent;
+      final safeRemaining = (goal - spent) < 0 ? 0 : (goal - spent);
+
       await _client.from('budgets').insert({
         'user_ID': user,
         'Title': title,
@@ -54,7 +53,6 @@ class BudgetService {
   }
 
   Future<List<Budget>> getUserBudgets() async {
-
     final budgetsResponse = await _client
         .from('budgets')
         .select('*')
@@ -75,12 +73,9 @@ class BudgetService {
 
       final categoryID = (matchingCategory['category_ID'] ?? 0);
 
-      return {
-        ...budget, 
-        'category_ID': categoryID
-      };
+      return {...budget, 'category_ID': categoryID};
     }).toList();
-    
+
     return budgetsWithId.map((row) => Budget.fromJson(row)).toList();
   }
 
@@ -93,7 +88,6 @@ class BudgetService {
           .eq('user_ID', user as Object);
 
       debugPrint('Deletion was successful!');
-
     } catch (error) {
       debugPrint('Error Deleting rows: $error');
       rethrow;
@@ -105,7 +99,7 @@ class BudgetService {
     required DateTime end,
   }) async {
     dynamic currentUser = user;
-    
+
     final response = await _client
         .from('plaid_transactions')
         .select(
@@ -114,7 +108,7 @@ class BudgetService {
         .eq('user_id', currentUser)
         .gte('date', start.toIso8601String().split("T")[0])
         .lt('date', end.toIso8601String().split("T")[0]);
-    
+
     return List<Map<String, dynamic>>.from(response);
   }
 
@@ -126,29 +120,26 @@ class BudgetService {
         .eq('user_ID', user as Object)
         .limit(1);
 
-     final rows = List<Map<String, dynamic>>.from(response);
+    final rows = List<Map<String, dynamic>>.from(response);
     if (rows.isEmpty) return null;
 
     return Budget.fromJson(rows.first);
   }
 
   Future<void> updateBudget({
-    required dynamic budgetId, 
-    required double amountSpent, 
-    required double amountRemaining
+    required dynamic budgetId,
+    required double amountSpent,
+    required double goal,
   }) async {
     if (user == null) return;
 
     final safeSpent = amountSpent < 0 ? 0 : amountSpent;
-    final safeRemaining = amountRemaining < 0 ? 0: amountRemaining;
+    final safeRemaining = (goal - safeSpent).clamp(0.0, goal);
 
     try {
       await _client
           .from('budgets')
-          .update({
-            'AmountSpent': safeSpent,
-            'AmountRemaining': safeRemaining,
-          })
+          .update({'AmountSpent': safeSpent, 'AmountRemaining': safeRemaining})
           .eq('budget_ID', budgetId)
           .eq('user_ID', user as Object)
           .select();
@@ -161,7 +152,6 @@ class BudgetService {
     required DateTime start,
     required DateTime end,
   }) async {
-    
     final response = await _client.rpc(
       'get_top_spending_categories',
       params: {
@@ -173,5 +163,4 @@ class BudgetService {
 
     return List<Map<String, dynamic>>.from(response);
   }
-
 }
